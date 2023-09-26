@@ -439,8 +439,6 @@ public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback
      */
     public void setEGLConfigChooser(int redSize, int greenSize, int blueSize,
             int alphaSize, int depthSize, int stencilSize) {
-        //setEGLConfigChooser(new ComponentSizeChooser(redSize, greenSize,
-        //        blueSize, alphaSize, depthSize, stencilSize));
         setEGLConfigChooser(new ComponentSizeChooser(8, 8,
                 8, alphaSize, depthSize, stencilSize));
     }

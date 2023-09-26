@@ -387,10 +387,8 @@ public class ImmersiveModeConfirmation {
         public void handleMessage(Message msg) {
             switch(msg.what) {
                 case SHOW:
-                    //handleShow();
                     break;
                 case HIDE:
-                    //handleHide();
                     break;
             }
         }

@@ -54,7 +54,6 @@ public class InterfaceController {
     }
 
     public boolean setIPv4Address(LinkAddress address) {
-        // CPH doesn't change IP address
         if (HwNetConfig.isCphWifi()) {
             return true;
         }
@@ -71,7 +70,6 @@ public class InterfaceController {
     }
 
     public boolean clearIPv4Address() {
-        // CPH doesn't change IP address
         if (HwNetConfig.isCphWifi()) {
             return true;
         }

@@ -17,7 +17,6 @@
 package android.view;
 
 import static android.view.WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED;
-import static android.view.WindowManager.LayoutParams.FLAG_SECURE;
 
 import android.annotation.ColorInt;
 import android.annotation.DrawableRes;

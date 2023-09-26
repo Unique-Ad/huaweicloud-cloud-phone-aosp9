@@ -219,7 +219,6 @@ cc_library_shared {
         "external/skia/src/image",
         "external/skia/src/images",
         "frameworks/base/media/jni",
-        "frameworks/native/opengl/libs/EGL/include",
         "libcore/include",
         "system/media/camera/include",
         "system/media/private/camera/include",

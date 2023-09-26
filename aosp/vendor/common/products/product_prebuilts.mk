@@ -3,7 +3,6 @@
 # Description: product prebuilts config
 #
 
-# media engine
 PRODUCT_PACKAGES += \
     libVmiStream \
     libCPHMediaEngine \

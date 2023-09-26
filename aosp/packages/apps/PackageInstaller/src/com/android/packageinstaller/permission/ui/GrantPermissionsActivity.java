@@ -32,7 +32,6 @@ import android.content.res.Resources;
 import android.graphics.drawable.Icon;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.SystemProperties;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.ArraySet;
@@ -262,10 +261,6 @@ public class GrantPermissionsActivity extends OverlayTouchActivity
                         mAppPermissions.getPackageInfo().packageName);
             }
         }
-    }
-
-    private void setPermissionsAllowed() {
-
     }
 
     /**
