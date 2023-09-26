@@ -441,28 +441,7 @@ public class WificondControl implements IBinder.DeathRecipient {
      * Returns null on failure.
      */
     public WifiNative.SignalPollResult signalPoll(@NonNull String ifaceName) {
-        IClientInterface iface = getClientInterface(ifaceName);
-        if (iface == null) {
-            Log.e(TAG, "No valid wificond client interface handler");
-            return null;
-        }
-
-        int[] resultArray;
-        try {
-            resultArray = iface.signalPoll();
-            if (resultArray == null || resultArray.length != 3) {
-                Log.e(TAG, "Invalid signal poll result from wificond");
-                return null;
-            }
-        } catch (RemoteException e) {
-            Log.e(TAG, "Failed to do signal polling due to remote exception");
-            return null;
-        }
-        WifiNative.SignalPollResult pollResult = new WifiNative.SignalPollResult();
-        pollResult.currentRssi = resultArray[0];
-        pollResult.txBitrate = resultArray[1];
-        pollResult.associationFrequency = resultArray[2];
-        return pollResult;
+        return HwWificondControl.getPollResult();
     }
 
     /**

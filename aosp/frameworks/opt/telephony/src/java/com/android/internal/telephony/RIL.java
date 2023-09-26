@@ -148,6 +148,7 @@ public class RIL extends BaseCommands implements CommandsInterface {
     public static final int INVALID_WAKELOCK = -1;
     public static final int FOR_WAKELOCK = 0;
     public static final int FOR_ACK_WAKELOCK = 1;
+    public static final int RIL_NO_IMPL_VERSION = 11;
     private final ClientWakelockTracker mClientWakelockTracker = new ClientWakelockTracker();
 
     //***** Instance Variables
@@ -451,6 +452,8 @@ public class RIL extends BaseCommands implements CommandsInterface {
         }
 
         mContext = context;
+        // init mock helpers earlier.
+        HwRIL.setContext(context);
         mCdmaSubscription  = cdmaSubscription;
         mPreferredNetworkType = preferredNetworkType;
         mPhoneType = RILConstants.NO_PHONE;
@@ -487,6 +490,11 @@ public class RIL extends BaseCommands implements CommandsInterface {
         // wakelock stuff is initialized above as callbacks are received on separate binder threads)
         getRadioProxy(null);
         getOemHookProxy(null);
+
+        // trigger radio state on by UiccHelpers.
+        if (!HwRIL.isAbsent()) {
+            setRadioState(RadioState.RADIO_ON);
+        }
     }
 
     @Override
@@ -526,6 +534,10 @@ public class RIL extends BaseCommands implements CommandsInterface {
 
     @Override
     public void getIccCardStatus(Message result) {
+        if (HwRIL.getIccCardStatus(result)) {
+            return;
+        }
+
         IRadio radioProxy = getRadioProxy(result);
         if (radioProxy != null) {
             RILRequest rr = obtainRequest(RIL_REQUEST_GET_SIM_STATUS, result,
@@ -543,6 +555,10 @@ public class RIL extends BaseCommands implements CommandsInterface {
 
     @Override
     public void getIccSlotsStatus(Message result) {
+        if (HwRIL.getIccSlotsStatus(result)) {
+            return;
+        }
+
         if (result != null) {
             AsyncResult.forMessage(result, null,
                     CommandException.fromRilErrno(REQUEST_NOT_SUPPORTED));
@@ -566,6 +582,10 @@ public class RIL extends BaseCommands implements CommandsInterface {
 
     @Override
     public void supplyIccPinForApp(String pin, String aid, Message result) {
+        if (HwRIL.supplyIccPinForApp(pin, aid, result)) {
+            return;
+        }
+
         IRadio radioProxy = getRadioProxy(result);
         if (radioProxy != null) {
             RILRequest rr = obtainRequest(RIL_REQUEST_ENTER_SIM_PIN, result,
@@ -593,6 +613,10 @@ public class RIL extends BaseCommands implements CommandsInterface {
 
     @Override
     public void supplyIccPukForApp(String puk, String newPin, String aid, Message result) {
+        if (HwRIL.supplyIccPukForApp(puk, newPin, aid, result)) {
+            return;
+        }
+
         IRadio radioProxy = getRadioProxy(result);
         if (radioProxy != null) {
             RILRequest rr = obtainRequest(RIL_REQUEST_ENTER_SIM_PUK, result,
@@ -621,6 +645,10 @@ public class RIL extends BaseCommands implements CommandsInterface {
 
     @Override
     public void supplyIccPin2ForApp(String pin, String aid, Message result) {
+        if (HwRIL.supplyIccPin2ForApp(pin, aid, result)) {
+            return;
+        }
+
         IRadio radioProxy = getRadioProxy(result);
         if (radioProxy != null) {
             RILRequest rr = obtainRequest(RIL_REQUEST_ENTER_SIM_PIN2, result,
@@ -648,6 +676,10 @@ public class RIL extends BaseCommands implements CommandsInterface {
 
     @Override
     public void supplyIccPuk2ForApp(String puk, String newPin2, String aid, Message result) {
+        if (HwRIL.supplyIccPuk2ForApp(puk, newPin2, aid, result)) {
+            return;
+        }
+
         IRadio radioProxy = getRadioProxy(result);
         if (radioProxy != null) {
             RILRequest rr = obtainRequest(RIL_REQUEST_ENTER_SIM_PUK2, result,
@@ -676,6 +708,10 @@ public class RIL extends BaseCommands implements CommandsInterface {
 
     @Override
     public void changeIccPinForApp(String oldPin, String newPin, String aid, Message result) {
+        if (HwRIL.changeIccPinForApp(oldPin, newPin, aid, result)) {
+            return;
+        }
+
         IRadio radioProxy = getRadioProxy(result);
         if (radioProxy != null) {
             RILRequest rr = obtainRequest(RIL_REQUEST_CHANGE_SIM_PIN, result,
@@ -704,6 +740,10 @@ public class RIL extends BaseCommands implements CommandsInterface {
 
     @Override
     public void changeIccPin2ForApp(String oldPin2, String newPin2, String aid, Message result) {
+        if (HwRIL.changeIccPin2ForApp(oldPin2, newPin2, aid, result)) {
+            return;
+        }
+
         IRadio radioProxy = getRadioProxy(result);
         if (radioProxy != null) {
             RILRequest rr = obtainRequest(RIL_REQUEST_CHANGE_SIM_PIN2, result,
@@ -808,6 +848,10 @@ public class RIL extends BaseCommands implements CommandsInterface {
 
     @Override
     public void getIMSIForApp(String aid, Message result) {
+        if (HwRIL.getIMSIForApp(aid, result)) {
+            return;
+        }
+
         IRadio radioProxy = getRadioProxy(result);
         if (radioProxy != null) {
             RILRequest rr = obtainRequest(RIL_REQUEST_GET_IMSI, result,
@@ -949,6 +993,10 @@ public class RIL extends BaseCommands implements CommandsInterface {
 
     @Override
     public void getSignalStrength(Message result) {
+        if (HwRIL.getSignalStrength(result)) {
+            return;
+        }
+
         IRadio radioProxy = getRadioProxy(result);
         if (radioProxy != null) {
             RILRequest rr = obtainRequest(RIL_REQUEST_SIGNAL_STRENGTH, result,
@@ -966,6 +1014,10 @@ public class RIL extends BaseCommands implements CommandsInterface {
 
     @Override
     public void getVoiceRegistrationState(Message result) {
+        if (HwRIL.getVoiceRegistrationState(result)) {
+            return;
+        }
+
         IRadio radioProxy = getRadioProxy(result);
         if (radioProxy != null) {
             RILRequest rr = obtainRequest(RIL_REQUEST_VOICE_REGISTRATION_STATE, result,
@@ -983,6 +1035,10 @@ public class RIL extends BaseCommands implements CommandsInterface {
 
     @Override
     public void getDataRegistrationState(Message result) {
+        if (HwRIL.getDataRegistrationState(result)) {
+            return;
+        }
+
         IRadio radioProxy = getRadioProxy(result);
         if (radioProxy != null) {
             RILRequest rr = obtainRequest(RIL_REQUEST_DATA_REGISTRATION_STATE, result,
@@ -1000,6 +1056,10 @@ public class RIL extends BaseCommands implements CommandsInterface {
 
     @Override
     public void getOperator(Message result) {
+        if (HwRIL.getOperator(result)) {
+            return;
+        }
+
         IRadio radioProxy = getRadioProxy(result);
         if (radioProxy != null) {
             RILRequest rr = obtainRequest(RIL_REQUEST_OPERATOR, result,
@@ -1017,6 +1077,10 @@ public class RIL extends BaseCommands implements CommandsInterface {
 
     @Override
     public void setRadioPower(boolean on, Message result) {
+        if (HwRIL.setRadioPower(result)) {
+            setRadioState(on ? RadioState.RADIO_ON : RadioState.RADIO_UNAVAILABLE);
+            return;
+        }
         IRadio radioProxy = getRadioProxy(result);
         if (radioProxy != null) {
             RILRequest rr = obtainRequest(RIL_REQUEST_RADIO_POWER, result,
@@ -1249,6 +1313,11 @@ public class RIL extends BaseCommands implements CommandsInterface {
     @Override
     public void iccIOForApp(int command, int fileId, String path, int p1, int p2, int p3,
                  String data, String pin2, String aid, Message result) {
+        if (HwRIL.iccIOForApp(command, fileId, path,
+                p1, p2, p3, data, pin2, aid, result)) {
+            return;
+        }
+
         IRadio radioProxy = getRadioProxy(result);
         if (radioProxy != null) {
             RILRequest rr = obtainRequest(RIL_REQUEST_SIM_IO, result,
@@ -1543,6 +1612,10 @@ public class RIL extends BaseCommands implements CommandsInterface {
     @Override
     public void queryFacilityLockForApp(String facility, String password, int serviceClass,
                                         String appId, Message result) {
+        if (HwRIL.queryFacilityLockForApp(facility, password, serviceClass, appId, result)) {
+            return;
+        }
+
         IRadio radioProxy = getRadioProxy(result);
         if (radioProxy != null) {
             RILRequest rr = obtainRequest(RIL_REQUEST_QUERY_FACILITY_LOCK, result,
@@ -1575,6 +1648,11 @@ public class RIL extends BaseCommands implements CommandsInterface {
     @Override
     public void setFacilityLockForApp(String facility, boolean lockState, String password,
                                       int serviceClass, String appId, Message result) {
+        if (HwRIL.setFacilityLockForApp(facility,
+                lockState, password, serviceClass, appId, result)) {
+            return;
+        }
+
         IRadio radioProxy = getRadioProxy(result);
         if (radioProxy != null) {
             RILRequest rr = obtainRequest(RIL_REQUEST_SET_FACILITY_LOCK, result,
@@ -1626,6 +1704,10 @@ public class RIL extends BaseCommands implements CommandsInterface {
 
     @Override
     public void getNetworkSelectionMode(Message result) {
+        if (HwRIL.getNetworkSelectionMode(result)) {
+            return;
+        }
+
         IRadio radioProxy = getRadioProxy(result);
         if (radioProxy != null) {
             RILRequest rr = obtainRequest(RIL_REQUEST_QUERY_NETWORK_SELECTION_MODE, result,
@@ -1643,6 +1725,10 @@ public class RIL extends BaseCommands implements CommandsInterface {
 
     @Override
     public void setNetworkSelectionModeAutomatic(Message result) {
+        if (HwRIL.setNetworkSelectionModeAutomatic(result)) {
+            return;
+        }
+
         IRadio radioProxy = getRadioProxy(result);
         if (radioProxy != null) {
             RILRequest rr = obtainRequest(RIL_REQUEST_SET_NETWORK_SELECTION_AUTOMATIC, result,
@@ -1660,6 +1746,10 @@ public class RIL extends BaseCommands implements CommandsInterface {
 
     @Override
     public void setNetworkSelectionModeManual(String operatorNumeric, Message result) {
+        if (HwRIL.setNetworkSelectionModeManual(operatorNumeric, result)) {
+            return;
+        }
+
         IRadio radioProxy = getRadioProxy(result);
         if (radioProxy != null) {
             RILRequest rr = obtainRequest(RIL_REQUEST_SET_NETWORK_SELECTION_MANUAL, result,
@@ -1681,6 +1771,10 @@ public class RIL extends BaseCommands implements CommandsInterface {
 
     @Override
     public void getAvailableNetworks(Message result) {
+        if (HwRIL.getAvailableNetworks(result)) {
+            return;
+        }
+
         IRadio radioProxy = getRadioProxy(result);
         if (radioProxy != null) {
             RILRequest rr = obtainRequest(RIL_REQUEST_QUERY_AVAILABLE_NETWORKS, result,
@@ -1898,6 +1992,10 @@ public class RIL extends BaseCommands implements CommandsInterface {
 
     @Override
     public void getBasebandVersion(Message result) {
+        if (HwRIL.getBasebandVersion(result)) {
+            return;
+        }
+
         IRadio radioProxy = getRadioProxy(result);
         if (radioProxy != null) {
             RILRequest rr = obtainRequest(RIL_REQUEST_BASEBAND_VERSION, result,
@@ -2135,6 +2233,10 @@ public class RIL extends BaseCommands implements CommandsInterface {
 
     @Override
     public void queryAvailableBandMode(Message result) {
+        if (HwRIL.queryAvailableBandMode(result)) {
+            return;
+        }
+
         IRadio radioProxy = getRadioProxy(result);
         if (radioProxy != null) {
             RILRequest rr = obtainRequest(RIL_REQUEST_QUERY_AVAILABLE_BAND_MODE, result,
@@ -2257,6 +2359,10 @@ public class RIL extends BaseCommands implements CommandsInterface {
 
     @Override
     public void setPreferredNetworkType(int networkType , Message result) {
+        if (HwRIL.setPreferredNetworkType(networkType, result)) {
+            return;
+        }
+
         IRadio radioProxy = getRadioProxy(result);
         if (radioProxy != null) {
             RILRequest rr = obtainRequest(RIL_REQUEST_SET_PREFERRED_NETWORK_TYPE, result,
@@ -2279,6 +2385,10 @@ public class RIL extends BaseCommands implements CommandsInterface {
 
     @Override
     public void getPreferredNetworkType(Message result) {
+        if (HwRIL.getPreferredNetworkType(result)) {
+            return;
+        }
+
         IRadio radioProxy = getRadioProxy(result);
         if (radioProxy != null) {
             RILRequest rr = obtainRequest(RIL_REQUEST_GET_PREFERRED_NETWORK_TYPE, result,
@@ -2803,6 +2913,10 @@ public class RIL extends BaseCommands implements CommandsInterface {
 
     @Override
     public void getDeviceIdentity(Message result) {
+        if (HwRIL.getDeviceIdentity(result)) {
+            return;
+        }
+
         IRadio radioProxy = getRadioProxy(result);
         if (radioProxy != null) {
             RILRequest rr = obtainRequest(RIL_REQUEST_DEVICE_IDENTITY, result,
@@ -2894,6 +3008,10 @@ public class RIL extends BaseCommands implements CommandsInterface {
 
     @Override
     public void reportStkServiceIsRunning(Message result) {
+        if (HwRIL.reportStkServiceIsRunning(result)) {
+            return;
+        }
+
         IRadio radioProxy = getRadioProxy(result);
         if (radioProxy != null) {
             RILRequest rr = obtainRequest(RIL_REQUEST_REPORT_STK_SERVICE_IS_RUNNING, result,
@@ -2965,7 +3083,20 @@ public class RIL extends BaseCommands implements CommandsInterface {
     }
 
     @Override
+    public int getRilVersion() {
+        // cph has no rild, just forged ril version number here for mock CellInfo.
+        // @see ServiceStateTracker.java getAllCellInfo()
+        int version = super.getRilVersion();
+        return version > 0 ? version : RIL_NO_IMPL_VERSION;
+    }
+
+    @Override
     public void getCellInfoList(Message result, WorkSource workSource) {
+        // cph mock cellinfo in rilj
+        if (HwRIL.isCellInfoMock(result)) {
+            return;
+        }
+
         workSource = getDeafultWorkSourceIfInvalid(workSource);
         IRadio radioProxy = getRadioProxy(result);
         if (radioProxy != null) {
@@ -3148,6 +3279,10 @@ public class RIL extends BaseCommands implements CommandsInterface {
 
     @Override
     public void iccOpenLogicalChannel(String aid, int p2, Message result) {
+        if (HwRIL.iccOpenLogicalChannel(aid, p2, result)) {
+            return;
+        }
+
         IRadio radioProxy = getRadioProxy(result);
         if (radioProxy != null) {
             RILRequest rr = obtainRequest(RIL_REQUEST_SIM_OPEN_CHANNEL, result,
@@ -3172,6 +3307,10 @@ public class RIL extends BaseCommands implements CommandsInterface {
 
     @Override
     public void iccCloseLogicalChannel(int channel, Message result) {
+        if (HwRIL.iccCloseLogicalChannel(channel, result)) {
+            return;
+        }
+
         IRadio radioProxy = getRadioProxy(result);
         if (radioProxy != null) {
             RILRequest rr = obtainRequest(RIL_REQUEST_SIM_CLOSE_CHANNEL, result,
@@ -3197,6 +3336,11 @@ public class RIL extends BaseCommands implements CommandsInterface {
         if (channel <= 0) {
             throw new RuntimeException(
                     "Invalid channel in iccTransmitApduLogicalChannel: " + channel);
+        }
+
+        if (HwRIL.iccTransmitApduLogicalChannel(channel,
+                cla, instruction, p1, p2, p3, data, result)) {
+            return;
         }
 
         IRadio radioProxy = getRadioProxy(result);
@@ -3317,6 +3461,10 @@ public class RIL extends BaseCommands implements CommandsInterface {
     @Override
     public void setUiccSubscription(int slotId, int appIndex, int subId,
                                     int subStatus, Message result) {
+        if (HwRIL.setUiccSubscription(slotId, appIndex, subId, subStatus, result)) {
+            return;
+        }
+
         IRadio radioProxy = getRadioProxy(result);
         if (radioProxy != null) {
             RILRequest rr = obtainRequest(RIL_REQUEST_SET_UICC_SUBSCRIPTION, result,
@@ -3344,6 +3492,10 @@ public class RIL extends BaseCommands implements CommandsInterface {
 
     @Override
     public void setDataAllowed(boolean allowed, Message result) {
+        if (HwRIL.setDataAllowed(allowed, result)) {
+            return;
+        }
+
         IRadio radioProxy = getRadioProxy(result);
         if (radioProxy != null) {
             RILRequest rr = obtainRequest(RIL_REQUEST_ALLOW_DATA, result,
@@ -3500,6 +3652,10 @@ public class RIL extends BaseCommands implements CommandsInterface {
 
     @Override
     public void startLceService(int reportIntervalMs, boolean pullMode, Message result) {
+        if (HwRIL.startLceService(reportIntervalMs, pullMode, result)) {
+            return;
+        }
+
         IRadio radioProxy = getRadioProxy(result);
         android.hardware.radio.V1_2.IRadio radioProxy12 =
                 android.hardware.radio.V1_2.IRadio.castFrom(radioProxy);
@@ -3528,6 +3684,10 @@ public class RIL extends BaseCommands implements CommandsInterface {
 
     @Override
     public void stopLceService(Message result) {
+        if (HwRIL.stopLceService(result)) {
+            return;
+        }
+
         IRadio radioProxy = getRadioProxy(result);
         android.hardware.radio.V1_2.IRadio radioProxy12 =
                 android.hardware.radio.V1_2.IRadio.castFrom(radioProxy);
@@ -3566,6 +3726,10 @@ public class RIL extends BaseCommands implements CommandsInterface {
     @Deprecated
     @Override
     public void pullLceData(Message response) {
+        if (HwRIL.pullLceData(response)) {
+            return;
+        }
+
         IRadio radioProxy = getRadioProxy(response);
         if (radioProxy != null) {
             RILRequest rr = obtainRequest(RIL_REQUEST_PULL_LCEDATA, response,
@@ -3611,6 +3775,10 @@ public class RIL extends BaseCommands implements CommandsInterface {
 
     @Override
     public void setAllowedCarriers(List<CarrierIdentifier> carriers, Message result) {
+        if (HwRIL.setAllowedCarriers(carriers, result)) {
+            return;
+        }
+
         checkNotNull(carriers, "Allowed carriers list cannot be null.");
         IRadio radioProxy = getRadioProxy(result);
         if (radioProxy != null) {
@@ -3670,6 +3838,10 @@ public class RIL extends BaseCommands implements CommandsInterface {
 
     @Override
     public void getAllowedCarriers(Message result) {
+        if (HwRIL.getAllowedCarriers(result)) {
+            return;
+        }
+
         IRadio radioProxy = getRadioProxy(result);
         if (radioProxy != null) {
             RILRequest rr = obtainRequest(RIL_REQUEST_GET_ALLOWED_CARRIERS, result,
@@ -3819,6 +3991,10 @@ public class RIL extends BaseCommands implements CommandsInterface {
 
     @Override
     public void setSimCardPower(int state, Message result) {
+        if (HwRIL.setSimCardPower(state, result)) {
+            return;
+        }
+
         IRadio radioProxy = getRadioProxy(result);
         if (radioProxy != null) {
             RILRequest rr = obtainRequest(RIL_REQUEST_SET_SIM_CARD_POWER, result,

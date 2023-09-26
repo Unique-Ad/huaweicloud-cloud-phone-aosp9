@@ -1449,6 +1449,7 @@ public class GsmCdmaPhone extends Phone {
     @Override
     public String getDeviceId() {
         if (isPhoneTypeGsm()) {
+            logd( "getDeviceId mImei: " + mImei);
             return mImei;
         } else {
             CarrierConfigManager configManager = (CarrierConfigManager)

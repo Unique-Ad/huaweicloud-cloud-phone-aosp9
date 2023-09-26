@@ -25,6 +25,7 @@ import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.text.TextUtils;
 import android.util.LocalLog;
+import android.util.Log;
 import android.util.Pair;
 
 import com.android.internal.R;
@@ -61,6 +62,10 @@ public class WifiNetworkSelector {
     private final int mStayOnNetworkMinimumTxRate;
     private final int mStayOnNetworkMinimumRxRate;
     private final boolean mEnableAutoJoinWhenAssociated;
+
+    private Context mContext;
+
+    private IHwWifiNetworkSelector mHwWifiNetworkSelector = new HwWifiNetworkSelector();
 
     /**
      * WiFi Network Selector supports various types of networks. Each type can
@@ -311,12 +316,6 @@ public class WifiNetworkSelector {
         // the channel of the currently connected network, so the currently connected
         // network won't show up in the scan results. We don't act on these scan results
         // to avoid aggressive network switching which might trigger disconnection.
-        if (isConnected && !scanResultsHaveCurrentBssid) {
-            localLog("Current connected BSSID " + currentBssid + " is not in the scan results."
-                    + " Skip network selection.");
-            validScanDetails.clear();
-            return validScanDetails;
-        }
 
         if (noValidSsid.length() != 0) {
             localLog("Networks filtered out due to invalid SSID: " + noValidSsid);
@@ -547,6 +546,8 @@ public class WifiNetworkSelector {
             return null;
         }
 
+        mHwWifiNetworkSelector.closeNowWifiConnectChangeSsid(mFilteredNetworks, wifiInfo, mContext);
+
         // Go through the registered network evaluators from the highest priority
         // one to the lowest till a network is selected.
         WifiConfiguration selectedNetwork = null;
@@ -601,6 +602,7 @@ public class WifiNetworkSelector {
     WifiNetworkSelector(Context context, ScoringParams scoringParams,
             WifiConfigManager configManager, Clock clock,
             LocalLog localLog) {
+        this.mContext = context;
         mWifiConfigManager = configManager;
         mClock = clock;
         mScoringParams = scoringParams;

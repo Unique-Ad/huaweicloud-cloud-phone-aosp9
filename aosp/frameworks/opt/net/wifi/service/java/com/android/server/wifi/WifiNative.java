@@ -870,12 +870,6 @@ public class WifiNative {
                 mWifiMetrics.incrementNumSetupClientInterfaceFailureDueToHal();
                 return null;
             }
-            if (mWificondControl.setupInterfaceForClientMode(iface.name) == null) {
-                Log.e(TAG, "Failed to setup iface in wificond on " + iface);
-                teardownInterface(iface.name);
-                mWifiMetrics.incrementNumSetupClientInterfaceFailureDueToWificond();
-                return null;
-            }
             if (!mSupplicantStaIfaceHal.setupIface(iface.name)) {
                 Log.e(TAG, "Failed to setup iface in supplicant on " + iface);
                 teardownInterface(iface.name);
@@ -891,7 +885,7 @@ public class WifiNative {
             mWifiMonitor.startMonitoring(iface.name);
             // Just to avoid any race conditions with interface state change callbacks,
             // update the interface state before we exit.
-            onInterfaceStateChanged(iface, isInterfaceUp(iface.name));
+            onInterfaceStateChanged(iface, true);
             initializeNwParamsForClientInterface(iface.name);
             Log.i(TAG, "Successfully setup " + iface);
             return iface.name;
@@ -983,27 +977,6 @@ public class WifiNative {
      * @param ifaceName Name of the interface.
      */
     public void teardownInterface(@NonNull String ifaceName) {
-        synchronized (mLock) {
-            final Iface iface = mIfaceMgr.getIface(ifaceName);
-            if (iface == null) {
-                Log.e(TAG, "Trying to teardown an invalid iface=" + ifaceName);
-                return;
-            }
-            // Trigger the iface removal from HAL. The rest of the cleanup will be triggered
-            // from the interface destroyed callback.
-            if (iface.type == Iface.IFACE_TYPE_STA) {
-                if (!removeStaIface(iface)) {
-                    Log.e(TAG, "Failed to remove iface in vendor HAL=" + ifaceName);
-                    return;
-                }
-            } else if (iface.type == Iface.IFACE_TYPE_AP) {
-                if (!removeApIface(iface)) {
-                    Log.e(TAG, "Failed to remove iface in vendor HAL=" + ifaceName);
-                    return;
-                }
-            }
-            Log.i(TAG, "Successfully initiated teardown for iface=" + ifaceName);
-        }
     }
 
     /**
@@ -1981,7 +1954,8 @@ public class WifiNative {
      */
     public boolean getBgScanCapabilities(
             @NonNull String ifaceName, ScanCapabilities capabilities) {
-        return mWifiVendorHal.getBgScanCapabilities(ifaceName, capabilities);
+        capabilities = HwWifiNative.getCapabilities(capabilities);
+        return true;
     }
 
     public static class ChannelSettings {

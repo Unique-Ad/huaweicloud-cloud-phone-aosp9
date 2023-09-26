@@ -127,6 +127,7 @@ public class AvailableNetworkNotifier {
     private final WifiStateMachine mWifiStateMachine;
     private final Messenger mSrcMessenger;
     private final ConnectToNetworkNotificationBuilder mNotificationBuilder;
+    private final IHwAvailableNetworkNotifier mHwAvailableNetworkNotifier;
 
     private ScanResult mRecommendedNetwork;
 
@@ -188,6 +189,7 @@ public class AvailableNetworkNotifier {
         filter.addAction(ACTION_PICK_WIFI_NETWORK_AFTER_CONNECT_FAILURE);
         mContext.registerReceiver(
                 mBroadcastReceiver, filter, null /* broadcastPermission */, mHandler);
+        mHwAvailableNetworkNotifier = new HwAvailableNetworkNotifier(this);
     }
 
     private final BroadcastReceiver mBroadcastReceiver =
@@ -294,7 +296,8 @@ public class AvailableNetworkNotifier {
                     recommendNetwork(availableNetworks, new ArraySet<>(mBlacklistedSsids));
 
             if (recommendation != null) {
-                postInitialNotification(recommendation);
+                // automatically connect to the scan result without display for user to click
+                mWifiStateMachine.sendMessage(mHwAvailableNetworkNotifier.getConnectNetworkMessage(recommendation, mSrcMessenger));
             } else {
                 clearPendingNotification(false /* resetRepeatTime */);
             }

@@ -266,7 +266,7 @@ public class WifiStateMachine extends StateMachine {
      * Interval in milliseconds between polling for RSSI
      * and linkspeed information
      */
-    private static final int DEFAULT_POLL_RSSI_INTERVAL_MSECS = 3000;
+    private static final int DEFAULT_POLL_RSSI_INTERVAL_MSECS = 60 * 1000;
 
     /**
      * Interval in milliseconds between receiving a disconnect event

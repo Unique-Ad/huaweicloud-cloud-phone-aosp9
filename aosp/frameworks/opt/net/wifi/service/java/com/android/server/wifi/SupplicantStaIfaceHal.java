@@ -108,6 +108,24 @@ public class SupplicantStaIfaceHal {
     private SupplicantDeathEventHandler mDeathEventHandler;
     private final Context mContext;
     private final WifiMonitor mWifiMonitor;
+    private final IHwSupplicantStaIfaceHal mHwSupplicantStaIfaceHal;
+    private final ISupplicantStaIfaceHalInner mSupplicantStaIfaceHalInner;
+
+    private class SupplicantStaIfaceHalInner implements ISupplicantStaIfaceHalInner {
+        @Override
+        public int getCurrentNetworkId(String ifaceName) {
+            return SupplicantStaIfaceHal.this.getCurrentNetworkId(ifaceName);
+        }
+        @Override
+        public WifiMonitor getWifiMonitor() {
+            return SupplicantStaIfaceHal.this.mWifiMonitor;
+        }
+
+        @Override
+        public Object getLock() {
+            return SupplicantStaIfaceHal.this.mLock;
+        }
+    }
 
     private final IServiceNotification mServiceNotificationCallback =
             new IServiceNotification.Stub() {
@@ -146,6 +164,8 @@ public class SupplicantStaIfaceHal {
     public SupplicantStaIfaceHal(Context context, WifiMonitor monitor) {
         mContext = context;
         mWifiMonitor = monitor;
+        mSupplicantStaIfaceHalInner = new SupplicantStaIfaceHalInner();
+        mHwSupplicantStaIfaceHal = new HwSupplicantStaIfaceHal(this, mSupplicantStaIfaceHalInner);
     }
 
     /**
@@ -275,7 +295,8 @@ public class SupplicantStaIfaceHal {
      */
     public boolean setupIface(@NonNull String ifaceName) {
         final String methodStr = "setupIface";
-        if (checkSupplicantStaIfaceAndLogFailure(ifaceName, methodStr) != null) return false;
+        // doesn't remove iface when disable wifi
+        if (checkSupplicantStaIfaceAndLogFailure(ifaceName, methodStr) != null) return true;
         ISupplicantIface ifaceHwBinder;
         if (isV1_1()) {
             ifaceHwBinder = addIfaceV1_1(ifaceName);
@@ -695,12 +716,8 @@ public class SupplicantStaIfaceHal {
                 mCurrentNetworkRemoteHandles.put(ifaceName, pair.first);
                 mCurrentNetworkLocalConfigs.put(ifaceName, pair.second);
             }
-            SupplicantStaNetworkHal networkHandle =
-                    checkSupplicantStaNetworkAndLogFailure(ifaceName, "connectToNetwork");
-            if (networkHandle == null || !networkHandle.select()) {
-                loge("Failed to select network configuration: " + config.configKey());
-                return false;
-            }
+            // directly notify completion without visiting wpa_supplicant
+            mHwSupplicantStaIfaceHal.notifyComplete();
             return true;
         }
     }
@@ -1131,22 +1148,7 @@ public class SupplicantStaIfaceHal {
      * null if the call fails
      */
     private java.util.ArrayList<Integer> listNetworks(@NonNull String ifaceName) {
-        synchronized (mLock) {
-            final String methodStr = "listNetworks";
-            ISupplicantStaIface iface = checkSupplicantStaIfaceAndLogFailure(ifaceName, methodStr);
-            if (iface == null) return null;
-            Mutable<ArrayList<Integer>> networkIdList = new Mutable<>();
-            try {
-                iface.listNetworks((SupplicantStatus status, ArrayList<Integer> networkIds) -> {
-                    if (checkStatusAndLogFailure(status, methodStr)) {
-                        networkIdList.value = networkIds;
-                    }
-                });
-            } catch (RemoteException e) {
-                handleRemoteException(e, methodStr);
-            }
-            return networkIdList.value;
-        }
+        return HwSupplicantStaIfaceHal.getNetworksList();
     }
 
     /**

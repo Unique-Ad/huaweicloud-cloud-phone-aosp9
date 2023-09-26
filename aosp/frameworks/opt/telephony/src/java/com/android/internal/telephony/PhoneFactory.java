@@ -260,6 +260,7 @@ public class PhoneFactory {
                             sPhoneSwitcher, sc, sSubscriptionMonitor, Looper.myLooper(),
                             sContext, i, sPhones[i].mDcTracker);
                 }
+                HwPhoneFactory.insertSim(sContext);
             }
         }
     }
