@@ -42,7 +42,6 @@
         android:description="@string/permdesc_accessAllDownloads"
         android:protectionLevel="signature"/>
 
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.ACCESS_DOWNLOAD_MANAGER" />
     <uses-permission android:name="android.permission.ACCESS_CACHE_FILESYSTEM" />
     <uses-permission android:name="android.permission.SEND_DOWNLOAD_COMPLETED_INTENTS" />
@@ -108,12 +107,7 @@
 
         <receiver android:name=".DownloadReceiver" android:exported="false">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.UID_REMOVED" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.MEDIA_MOUNTED" />
-                <data android:scheme="file" />
             </intent-filter>
         </receiver>
     </application>

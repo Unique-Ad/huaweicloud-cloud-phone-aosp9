@@ -904,7 +904,6 @@ public class MobileNetworkSettings extends Activity  {
 
             prefSet.addPreference(mMobileDataPref);
             prefSet.addPreference(mButtonDataRoam);
-            prefSet.addPreference(mDataUsagePref);
 
             // Customized preferences needs to be initialized with subId.
             mMobileDataPref.initialize(phoneSubId);
@@ -1187,11 +1186,11 @@ public class MobileNetworkSettings extends Activity  {
             }
             ps = findPreference(CATEGORY_GSM_APN_EXPAND_KEY);
             if (ps != null) {
-                ps.setEnabled(hasActiveSubscriptions);
+                ps.setEnabled(false);
             }
             ps = findPreference(CATEGORY_CDMA_APN_EXPAND_KEY);
             if (ps != null) {
-                ps.setEnabled(hasActiveSubscriptions);
+                ps.setEnabled(false);
             }
             ps = findPreference(NetworkOperators.CATEGORY_NETWORK_OPERATORS_KEY);
             if (ps != null) {

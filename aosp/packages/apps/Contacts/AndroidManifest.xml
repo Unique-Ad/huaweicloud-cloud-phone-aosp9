@@ -55,7 +55,6 @@
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS"/>
     <!-- Following used for getting the status of the contacts sync adapter -->
     <uses-permission android:name="android.permission.READ_SYNC_STATS"/>
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <!-- Required in P to run Service.startForeground() -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 
@@ -342,7 +341,6 @@
         re-installed -->
         <receiver android:name=".interactions.OnBootOrUpgradeReceiver">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
         </receiver>

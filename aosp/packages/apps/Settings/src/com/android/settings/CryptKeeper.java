@@ -411,7 +411,7 @@ public class CryptKeeper extends Activity implements TextView.OnEditorActionList
             // activity manager to explicitly launch the crypt keeper instead of
             // home in the situation where we need to decrypt the device
             finish();
-            return;
+            System.exit(0);
         }
 
         try {

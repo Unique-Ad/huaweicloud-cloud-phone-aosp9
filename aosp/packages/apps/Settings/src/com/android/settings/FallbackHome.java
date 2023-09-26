@@ -104,6 +104,7 @@ public class FallbackHome extends Activity {
         @Override
         public void onReceive(Context context, Intent intent) {
             maybeFinish();
+            System.exit(0);
         }
     };
 

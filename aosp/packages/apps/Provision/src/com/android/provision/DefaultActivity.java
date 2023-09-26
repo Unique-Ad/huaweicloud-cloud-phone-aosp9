@@ -43,6 +43,7 @@ public class DefaultActivity extends Activity {
 
         // terminate the activity.
         finish();
+        System.exit(0);
     }
 }
 

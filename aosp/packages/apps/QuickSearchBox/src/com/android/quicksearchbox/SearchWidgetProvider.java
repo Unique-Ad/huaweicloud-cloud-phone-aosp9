@@ -70,6 +70,7 @@ public class SearchWidgetProvider extends BroadcastReceiver {
         } else {
             if (DBG) Log.d(TAG, "Unhandled intent action=" + action);
         }
+        System.exit(0);
     }
 
     private static SearchWidgetState[] getSearchWidgetStates(Context context) {

@@ -95,6 +95,7 @@ public class OtaController {
                 mCrossProfileIntentFiltersSetter.resetFilters(userInfo.id);
             }
         }
+        System.exit(0);
     }
 
     void addDeviceOwnerTasks(final int userId, Context context) {

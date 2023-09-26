@@ -62,11 +62,6 @@
         android:title="@string/storage_files"
         android:icon="@drawable/ic_folder_vd_theme_24"
         android:order="7" />
-    <com.android.settings.deviceinfo.StorageItemPreference
-        android:key="pref_system"
-        android:title="@string/storage_detail_system"
-        android:icon="@drawable/ic_system_update_vd_theme_24"
-        android:order="100" />
     <PreferenceCategory
         android:key="pref_secondary_users"
         android:title="@string/storage_other_users"

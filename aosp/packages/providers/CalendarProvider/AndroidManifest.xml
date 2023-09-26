@@ -20,7 +20,6 @@
 
     <uses-permission android:name="android.permission.READ_CALENDAR" />
     <uses-permission android:name="android.permission.WRITE_CALENDAR" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="com.google.android.googleapps.permission.GOOGLE_AUTH" />
     <uses-permission android:name="com.google.android.googleapps.permission.GOOGLE_AUTH.cl" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
@@ -58,9 +57,6 @@
             </intent-filter>
         </activity>
         <receiver android:name="CalendarReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
         </receiver>
 
         <activity android:name="CalendarDebug" android:label="@string/calendar_info">
@@ -88,9 +84,6 @@
            <!-- This broadcast is sent after the core system has finished
                 booting, before the home app is launched or BOOT_COMPLETED
                 is sent. -->
-           <intent-filter>
-               <action android:name="android.intent.action.PRE_BOOT_COMPLETED"/>
-           </intent-filter>
        </receiver>
 
         <receiver android:name="CalendarProviderBroadcastReceiver"

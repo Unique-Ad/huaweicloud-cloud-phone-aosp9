@@ -239,7 +239,6 @@ public class StorageItemPreferenceController extends AbstractPreferenceControlle
         mGamePreference = (StorageItemPreference) screen.findPreference(GAME_KEY);
         mMoviesPreference = (StorageItemPreference) screen.findPreference(MOVIES_KEY);
         mAppPreference = (StorageItemPreference) screen.findPreference(OTHER_APPS_KEY);
-        mSystemPreference = (StorageItemPreference) screen.findPreference(SYSTEM_KEY);
         mFilePreference = (StorageItemPreference) screen.findPreference(FILES_KEY);
 
         setFilesPreferenceVisibility();
