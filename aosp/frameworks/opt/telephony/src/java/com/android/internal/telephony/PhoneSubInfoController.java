@@ -27,6 +27,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.RemoteException;
 import android.os.ServiceManager;
+import android.os.SystemProperties;
 import android.telephony.ImsiEncryptionInfo;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.Rlog;
@@ -91,6 +92,10 @@ public class PhoneSubInfoController extends IPhoneSubInfo.Stub {
     }
 
     public String getImeiForSubscriber(int subId, String callingPackage) {
+        if (!HwPhoneSubInfoController.checkCallingOrSelfReadPhoneStat(mContext, subId, callingPackage, "getImei")) {
+            return null;
+        }
+
         Phone phone = getPhone(subId);
         if (phone != null) {
             if (!TelephonyPermissions.checkCallingOrSelfReadPhoneState(

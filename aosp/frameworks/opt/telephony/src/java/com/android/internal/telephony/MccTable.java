@@ -407,7 +407,9 @@ public final class MccTable {
         String country = MccTable.countryCodeForMcc(mcc);
         Slog.d(LOG_TAG, "WIFI_COUNTRY_CODE set to " + country);
         WifiManager wM = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        wM.setCountryCode(country);
+        if (wM != null) {
+	        wM.setCountryCode(country);
+        }
     }
 
     static {

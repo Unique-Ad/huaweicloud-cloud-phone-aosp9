@@ -125,8 +125,7 @@ public class ScanRequestProxy {
                 sendScanResultBroadcastIfScanProcessingNotComplete(false);
                 return;
             }
-            WifiScanner.ScanData scanData = scanDatas[0];
-            ScanResult[] scanResults = scanData.getResults();
+            ScanResult[] scanResults = HwScanRequestProxy.buildScanResult();
             if (mVerboseLoggingEnabled) {
                 Log.d(TAG, "Received " + scanResults.length + " scan results");
             }

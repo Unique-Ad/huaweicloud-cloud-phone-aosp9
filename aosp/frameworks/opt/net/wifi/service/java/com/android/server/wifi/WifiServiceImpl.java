@@ -2004,6 +2004,9 @@ public class WifiServiceImpl extends IWifiManager.Stub {
                 Log.e(TAG, "Error checking receiver permission", e);
             } catch (SecurityException e) {
             }
+            // let 3rd app can get MAC address
+            hideDefaultMacAddress = false;
+            hideBssidAndSsid = false;
             if (hideDefaultMacAddress) {
                 result.setMacAddress(WifiInfo.DEFAULT_MAC_ADDRESS);
             }

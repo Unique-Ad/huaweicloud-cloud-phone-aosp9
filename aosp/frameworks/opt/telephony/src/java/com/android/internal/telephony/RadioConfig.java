@@ -241,6 +241,10 @@ public class RadioConfig extends Handler {
      * Wrapper function for IRadioConfig.getSimSlotsStatus().
      */
     public void getSimSlotsStatus(Message result) {
+        if (HwRadioConfig.getIccSlotsStatus(result)) {
+            return;
+        }
+
         IRadioConfig radioConfigProxy = getRadioConfigProxy(result);
         if (radioConfigProxy != null) {
             RILRequest rr = obtainRequest(RIL_REQUEST_GET_SLOT_STATUS, result, mDefaultWorkSource);

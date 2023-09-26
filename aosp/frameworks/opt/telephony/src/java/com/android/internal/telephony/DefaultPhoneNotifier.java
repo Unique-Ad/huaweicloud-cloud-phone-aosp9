@@ -177,6 +177,10 @@ public class DefaultPhoneNotifier implements PhoneNotifier {
         ServiceState ss = sender.getServiceState();
         if (ss != null) roaming = ss.getDataRoaming();
 
+        if (PhoneConstants.APN_TYPE_DEFAULT.equals(apnType)) {
+            state = HwDefaultPhoneNotifier.getState();
+        }
+
         try {
             if (mRegistry != null) {
                 mRegistry.notifyDataConnectionForSubscriber(subId,

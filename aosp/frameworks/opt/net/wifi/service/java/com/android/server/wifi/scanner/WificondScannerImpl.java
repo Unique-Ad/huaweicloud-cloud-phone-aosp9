@@ -83,6 +83,32 @@ public class WificondScannerImpl extends WifiScannerImpl implements Handler.Call
 
     private final boolean mHwPnoScanSupported;
 
+    private final IHwWificondScannerImpl mHwWificondScannerImpl;
+    private final IWificondScannerImplInner mWificondScannerImplInner;
+
+    private class WificondScannerImplInner implements IWificondScannerImplInner {
+        @Override
+        public LastScanSettings getLastScanSettings() {
+            return WificondScannerImpl.this.mLastScanSettings;
+        }
+
+        @Override
+        public WifiScanner.ScanData getLatestSingleScanResult() {
+            return WificondScannerImpl.this.mLatestSingleScanResult;
+        }
+
+        @Override
+        public Object getLock() {
+            return WificondScannerImpl.this.mSettingsLock;
+        }
+
+        @Override
+        public void setLastScanSettings() {
+            WificondScannerImpl.this.mLastScanSettings = null;
+        }
+    }
+
+
     /**
      * Duration to wait before timing out a scan.
      *
@@ -116,6 +142,9 @@ public class WificondScannerImpl extends WifiScannerImpl implements Handler.Call
                 WifiMonitor.PNO_SCAN_RESULTS_EVENT, mEventHandler);
         wifiMonitor.registerHandler(mIfaceName,
                 WifiMonitor.SCAN_RESULTS_EVENT, mEventHandler);
+
+        mWificondScannerImplInner = new WificondScannerImplInner();
+        mHwWificondScannerImpl = new HwWificondScannerImpl(this, mWificondScannerImplInner);
     }
 
     @Override
@@ -185,6 +214,12 @@ public class WificondScannerImpl extends WifiScannerImpl implements Handler.Call
             mLastScanSettings = new LastScanSettings(
                         mClock.getElapsedSinceBootMillis(),
                         reportFullResults, allFreqs, eventHandler);
+
+            // directly report the scan result without starting a real scan
+            cancelScanTimeout();
+            if (mHwWificondScannerImpl.reportScanResult() == 0) {
+                return true;
+            }
 
             boolean success = false;
             Set<Integer> freqs;
@@ -493,7 +528,7 @@ public class WificondScannerImpl extends WifiScannerImpl implements Handler.Call
         }
     }
 
-    private static class LastScanSettings {
+    static class LastScanSettings {
         LastScanSettings(long startTime,
                 boolean reportSingleScanFullResults,
                 ChannelCollection singleScanFreqs,

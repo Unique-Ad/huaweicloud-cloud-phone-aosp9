@@ -138,6 +138,7 @@ public class WifiInjector {
     private final ScanRequestProxy mScanRequestProxy;
     private final SarManager mSarManager;
     private final BaseWifiDiagnostics mWifiDiagnostics;
+    private final IHwWifiInjector mHwWifiInjector;
 
     private final boolean mUseRealLogger;
 
@@ -183,9 +184,9 @@ public class WifiInjector {
         // Modules interacting with Native.
         mWifiMonitor = new WifiMonitor(this);
         mHalDeviceManager = new HalDeviceManager(mClock);
-        mWifiVendorHal =
-                new WifiVendorHal(mHalDeviceManager, mWifiStateMachineHandlerThread.getLooper());
-        mSupplicantStaIfaceHal = new SupplicantStaIfaceHal(mContext, mWifiMonitor);
+        mHwWifiInjector = new HwWifiInjector();
+        mWifiVendorHal = mHwWifiInjector.getWifiVendorHal(mHalDeviceManager, mWifiStateMachineHandlerThread.getLooper());
+        mSupplicantStaIfaceHal = mHwWifiInjector.getSupplicantStaIfaceHal(mContext, mWifiMonitor);
         mHostapdHal = new HostapdHal(mContext);
         mWificondControl = new WificondControl(this, mWifiMonitor, mCarrierNetworkConfig);
         mNwManagementService = INetworkManagementService.Stub.asInterface(

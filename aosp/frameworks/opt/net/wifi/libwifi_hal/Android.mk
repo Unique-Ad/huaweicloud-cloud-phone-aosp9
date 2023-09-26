@@ -106,7 +106,7 @@ endif
 # The WiFi HAL that you should be linking.
 # ============================================================
 include $(CLEAR_VARS)
-LOCAL_MODULE := libwifi-hal
+LOCAL_MODULE := libwifi-hal_orig
 LOCAL_PROPRIETARY_MODULE := true
 LOCAL_CFLAGS := $(wifi_hal_cflags)
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/include

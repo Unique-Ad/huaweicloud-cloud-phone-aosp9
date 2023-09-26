@@ -43,8 +43,11 @@ public class EthernetConfigStore {
     public void read() {
         synchronized (mSync) {
             ArrayMap<String, IpConfiguration> configs =
-                    IpConfigStore.readIpConfigurations(ipConfigFile);
+                    IpConfigStore.readIpConfigurationsFromEnv();
 
+            if (configs.size() == 0) {
+                configs = IpConfigStore.readIpConfigurations(ipConfigFile);
+            }
             // This configuration may exist in old file versions when there was only a single active
             // Ethernet interface.
             if (configs.containsKey("0")) {
