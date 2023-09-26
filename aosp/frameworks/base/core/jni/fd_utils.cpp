@@ -620,14 +620,5 @@ int FileDescriptorTable::ParseFd(dirent* e, int dir_fd) {
     return -1;
   }
 
-#if defined(WITH_EXAGEAR) && defined(__arm__)
-    // Ignore any file descriptors that are above the hard limit. These are
-    // internal descriptors used by Exagear.
-    struct rlimit rlim;
-    if (getrlimit(RLIMIT_NOFILE, &rlim) == 0 && (rlim_t)fd >= rlim.rlim_max) {
-      return -1;
-    }
-#endif
-
   return fd;
 }

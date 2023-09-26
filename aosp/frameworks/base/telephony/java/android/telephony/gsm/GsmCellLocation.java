@@ -45,12 +45,12 @@ public class GsmCellLocation extends CellLocation {
             mLac = bundle.getInt("lac", -1);
             mCid = bundle.getInt("cid", -1);
             mPsc = bundle.getInt("psc", -1);
-		}
+        }
 
         if (mLac < 0 || mCid < 0) {
             mLac = HwGsmCellLocation.initLac();
             mCid = HwGsmCellLocation.initCid();
-		}
+        }
 
     }
 

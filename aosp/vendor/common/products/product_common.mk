@@ -85,7 +85,7 @@ PRODUCT_COPY_FILES += \
     vendor/common/android/etc/cph_perf_name_list.xml:system/etc/cph_perf_name_list.xml \
     vendor/common/android/etc/init.wifi.rc:root/init.wifi.rc \
     vendor/common/android/etc/InstallBlacklist:system/etc/InstallBlacklist \
-    vendor/common/android/etc/monbox.xml:system/etc/permissions/monbox.xml \
+    vendor/common/android/etc/handheld_core_hardware.xml:system/etc/permissions/handheld_core_hardware.xml \
     vendor/common/android/etc/packages_priv.xml:system/etc/packages_priv.xml \
     vendor/common/android/etc/wpa_supplicant.conf:system/etc/wifi/wpa_supplicant.conf \
     vendor/common/android/scripts/buildOverlayfs.sh:system/bin/buildOverlayfs.sh \

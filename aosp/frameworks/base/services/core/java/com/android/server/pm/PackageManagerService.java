@@ -332,21 +332,17 @@ import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
 import java.security.DigestException;
 import java.security.DigestInputStream;
@@ -2502,7 +2498,7 @@ public class PackageManagerService extends IPackageManager.Stub
         mOnlyCore = onlyCore;
         mMetrics = new DisplayMetrics();
         mInstaller = installer;
-		
+
         // Create sub-components that provide services / data. Order here is important.
         synchronized (mInstallLock) {
         synchronized (mPackages) {
@@ -8043,6 +8039,7 @@ public class PackageManagerService extends IPackageManager.Stub
                     }
                 }
             }
+
             mHwPackageManagerService.filterPackageInfo(list);
             mHwPackageManagerService.hookSystemPackageFirstInstallTime(list);
             return new ParceledListSlice<>(list);
@@ -8190,6 +8187,7 @@ public class PackageManagerService extends IPackageManager.Stub
                     }
                 }
             }
+
             mHwPackageManagerService.filterApplicationInfo(list);
             return new ParceledListSlice<>(list);
         }
@@ -11809,7 +11807,6 @@ public class PackageManagerService extends IPackageManager.Stub
                     throws PackageManagerException {
         // Give ourselves some initial paths; we'll come back for another
         // pass once we've determined ABI below.
-
         setNativeLibraryPaths(pkg, sAppLib32InstallDir);
 
         // We would never need to extract libs for forward-locked and external packages,
@@ -11961,7 +11958,6 @@ public class PackageManagerService extends IPackageManager.Stub
         // Now that we've calculated the ABIs and determined if it's an internal app,
         // we will go ahead and populate the nativeLibraryPath.
         setNativeLibraryPaths(pkg, sAppLib32InstallDir);
-
     }
 
     /**

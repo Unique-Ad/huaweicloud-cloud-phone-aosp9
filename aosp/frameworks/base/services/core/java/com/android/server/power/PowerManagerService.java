@@ -658,7 +658,6 @@ public final class PowerManagerService extends SystemService
         public ArrayList<PowerManagerService.WakeLock> getWackLocks() {
             return mWakeLocks;
         }
-
     }
 
     public PowerManagerService(Context context) {

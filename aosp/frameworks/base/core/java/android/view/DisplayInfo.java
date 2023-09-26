@@ -34,18 +34,11 @@ import android.util.proto.ProtoOutputStream;
 import java.util.Arrays;
 import java.util.Objects;
 
-
 /**
  * Describes the characteristics of a particular logical display.
  * @hide
  */
 public final class DisplayInfo implements Parcelable {
-
-    private final static String WIDTH_NAME = "ro.hardware.widthpixels";
-    private final static String HEIGHT_NAME = "ro.hardware.heightpixels";
-    private final static String DPI_NAME = "ro.hardware.densitydpi";
-    private final static String TAG = "DisplayInfo";
-
     /**
      * The surface flinger layer stack associated with this logical display.
      */

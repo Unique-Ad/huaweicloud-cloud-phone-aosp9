@@ -105,7 +105,6 @@ public class ConnectivityPacketTracker {
                 NetworkUtils.attachControlPacketFilter(s, ARPHRD_ETHER);
                 Os.bind(s, new PacketSocketAddress((short) ETH_P_ALL, mInterface.index));
             } catch (ErrnoException | IOException e) {
-                //logError("Failed to create packet tracking socket: ", e);
                 closeFd(s);
                 return null;
             }
@@ -142,8 +141,6 @@ public class ConnectivityPacketTracker {
 
         @Override
         protected void logError(String msg, Exception e) {
-            //Log.e(mTag, msg, e);
-            //addLogEntry(msg + e);
         }
 
         private void addLogEntry(String entry) {
