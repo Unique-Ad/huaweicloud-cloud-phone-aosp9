@@ -248,7 +248,7 @@ status_t SoftHEVC::setNumCores() {
     IV_API_CALL_STATUS_T status;
     s_set_cores_ip.e_cmd = IVD_CMD_VIDEO_CTL;
     s_set_cores_ip.e_sub_cmd = IVDEXT_CMD_CTL_SET_NUM_CORES;
-    s_set_cores_ip.u4_num_cores = MIN(mNumCores, CODEC_MAX_NUM_CORES);
+    s_set_cores_ip.u4_num_cores = 1;
     s_set_cores_ip.u4_size = sizeof(ivdext_ctl_set_num_cores_ip_t);
     s_set_cores_op.u4_size = sizeof(ivdext_ctl_set_num_cores_op_t);
     ALOGV("Set number of cores to %u", s_set_cores_ip.u4_num_cores);
@@ -550,7 +550,6 @@ void SoftHEVC::onQueueFilled(OMX_U32 portIndex) {
         {
             ivd_video_decode_ip_t s_dec_ip;
             ivd_video_decode_op_t s_dec_op;
-            WORD32 timeDelay, timeTaken;
             size_t sizeY, sizeUV;
 
             if (!setDecodeArgs(&s_dec_ip, &s_dec_op, inHeader, outHeader, timeStampIx)) {
@@ -559,11 +558,6 @@ void SoftHEVC::onQueueFilled(OMX_U32 portIndex) {
                 mSignalledError = true;
                 return;
             }
-
-            GETTIME(&mTimeStart, NULL);
-            /* Compute time elapsed between end of previous decode()
-             * to start of current decode() */
-            TIME_DIFF(mTimeEnd, mTimeStart, timeDelay);
 
             IV_API_CALL_STATUS_T status;
             status = ivdec_api_function(mCodecCtx, (void *)&s_dec_ip, (void *)&s_dec_op);
@@ -591,12 +585,6 @@ void SoftHEVC::onQueueFilled(OMX_U32 portIndex) {
 
             getVUIParams();
 
-            GETTIME(&mTimeEnd, NULL);
-            /* Compute time taken for decode() */
-            TIME_DIFF(mTimeStart, mTimeEnd, timeTaken);
-
-            ALOGV("timeTaken=%6d delay=%6d numBytes=%6d", timeTaken, timeDelay,
-                   s_dec_op.u4_num_bytes_consumed);
             if (s_dec_op.u4_frame_decoded_flag && !mFlushNeeded) {
                 mFlushNeeded = true;
             }

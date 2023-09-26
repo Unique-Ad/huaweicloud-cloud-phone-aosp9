@@ -15,7 +15,7 @@ cc_test {
         "android.hardware.drm@1.1",
     ],
 
-    compile_multilib: "32",
+    compile_multilib: "64",
 
     cflags: [
         "-Werror",

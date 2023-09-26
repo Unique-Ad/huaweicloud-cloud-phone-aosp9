@@ -267,9 +267,12 @@ std::list<FrameRenderTracker::Info> SoftwareRenderer::render(
     Rect bounds(mCropWidth, mCropHeight);
 
     void *dst;
-    CHECK_EQ(0, mapper.lock(buf->handle,
-            GRALLOC_USAGE_SW_READ_NEVER | GRALLOC_USAGE_SW_WRITE_RARELY,
-            bounds, &dst));
+    android_ycbcr dstYCbCr;
+    if (mColorFormat == OMX_COLOR_FormatYUV420Planar) {
+        CHECK_EQ(0, mapper.lockYCbCr(buf->handle,  GRALLOC_USAGE_SW_READ_NEVER | GRALLOC_USAGE_SW_WRITE_RARELY, bounds, &dstYCbCr));
+    } else {
+        CHECK_EQ(0, mapper.lock(buf->handle,  GRALLOC_USAGE_SW_READ_NEVER | GRALLOC_USAGE_SW_WRITE_RARELY, bounds, &dst));
+    }
 
     // TODO move the other conversions also into ColorConverter, and
     // fix cropping issues (when mCropLeft/Top != 0 or mWidth != mCropWidth)
@@ -291,12 +294,12 @@ std::list<FrameRenderTracker::Info> SoftwareRenderer::render(
         src_u +=(mCropLeft + mCropTop * mWidth / 2)/2;
         src_v +=(mCropLeft + mCropTop * mWidth / 2)/2;
 
-        uint8_t *dst_y = (uint8_t *)dst;
-        size_t dst_y_size = buf->stride * buf->height;
-        size_t dst_c_stride = ALIGN(buf->stride / 2, 16);
-        size_t dst_c_size = dst_c_stride * buf->height / 2;
-        uint8_t *dst_v = dst_y + dst_y_size;
-        uint8_t *dst_u = dst_v + dst_c_size;
+        uint8_t *dst_y = (uint8_t *)(dstYCbCr.y);
+        size_t dst_y_size = dstYCbCr.ystride * mHeight;
+        size_t dst_c_stride = dstYCbCr.cstride;
+        size_t dst_c_size = dst_c_stride * mHeight / 2;
+        uint8_t *dst_v = (uint8_t *)(dstYCbCr.cr);
+        uint8_t *dst_u = (uint8_t *)(dstYCbCr.cb);
 
         dst_y += mCropTop * buf->stride + mCropLeft;
         dst_v += (mCropTop/2) * dst_c_stride + mCropLeft/2;

@@ -656,6 +656,7 @@ public:
     virtual     status_t    checkEffectCompatibility_l(const effect_descriptor_t *desc,
                                                        audio_session_t sessionId);
 
+    virtual bool isPlaying(uid_t uid);
 protected:
     // Code snippets that were lifted up out of threadLoop()
     virtual     void        threadLoop_mix() = 0;
@@ -1480,6 +1481,7 @@ public:
 
             void        updateMetadata_l() override;
 
+    virtual bool isRecording(uid_t uid);
 private:
             // Enter standby if not already in standby, and set mStandby flag
             void    standbyIfNotAlreadyInStandby();

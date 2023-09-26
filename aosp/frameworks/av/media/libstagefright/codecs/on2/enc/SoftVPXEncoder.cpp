@@ -45,17 +45,6 @@ static void InitOMXParams(T *params) {
     params->nVersion.s.nStep = 0;
 }
 
-static int GetCPUCoreCount() {
-    int cpuCoreCount = 1;
-#if defined(_SC_NPROCESSORS_ONLN)
-    cpuCoreCount = sysconf(_SC_NPROCESSORS_ONLN);
-#else
-    // _SC_NPROC_ONLN must be defined...
-    cpuCoreCount = sysconf(_SC_NPROC_ONLN);
-#endif
-    CHECK_GE(cpuCoreCount, 1);
-    return cpuCoreCount;
-}
 
 SoftVPXEncoder::SoftVPXEncoder(const char *name,
                                const OMX_CALLBACKTYPE *callbacks,
@@ -125,7 +114,7 @@ status_t SoftVPXEncoder::initEncoder() {
 
     mCodecConfiguration->g_w = mWidth;
     mCodecConfiguration->g_h = mHeight;
-    mCodecConfiguration->g_threads = GetCPUCoreCount();
+    mCodecConfiguration->g_threads = 1;
     mCodecConfiguration->g_error_resilient = mErrorResilience;
 
     // OMX timebase unit is microsecond

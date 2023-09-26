@@ -2390,6 +2390,20 @@ void AudioFlinger::PlaybackThread::removeTrack_l(const sp<Track>& track)
     }
 }
 
+bool AudioFlinger::PlaybackThread::isPlaying(const uid_t uid)
+{
+    Mutex::Autolock _l(mLock);
+    for (size_t i = 0; i < mActiveTracks.size(); ++i) {
+        sp<Track> track = mActiveTracks[i];
+        if (track == 0 || uid != track->uid()) {
+            continue;
+        }
+        ALOGV("isPlaying: uid = %d", track->uid());
+        return true;
+    }
+    return false;
+}
+
 String8 AudioFlinger::PlaybackThread::getParameters(const String8& keys)
 {
     Mutex::Autolock _l(mLock);
@@ -7600,6 +7614,20 @@ bool AudioFlinger::RecordThread::checkForNewParameter_l(const String8& keyValueP
     }
 
     return reconfig;
+}
+
+bool AudioFlinger::RecordThread::isRecording(const uid_t uid)
+{
+    Mutex::Autolock _l(mLock);
+    for (size_t i = 0; i < mActiveTracks.size(); ++i) {
+        sp<RecordTrack> track = mActiveTracks[i];
+        if (track == 0 || uid != track->uid()) {
+            continue;
+        }
+        ALOGV("isRecording: uid = %d", track->uid());
+        return true;
+    }
+    return false;
 }
 
 String8 AudioFlinger::RecordThread::getParameters(const String8& keys)

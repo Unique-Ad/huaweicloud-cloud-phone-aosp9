@@ -211,7 +211,7 @@ status_t SoftAVC::setNumCores() {
     IV_API_CALL_STATUS_T status;
     s_set_cores_ip.e_cmd = IVD_CMD_VIDEO_CTL;
     s_set_cores_ip.e_sub_cmd = IVDEXT_CMD_CTL_SET_NUM_CORES;
-    s_set_cores_ip.u4_num_cores = MIN(mNumCores, CODEC_MAX_NUM_CORES);
+    s_set_cores_ip.u4_num_cores = 1;
     s_set_cores_ip.u4_size = sizeof(ivdext_ctl_set_num_cores_ip_t);
     s_set_cores_op.u4_size = sizeof(ivdext_ctl_set_num_cores_op_t);
     status = ivdec_api_function(

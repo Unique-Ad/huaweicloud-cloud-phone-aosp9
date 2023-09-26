@@ -43,6 +43,7 @@ ifneq ($(TARGET_ENABLE_MEDIADRM_64), true)
 LOCAL_32_BIT_ONLY := true
 endif
 
+LOCAL_32_BIT_ONLY := false
 LOCAL_INIT_RC := mediadrmserver.rc
 
 include $(BUILD_EXECUTABLE)

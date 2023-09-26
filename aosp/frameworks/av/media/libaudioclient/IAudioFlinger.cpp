@@ -869,7 +869,6 @@ status_t BnAudioFlinger::onTransact(
 {
     // make sure transactions reserved to AudioPolicyManager do not come from other processes
     switch (code) {
-        case SET_STREAM_VOLUME:
         case SET_STREAM_MUTE:
         case OPEN_OUTPUT:
         case OPEN_DUPLICATE_OUTPUT:

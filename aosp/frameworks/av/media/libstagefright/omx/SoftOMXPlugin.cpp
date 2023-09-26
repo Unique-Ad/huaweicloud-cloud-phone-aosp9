@@ -66,6 +66,12 @@ static const struct {
     { "OMX.google.flac.decoder", "flacdec", "audio_decoder.flac" },
     { "OMX.google.flac.encoder", "flacenc", "audio_encoder.flac" },
     { "OMX.google.gsm.decoder", "gsmdec", "audio_decoder.gsm" },
+    { "OMX.hisi.video.decoder.avc", "avcdec", "video_decoder.avc" },
+    { "OMX.hisi.video.decoder.hevc", "hevcdec", "video_decoder.hevc" },
+    { "OMX.hisi.video.decoder.h263", "mpeg4dec", "video_decoder.h263" },
+    { "OMX.hisi.video.decoder.mpeg4", "mpeg4dec", "video_decoder.mpeg4" },
+    { "OMX.hisi.video.decoder.vp8", "vpxdec", "video_decoder.vp8" },
+    { "OMX.hisi.video.decoder.vp9", "vpxdec", "video_decoder.vp9" },
 };
 
 static const size_t kNumComponents =
