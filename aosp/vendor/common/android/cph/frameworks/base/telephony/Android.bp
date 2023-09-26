@@ -1,0 +1,8 @@
+
+java_import {
+    name: "framework.telephony-vendor",
+    installable: false,
+    required: ["framework.telephony-vendor-impl"],
+    jars: ["framework.telephony-vendor-impl.jar"],
+}
+

@@ -1,0 +1,6 @@
+java_import {
+    name: "packageinstaller.src-vendor",
+    installable: false,
+    required: ["packageinstaller.src-vendor-impl"],
+    jars: ["packageinstaller.src-vendor-impl.jar"],
+}

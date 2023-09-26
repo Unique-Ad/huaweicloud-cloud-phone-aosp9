@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='utf-8' standalone='yes' ?>
+<map>
+    <int name="version" value="1" />
+    <int name="com.android.keychain" value="4" />
+    <int name="com.android.music" value="4" />
+    <int name="com.android.providers.contacts" value="4" />
+    <int name="android" value="9" />
+    <int name="com.android.defcontainer" value="9" />
+    <int name="com.android.systemui" value="9" />
+    <int name="com.android.launcher3" value="9" />
+    <int name="com.huawei.hwid" value="9" />
+    <int name="com.he.ardc" value="9" />
+    <int name="com.android.webview" value="9" />
+    <int name="com.android.preconditions.cts" value="1" />
+    <int name="com.android.tradefed.utils.wifi" value="1" />
+    <int name="android.acceleration.cts" value="1" />
+    <int name="com.android.compatibility.common.deviceinfo" value="1" />
+</map>

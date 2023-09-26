@@ -1,0 +1,8 @@
+
+java_import {
+    name: "services.net-vendor",
+    installable: false,
+    required: ["services.net-vendor-impl"],
+    jars: ["services.net-vendor-impl.jar"],
+}
+

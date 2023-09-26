@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- Strings for low memory notification -->
+    <!-- system low memory notification content title -->
+    <string name="notification_lowmem_title">System Low Memory</string>
+    <!-- system low memory notification content text -->
+    <string name="notification_lowmem_text">System current memory is about to run out...</string>
+    <!-- system low memory notification big text -->
+    <string name="notification_lowmem_bigtext">System current memory is less than <xliff:g example="200" id="availMem">%1$s</xliff:g>MB.\nKill the top app which takes up a lot of memory: <xliff:g example="com.android.demo" id="packageName">%2$s</xliff:g>(<xliff:g example="2048" id="appMem">%3$s</xliff:g>MB).</string>
+</resources>

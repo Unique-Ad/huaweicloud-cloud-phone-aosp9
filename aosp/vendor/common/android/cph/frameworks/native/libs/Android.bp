@@ -1,0 +1,17 @@
+
+cc_prebuilt_library_static {
+    name: "libbinder_vendor",
+    compile_multilib: "both",
+    export_include_dirs: ["./include"],
+    multilib: {
+        lib64: {
+            srcs: ["lib64/libbinder_vendor_impl.a"],
+        },
+        lib32: {
+            srcs: ["lib/libbinder_vendor_impl.a"],
+        },
+    },
+    strip : {
+        none: true,
+    },
+}

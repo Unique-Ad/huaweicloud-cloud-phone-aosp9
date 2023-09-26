@@ -1,0 +1,8 @@
+
+java_import {
+    name: "services.core-vendor",
+    installable: false,
+    required: ["services.core-vendor-impl"],
+    jars: ["services.core-vendor-impl.jar"],
+}
+

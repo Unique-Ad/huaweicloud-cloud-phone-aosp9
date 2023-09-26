@@ -1,0 +1,25 @@
+
+java_import {
+    name: "framework.core-vendor",
+    installable: false,
+    required: ["framework.core-vendor-impl"],
+    jars: ["framework.core-vendor-impl.jar"],
+}
+
+cc_prebuilt_library_static {
+    name: "libandroid_runtime_vendor",
+    compile_multilib: "both",
+    export_include_dirs: ["./include"],
+    multilib: {
+        lib64: {
+            srcs: ["lib64/libandroid_runtime_vendor_impl.a"],
+        },
+        lib32: {
+            srcs: ["lib/libandroid_runtime_vendor_impl.a"],
+        },
+    },
+    strip : {
+        none: true,
+    },
+}
+

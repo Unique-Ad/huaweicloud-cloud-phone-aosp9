@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <bool translatable="false" name="config_wifi_enable_wifi_firmware_debugging">false</bool>
+    <string name="config_networkLocationProviderPackageName" translatable="false">com.cph.networklocation</string>
+    <string name="config_geocoderProviderPackageName" translatable="false">com.cph.networklocation</string>
+    <string-array name="config_locationProviderPackageNames" translatable="false">
+        <item>com.cph.networklocation</item>
+        <item>com.android.location.fused</item>
+    </string-array>
+    <string translatable="false" name="config_ntpServer">ntp.myhuaweicloud.com</string>
+    <string-array translatable="false" name="config_globalActionsList">
+        <item>power</item>
+        <item>lockdown</item>
+        <item>logout</item>
+        <item>bugreport</item>
+        <item>screenshot</item>
+    </string-array>
+    <bool name="config_freeformWindowManagement">true</bool>
+</resources>

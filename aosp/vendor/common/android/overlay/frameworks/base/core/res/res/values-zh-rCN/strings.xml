@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- Strings for low memory notification -->
+    <!-- system low memory notification content title -->
+    <string name="notification_lowmem_title">系统内存极低</string>
+    <!-- system low memory notification content text -->
+    <string name="notification_lowmem_text">系统内存即将耗尽，请及时清理应用进程...</string>
+    <!-- system low memory notification big text -->
+    <string name="notification_lowmem_bigtext">系统剩余内存低于<xliff:g example="200" id="availMem">%1$s</xliff:g>MB，且前台App占用内存过大，已被清理: <xliff:g example="com.android.demo" id="packageName">%2$s</xliff:g>(<xliff:g example="2048" id="appMem">%3$s</xliff:g>MB)</string>
+</resources>

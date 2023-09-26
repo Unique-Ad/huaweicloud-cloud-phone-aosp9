@@ -1,0 +1,7 @@
+
+java_import {
+    name: "wifi-service-vendor",
+    installable: false,
+    required: ["wifi-service-vendor-impl"],
+    jars: ["wifi-service-vendor-impl.jar"],
+}
