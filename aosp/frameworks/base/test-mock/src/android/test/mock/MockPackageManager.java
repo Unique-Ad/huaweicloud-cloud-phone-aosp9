@@ -1224,4 +1224,36 @@ public class MockPackageManager extends PackageManager {
     public String getSystemTextClassifierPackageName() {
         throw new UnsupportedOperationException();
     }
+
+    /**
+     * @hide
+     */
+    @Override
+    public boolean installShareApp(String packageName) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * @hide
+     */
+    @Override
+    public boolean uninstallShareApp(String packageName) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * @hide
+     */
+    @Override
+    public boolean startShareApp(String packageName) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * @hide
+     */
+    @Override
+    public boolean clearShareApp() {
+        throw new UnsupportedOperationException();
+    }
 }

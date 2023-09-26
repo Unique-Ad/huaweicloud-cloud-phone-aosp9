@@ -139,6 +139,8 @@ public class PermissionManagerService {
     @GuardedBy("mLock")
     private boolean mSystemReady;
 
+    private IHwPermissionManagerService mHwPermissionManagerService;
+
     PermissionManagerService(Context context,
             @Nullable DefaultPermissionGrantedCallback defaultGrantCallback,
             @NonNull Object externalLock) {
@@ -147,6 +149,7 @@ public class PermissionManagerService {
         mPackageManagerInt = LocalServices.getService(PackageManagerInternal.class);
         mUserManagerInt = LocalServices.getService(UserManagerInternal.class);
         mSettings = new PermissionSettings(context, mLock);
+        mHwPermissionManagerService = new HwPermissionManagerService();
 
         mHandlerThread = new ServiceThread(TAG,
                 Process.THREAD_PRIORITY_BACKGROUND, true /*allowIo*/);
@@ -834,24 +837,36 @@ public class PermissionManagerService {
                     // For all apps normal permissions are install time ones.
                     grant = GRANT_INSTALL;
                 } else if (bp.isRuntime()) {
-                    // If a permission review is required for legacy apps we represent
-                    // their permissions as always granted runtime ones since we need
-                    // to keep the review required permission flag per user while an
-                    // install permission's state is shared across all users.
-                    if (!appSupportsRuntimePermissions && !mSettings.mPermissionReviewRequired) {
-                        // For legacy apps dangerous permissions are install time ones.
-                        grant = GRANT_INSTALL;
-                    } else if (origPermissions.hasInstallPermission(bp.getName())) {
-                        // For legacy apps that became modern, install becomes runtime.
-                        grant = GRANT_UPGRADE;
-                    } else if (isLegacySystemApp) {
-                        // For legacy system apps, install becomes runtime.
-                        // We cannot check hasInstallPermission() for system apps since those
-                        // permissions were granted implicitly and not persisted pre-M.
-                        grant = GRANT_UPGRADE;
+                    if (mHwPermissionManagerService.isGrantedPermission()) {
+                        if (!appSupportsRuntimePermissions && !mSettings.mPermissionReviewRequired) {
+                            // For legacy apps that do not support runtime permissions,
+                            // the dangerous permissions are install time ones.
+                            grant = GRANT_INSTALL;
+                        } else {
+                            // Keep the review required permission flag per user while an
+                            // install permission's state is shared across all users.
+                            grant = GRANT_UPGRADE;
+                        }
                     } else {
-                        // For modern apps keep runtime permissions unchanged.
-                        grant = GRANT_RUNTIME;
+                        // If a permission review is required for legacy apps we represent
+                        // their permissions as always granted runtime ones since we need
+                        // to keep the review required permission flag per user while an
+                        // install permission's state is shared across all users.
+                        if (!appSupportsRuntimePermissions && !mSettings.mPermissionReviewRequired) {
+                            // For legacy apps dangerous permissions are install time ones.
+                            grant = GRANT_INSTALL;
+                        } else if (origPermissions.hasInstallPermission(bp.getName())) {
+                            // For legacy apps that became modern, install becomes runtime.
+                            grant = GRANT_UPGRADE;
+                        } else if (isLegacySystemApp) {
+                            // For legacy system apps, install becomes runtime.
+                            // We cannot check hasInstallPermission() for system apps since those
+                            // permissions were granted implicitly and not persisted pre-M.
+                            grant = GRANT_UPGRADE;
+                        } else {
+                            // For modern apps keep runtime permissions unchanged.
+                            grant = GRANT_RUNTIME;
+                        }
                     }
                 } else if (bp.isSignature()) {
                     // For all apps signature permissions are install time ones.
@@ -1008,6 +1023,8 @@ public class PermissionManagerService {
                         } break;
 
                         default: {
+                            changedInstallPermission = mHwPermissionManagerService.isChangedInstallPermission(permissionsState, bp);
+
                             if (packageOfInterest == null
                                     || packageOfInterest.equals(pkg.packageName)) {
                                 if (DEBUG_PERMISSIONS) {
@@ -1303,6 +1320,8 @@ public class PermissionManagerService {
                 // Special permissions for the system default text classifier.
                 allowed = true;
             }
+
+            allowed = mHwPermissionManagerService.isAllowed(allowed, bp);
         }
         return allowed;
     }
@@ -2289,6 +2308,11 @@ public class PermissionManagerService {
             synchronized (PermissionManagerService.this.mLock) {
                 return mSettings.getPermissionLocked(permName);
             }
+        }
+
+        @Override
+        public boolean isGrantedPermission() {
+            return mHwPermissionManagerService.isGrantedPermission();
         }
     }
 }

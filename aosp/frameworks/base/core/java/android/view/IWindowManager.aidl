@@ -76,6 +76,7 @@ interface IWindowManager
     boolean inputMethodClientHasFocus(IInputMethodClient client);
 
     void getInitialDisplaySize(int displayId, out Point size);
+    void getOrigDisplaySize(int displayId, out Point size);
     void getBaseDisplaySize(int displayId, out Point size);
     void setForcedDisplaySize(int displayId, int width, int height);
     void clearForcedDisplaySize(int displayId);

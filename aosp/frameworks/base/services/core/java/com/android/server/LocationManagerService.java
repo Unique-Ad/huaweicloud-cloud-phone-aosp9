@@ -183,6 +183,7 @@ public class LocationManagerService extends ILocationManager.Stub {
     private GnssMeasurementsProvider mGnssMeasurementsProvider;
     private GnssNavigationMessageProvider mGnssNavigationMessageProvider;
     private IGpsGeofenceHardware mGpsGeofenceProxy;
+    private LocationInjectNotify mLocationInjectNotify;
 
     // --- fields below are protected by mLock ---
     // Set of providers that are explicitly enabled
@@ -267,6 +268,8 @@ public class LocationManagerService extends ILocationManager.Stub {
                                 com.android.internal.R.array.config_locationProviderPackageNames);
                     }
                 });
+
+        mLocationInjectNotify = new LocationInjectNotify();
 
         if (D) Log.d(TAG, "Constructed");
 
@@ -1968,6 +1971,8 @@ public class LocationManagerService extends ILocationManager.Stub {
                 return null;
             }
             mReceivers.put(binder, receiver);
+
+            mLocationInjectNotify.addPackageToList(packageName);
         }
         return receiver;
     }
@@ -1979,6 +1984,8 @@ public class LocationManagerService extends ILocationManager.Stub {
             receiver = new Receiver(null, intent, pid, uid, packageName, workSource,
                     hideFromAppOps);
             mReceivers.put(intent, receiver);
+
+            mLocationInjectNotify.addPackageToList(packageName);
         }
         return receiver;
     }
@@ -2197,6 +2204,8 @@ public class LocationManagerService extends ILocationManager.Stub {
 
             applyRequirementsLocked(provider);
         }
+
+        mLocationInjectNotify.deletePackageFromList(receiver.mIdentity.mPackageName);
     }
 
     private void applyAllProviderRequirementsLocked() {

@@ -1660,9 +1660,10 @@ final class DisplayPowerController implements AutomaticBrightnessController.Call
         pw.println("  mReportedToPolicy=" +
                 reportedToPolicyToString(mReportedScreenStateToPolicy));
 
-        pw.println("  mScreenBrightnessRampAnimator.isAnimating()=" +
-                mScreenBrightnessRampAnimator.isAnimating());
-
+        if (mScreenBrightnessRampAnimator != null) {
+            pw.println("  mScreenBrightnessRampAnimator.isAnimating()=" +
+                    mScreenBrightnessRampAnimator.isAnimating());
+        }
         if (mColorFadeOnAnimator != null) {
             pw.println("  mColorFadeOnAnimator.isStarted()=" +
                     mColorFadeOnAnimator.isStarted());
@@ -1742,13 +1743,9 @@ final class DisplayPowerController implements AutomaticBrightnessController.Call
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case MSG_UPDATE_POWER_STATE:
-                    updatePowerState();
                     break;
-
                 case MSG_PROXIMITY_SENSOR_DEBOUNCED:
-                    debounceProximitySensor();
                     break;
-
                 case MSG_SCREEN_ON_UNBLOCKED:
                     if (mPendingScreenOnUnblocker == msg.obj) {
                         unblockScreenOn();
@@ -1756,25 +1753,14 @@ final class DisplayPowerController implements AutomaticBrightnessController.Call
                     }
                     break;
                 case MSG_SCREEN_OFF_UNBLOCKED:
-                    if (mPendingScreenOffUnblocker == msg.obj) {
-                        unblockScreenOff();
-                        updatePowerState();
-                    }
                     break;
                 case MSG_CONFIGURE_BRIGHTNESS:
-                    mBrightnessConfiguration = (BrightnessConfiguration)msg.obj;
-                    updatePowerState();
                     break;
 
                 case MSG_SET_TEMPORARY_BRIGHTNESS:
-                    // TODO: Should we have a a timeout for the temporary brightness?
-                    mTemporaryScreenBrightness = msg.arg1;
-                    updatePowerState();
                     break;
 
                 case MSG_SET_TEMPORARY_AUTO_BRIGHTNESS_ADJUSTMENT:
-                    mTemporaryAutoBrightnessAdjustment = Float.intBitsToFloat(msg.arg1);
-                    updatePowerState();
                     break;
             }
         }

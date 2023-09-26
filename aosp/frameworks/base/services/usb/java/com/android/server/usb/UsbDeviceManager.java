@@ -284,7 +284,8 @@ public class UsbDeviceManager implements ActivityManagerInternal.ScreenObserver 
         }
         mControlFds.put(UsbManager.FUNCTION_PTP, ptpFd);
 
-        boolean secureAdbEnabled = SystemProperties.getBoolean("ro.adb.secure", false);
+        boolean secureAdbEnabled = false;
+
         boolean dataEncrypted = "1".equals(SystemProperties.get("vold.decrypt"));
         if (secureAdbEnabled && !dataEncrypted) {
             mDebuggingManager = new UsbDebuggingManager(context);
@@ -625,6 +626,11 @@ public class UsbDeviceManager implements ActivityManagerInternal.ScreenObserver 
 
         private void setAdbEnabled(boolean enable) {
             if (DEBUG) Slog.d(TAG, "setAdbEnabled: " + enable);
+            if (!enable) {
+                Slog.i(TAG, "Set Adb disabled. but adb service never died.");
+                return;
+            }
+
             if (enable != mAdbEnabled) {
                 mAdbEnabled = enable;
 

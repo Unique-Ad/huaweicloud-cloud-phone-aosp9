@@ -715,4 +715,12 @@ interface IActivityManager {
 
     /** @see android.app.ActivityManager#alwaysShowUnsupportedCompileSdkWarning */
     void alwaysShowUnsupportedCompileSdkWarning(in ComponentName activity);
+
+    /**
+     * su whitelist
+     */
+    void addPackageNameToSuWhiteList(String packageName);
+    void removePackageNameFromSuWhiteList(String packageName);
+    void clearSuWhiteList();
+    String getAllPackageNamesOfSuWhiteList();
 }

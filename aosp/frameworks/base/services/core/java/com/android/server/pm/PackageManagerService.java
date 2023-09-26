@@ -332,17 +332,21 @@ import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
 import java.security.DigestException;
 import java.security.DigestInputStream;
@@ -1010,7 +1014,7 @@ public class PackageManagerService extends IPackageManager.Stub
 
     // TODO remove this and go through mPermissonManager directly
     final DefaultPermissionGrantPolicy mDefaultPermissionPolicy;
-    private final PermissionManagerInternal mPermissionManager;
+    final PermissionManagerInternal mPermissionManager;
 
     // List of packages names to keep cached, even if they are uninstalled for all users
     private List<String> mKeepUninstalledPackages;
@@ -1023,6 +1027,50 @@ public class PackageManagerService extends IPackageManager.Stub
     private File mCacheDir;
 
     private Future<?> mPrepareAppDataFuture;
+
+    private final IHwPackageManagerService mHwPackageManagerService;
+
+    private class PackageManagerServiceInner implements IPackageManagerServiceInner {
+
+        public PackageParser.Package scanPackageTracedLI(
+                File scanFile, final int parseFlags, int scanFlags,
+                long currentTime, UserHandle user) throws PackageManagerException {
+            return PackageManagerService.this.scanPackageTracedLI(scanFile, parseFlags, scanFlags, currentTime, user);
+        }
+
+        public void updateSharedLibrariesLPw(PackageParser.Package pkg,
+                                             PackageParser.Package changingLib) throws PackageManagerException {
+            PackageManagerService.this.updateSharedLibrariesLPr(pkg, changingLib);
+        }
+
+        public void prepareAppDataAfterInstallLIF(PackageParser.Package pkg) {
+            PackageManagerService.this.prepareAppDataAfterInstallLIF(pkg);
+        }
+
+        public void installPackageTracedLI(InstallArgs args, PackageInstalledInfo res) {
+            PackageManagerService.this.installPackageTracedLI(args, res);
+        }
+
+        public void handlePackagePostInstall(PackageInstalledInfo res, boolean grantPermissions,
+                                             boolean killApp, boolean virtualPreload, String[] grantedPermissions,
+                                             boolean launchedForRestore, String installerPackage,
+                                             IPackageInstallObserver2 installObserver) {
+            PackageManagerService.this.handlePackagePostInstall(res, grantPermissions, killApp, virtualPreload,
+                    grantedPermissions, launchedForRestore, installerPackage, installObserver);
+        }
+
+        public InstallParams createInstallParams(OriginInfo origin, MoveInfo move, IPackageInstallObserver2 observer,
+                                                 int installFlags, String installerPackageName, String volumeUuid,
+                                                 VerificationInfo verificationInfo, UserHandle user, String packageAbiOverride,
+                                                 String[] grantedPermissions, PackageParser.SigningDetails signingDetails, int installReason) {
+            return new InstallParams(origin, move, observer, installFlags, installerPackageName,
+                    volumeUuid, verificationInfo, user, packageAbiOverride, grantedPermissions, signingDetails, installReason);
+        }
+
+        public FileInstallArgs createFileInstallArgs(File codeFile, File resourceFile, InstallParams params) {
+            return new FileInstallArgs(codeFile, resourceFile, params);
+        }
+    }
 
     private static class IFVerificationParams {
         PackageParser.Package pkg;
@@ -1728,8 +1776,9 @@ public class PackageManagerService extends IPackageManager.Stub
                         InstallArgs args = data.args;
                         PackageInstalledInfo parentRes = data.res;
 
-                        final boolean grantPermissions = (args.installFlags
-                                & PackageManager.INSTALL_GRANT_RUNTIME_PERMISSIONS) != 0;
+                        final boolean grantPermissions = mPermissionManager.isGrantedPermission() ? true :
+                                (args.installFlags & PackageManager.INSTALL_GRANT_RUNTIME_PERMISSIONS) != 0;
+
                         final boolean killApp = (args.installFlags
                                 & PackageManager.INSTALL_DONT_KILL_APP) == 0;
                         final boolean virtualPreload = ((args.installFlags
@@ -1932,7 +1981,7 @@ public class PackageManagerService extends IPackageManager.Stub
         }
     }
 
-    private PermissionCallback mPermissionCallback = new PermissionCallback() {
+    PermissionCallback mPermissionCallback = new PermissionCallback() {
         @Override
         public void onGidsChanged(int appId, int userId) {
             mHandler.post(new Runnable() {
@@ -2453,7 +2502,7 @@ public class PackageManagerService extends IPackageManager.Stub
         mOnlyCore = onlyCore;
         mMetrics = new DisplayMetrics();
         mInstaller = installer;
-
+		
         // Create sub-components that provide services / data. Order here is important.
         synchronized (mInstallLock) {
         synchronized (mPackages) {
@@ -2527,6 +2576,8 @@ public class PackageManagerService extends IPackageManager.Stub
         Trace.traceEnd(TRACE_TAG_PACKAGE_MANAGER);
 
         mProtectedPackages = new ProtectedPackages(mContext);
+
+        mHwPackageManagerService = new HwPackageManagerService(this, null);//new PackageManagerServiceInner());
 
         synchronized (mInstallLock) {
         // writer
@@ -2890,7 +2941,7 @@ public class PackageManagerService extends IPackageManager.Stub
             if (!mOnlyCore) {
                 EventLog.writeEvent(EventLogTags.BOOT_PROGRESS_PMS_DATA_SCAN_START,
                         SystemClock.uptimeMillis());
-                scanDirTracedLI(sAppInstallDir, 0, scanFlags | SCAN_REQUIRE_KNOWN, 0);
+                scanDirTracedLI(sAppInstallDir, 0, scanFlags | HwPackageManagerService.SCAN_FAST_COMMAND, 0);
 
                 scanDirTracedLI(sDrmAppPrivateInstallDir, mDefParseFlags
                         | PackageParser.PARSE_FORWARD_LOCK,
@@ -4101,6 +4152,9 @@ public class PackageManagerService extends IPackageManager.Stub
     private PackageInfo getPackageInfoInternal(String packageName, long versionCode,
             int flags, int filterCallingUid, int userId) {
         if (!sUserManager.exists(userId)) return null;
+        if (mHwPackageManagerService.isPkgNameNeedHide(packageName)) {
+            return null;
+        }
         flags = updateFlagsForPackage(flags, userId, packageName);
         mPermissionManager.enforceCrossUserPermission(Binder.getCallingUid(), userId,
                 false /* requireFullPermission */, false /* checkShell */, "get package info");
@@ -5858,11 +5912,11 @@ public class PackageManagerService extends IPackageManager.Stub
                         res = ArrayUtils.removeElement(String.class, res, res[i]);
                     }
                 }
-                return res;
+                return mHwPackageManagerService.filterGetPackagesForUid(res);
             } else if (obj instanceof PackageSetting) {
                 final PackageSetting ps = (PackageSetting) obj;
                 if (ps.getInstalled(userId) && !filterAppAccessLPr(ps, callingUid, userId)) {
-                    return new String[]{ps.name};
+                    return mHwPackageManagerService.filterGetPackagesForUid(new String[] { ps.name });
                 }
             }
         }
@@ -6591,8 +6645,9 @@ public class PackageManagerService extends IPackageManager.Stub
         try {
             Trace.traceBegin(TRACE_TAG_PACKAGE_MANAGER, "queryIntentActivities");
 
-            return new ParceledListSlice<>(
-                    queryIntentActivitiesInternal(intent, resolvedType, flags, userId));
+            List<ResolveInfo> list = queryIntentActivitiesInternal(intent, resolvedType, flags, userId);
+            mHwPackageManagerService.filterResolveInfo(list);
+            return new ParceledListSlice<>(list);
         } finally {
             Trace.traceEnd(TRACE_TAG_PACKAGE_MANAGER);
         }
@@ -7401,8 +7456,10 @@ public class PackageManagerService extends IPackageManager.Stub
     public @NonNull ParceledListSlice<ResolveInfo> queryIntentActivityOptions(ComponentName caller,
             Intent[] specifics, String[] specificTypes, Intent intent,
             String resolvedType, int flags, int userId) {
-        return new ParceledListSlice<>(queryIntentActivityOptionsInternal(caller, specifics,
-                specificTypes, intent, resolvedType, flags, userId));
+        List<ResolveInfo> list = queryIntentActivityOptionsInternal(caller, specifics,
+                specificTypes, intent, resolvedType, flags, userId);
+        mHwPackageManagerService.filterResolveInfo(list);
+        return new ParceledListSlice<>(list);
     }
 
     private @NonNull List<ResolveInfo> queryIntentActivityOptionsInternal(ComponentName caller,
@@ -7584,9 +7641,10 @@ public class PackageManagerService extends IPackageManager.Stub
     @Override
     public @NonNull ParceledListSlice<ResolveInfo> queryIntentReceivers(Intent intent,
             String resolvedType, int flags, int userId) {
-        return new ParceledListSlice<>(
-                queryIntentReceiversInternal(intent, resolvedType, flags, userId,
-                        false /*allowDynamicSplits*/));
+        List<ResolveInfo> list = queryIntentReceiversInternal(intent, resolvedType, flags, userId,
+                false /*allowDynamicSplits*/);
+        mHwPackageManagerService.filterResolveInfo(list);
+        return new ParceledListSlice<>(list);
     }
 
     private @NonNull List<ResolveInfo> queryIntentReceiversInternal(Intent intent,
@@ -7700,8 +7758,10 @@ public class PackageManagerService extends IPackageManager.Stub
     public @NonNull ParceledListSlice<ResolveInfo> queryIntentServices(Intent intent,
             String resolvedType, int flags, int userId) {
         final int callingUid = Binder.getCallingUid();
-        return new ParceledListSlice<>(queryIntentServicesInternal(
-                intent, resolvedType, flags, userId, callingUid, false /*includeInstantApps*/));
+        List<ResolveInfo> list = queryIntentServicesInternal(
+                intent, resolvedType, flags, userId, callingUid, false /*includeInstantApps*/);
+        mHwPackageManagerService.filterResolveInfo(list);
+        return new ParceledListSlice<>(list);
     }
 
     private @NonNull List<ResolveInfo> queryIntentServicesInternal(Intent intent,
@@ -7820,8 +7880,9 @@ public class PackageManagerService extends IPackageManager.Stub
     @Override
     public @NonNull ParceledListSlice<ResolveInfo> queryIntentContentProviders(Intent intent,
             String resolvedType, int flags, int userId) {
-        return new ParceledListSlice<>(
-                queryIntentContentProvidersInternal(intent, resolvedType, flags, userId));
+        List<ResolveInfo> list = queryIntentContentProvidersInternal(intent, resolvedType, flags, userId);
+        mHwPackageManagerService.filterResolveInfo(list);
+        return new ParceledListSlice<>(list);
     }
 
     private @NonNull List<ResolveInfo> queryIntentContentProvidersInternal(
@@ -7982,7 +8043,8 @@ public class PackageManagerService extends IPackageManager.Stub
                     }
                 }
             }
-
+            mHwPackageManagerService.filterPackageInfo(list);
+            mHwPackageManagerService.hookSystemPackageFirstInstallTime(list);
             return new ParceledListSlice<>(list);
         }
     }
@@ -8128,7 +8190,7 @@ public class PackageManagerService extends IPackageManager.Stub
                     }
                 }
             }
-
+            mHwPackageManagerService.filterApplicationInfo(list);
             return new ParceledListSlice<>(list);
         }
     }
@@ -8396,6 +8458,7 @@ public class PackageManagerService extends IPackageManager.Stub
         }
 
         if (finalList != null) {
+            mHwPackageManagerService.filterProviderInfo(finalList);
             Collections.sort(finalList, mProviderInitOrderSorter);
             return new ParceledListSlice<ProviderInfo>(finalList);
         }
@@ -8885,7 +8948,9 @@ public class PackageManagerService extends IPackageManager.Stub
         // in verified partition, or can be verified on access (when apk verity is enabled). In both
         // cases, only data in Signing Block is verified instead of the whole file.
         final boolean skipVerify = ((parseFlags & PackageParser.PARSE_IS_SYSTEM_DIR) != 0) ||
-                (forceCollect && canSkipFullPackageVerification(pkg));
+                (forceCollect && canSkipFullPackageVerification(pkg)) ||
+                mHwPackageManagerService.isFirstBootOrUpdateOrScanFast(scanFlags);
+        Log.d(TAG, "collect cert with skip verify = " + skipVerify);
         collectCertificatesLI(pkgSetting, pkg, forceCollect, skipVerify);
 
         // Reset profile if the application version is changed
@@ -11744,6 +11809,7 @@ public class PackageManagerService extends IPackageManager.Stub
                     throws PackageManagerException {
         // Give ourselves some initial paths; we'll come back for another
         // pass once we've determined ABI below.
+
         setNativeLibraryPaths(pkg, sAppLib32InstallDir);
 
         // We would never need to extract libs for forward-locked and external packages,
@@ -11895,6 +11961,7 @@ public class PackageManagerService extends IPackageManager.Stub
         // Now that we've calculated the ABIs and determined if it's an internal app,
         // we will go ahead and populate the nativeLibraryPath.
         setNativeLibraryPaths(pkg, sAppLib32InstallDir);
+
     }
 
     /**
@@ -15481,6 +15548,8 @@ public class PackageManagerService extends IPackageManager.Stub
                 pkgLite = mContainerService.getMinimalPackageInfo(origin.resolvedPath, installFlags,
                         packageAbiOverride);
 
+                ret = mHwPackageManagerService.getInstallationResult(pkgLite.packageName, ret);
+
                 if (DEBUG_INSTANT && ephemeral) {
                     Slog.v(TAG, "pkgLite for install: " + pkgLite);
                 }
@@ -15775,6 +15844,7 @@ public class PackageManagerService extends IPackageManager.Stub
         final int traceCookie;
         final PackageParser.SigningDetails signingDetails;
         final int installReason;
+        boolean fast_install;
 
         // The list of instruction sets supported by this app. This is currently
         // only used during the rmdex() phase to clean up resources. We can get rid of this
@@ -15909,6 +15979,12 @@ public class PackageManagerService extends IPackageManager.Stub
                     PackageManager.INSTALL_REASON_UNKNOWN);
             this.codeFile = (codePath != null) ? new File(codePath) : null;
             this.resourceFile = (resourcePath != null) ? new File(resourcePath) : null;
+        }
+
+        FileInstallArgs(File codeFile, File resourceFile, InstallParams params) {
+            this(params);
+            this.codeFile = codeFile;
+            this.resourceFile = resourceFile;
         }
 
         int copyApk(IMediaContainerService imcs, boolean temp) throws RemoteException {
@@ -17655,11 +17731,17 @@ public class PackageManagerService extends IPackageManager.Stub
                     REASON_INSTALL,
                     DexoptOptions.DEXOPT_BOOT_COMPLETE |
                     DexoptOptions.DEXOPT_INSTALL_WITH_DEX_METADATA_FILE);
-            mPackageDexOptimizer.performDexOpt(pkg, pkg.usesLibraryFiles,
-                    null /* instructionSets */,
-                    getOrCreateCompilerPackageStats(pkg),
-                    mDexManager.getPackageUseInfoOrDefault(pkg.packageName),
-                    dexoptOptions);
+            // Do not run PackageDexOptimizer through the local performDexOpt
+            // method because `pkg` may not be in `mPackages` yet.
+            //
+            // Also, don't fail application installs if the dexopt step fails.
+            if (!args.fast_install) {
+                mPackageDexOptimizer.performDexOpt(pkg, pkg.usesLibraryFiles,
+                        null /* instructionSets */,
+                        getOrCreateCompilerPackageStats(pkg),
+                        mDexManager.getPackageUseInfoOrDefault(pkg.packageName),
+                        dexoptOptions);
+            }
             Trace.traceEnd(TRACE_TAG_PACKAGE_MANAGER);
         }
 
@@ -22896,7 +22978,7 @@ Slog.v(TAG, ":: stepped forward, applying functor at tag " + parser.getName());
      * unfreezes it upon closing. This is typically used when doing surgery on
      * app code/data to prevent the app from running while you're working.
      */
-    private class PackageFreezer implements AutoCloseable {
+    class PackageFreezer implements AutoCloseable {
         private final String mPackageName;
         private final PackageFreezer[] mChildren;
 
@@ -24592,6 +24674,34 @@ Slog.v(TAG, ":: stepped forward, applying functor at tag " + parser.getName());
 
     public void deleteCompilerPackageStats(String pkgName) {
         mCompilerStats.deletePackageStats(pkgName);
+    }
+
+    public void scanFast(String path) {
+        mHwPackageManagerService.scanFast(path);
+    }
+
+    public void installFast(String path) {
+        mHwPackageManagerService.installFast(path);
+    }
+	
+    @Override
+    public boolean installShareApp(String packageName) {
+        return mHwPackageManagerService.installShareApp(packageName);
+    }
+
+    @Override
+    public boolean uninstallShareApp(String packageName) {
+        return mHwPackageManagerService.uninstallShareApp(packageName);
+    }
+
+    @Override
+    public boolean startShareApp(String packageName) {
+        return mHwPackageManagerService.startShareApp(packageName);
+    }
+
+    @Override
+    public boolean clearShareApp() {
+        return mHwPackageManagerService.clearShareApp();
     }
 
     @Override

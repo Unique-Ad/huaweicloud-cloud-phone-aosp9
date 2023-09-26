@@ -971,9 +971,9 @@ class StorageManagerService extends IStorageManager.Stub
 
         // On an encrypted device we can't see system properties yet, so pull
         // the system locale out of the mount service.
-        if ("".equals(SystemProperties.get("vold.encrypt_progress"))) {
+        /*if ("".equals(SystemProperties.get("vold.encrypt_progress"))) {
             copyLocaleFromMountService();
-        }
+        }*/
     }
 
     private void copyLocaleFromMountService() {

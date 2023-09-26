@@ -235,7 +235,7 @@ public class RequestThreadManager {
                                     LegacyMetadataMapper.HAL_PIXEL_FORMAT_RGBA_8888);
 
                             int dimen = (int) Math.ceil(Math.sqrt(totalSize));
-                            dimen = (dimen + 0xf) & ~0xf; // round up to nearest multiple of 16
+                            dimen = (dimen + 0xff) & ~0xff; // round up to nearest multiple of 256
                             LegacyCameraDevice.setSurfaceDimens(s, dimen, dimen);
                             LegacyCameraDevice.produceFrame(s, data, dimen, dimen,
                                     CameraMetadataNative.NATIVE_JPEG_FORMAT);

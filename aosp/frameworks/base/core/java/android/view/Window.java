@@ -17,6 +17,7 @@
 package android.view;
 
 import static android.view.WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED;
+import static android.view.WindowManager.LayoutParams.FLAG_SECURE;
 
 import android.annotation.ColorInt;
 import android.annotation.DrawableRes;
@@ -308,6 +309,8 @@ public abstract class Window {
     // The current window attributes.
     private final WindowManager.LayoutParams mWindowAttributes =
         new WindowManager.LayoutParams();
+
+    private final IHwWindow mHwWindow = new HwWindow();
 
     /**
      * API from a Window back to its caller.  This allows the client to
@@ -1106,6 +1109,7 @@ public abstract class Window {
      */
     public void setFlags(int flags, int mask) {
         final WindowManager.LayoutParams attrs = getAttributes();
+        flags = mHwWindow.dropFlagSecure(flags);
         attrs.flags = (attrs.flags&~mask) | (flags&mask);
         mForcedWindowFlags |= mask;
         dispatchWindowAttributesChanged(attrs);

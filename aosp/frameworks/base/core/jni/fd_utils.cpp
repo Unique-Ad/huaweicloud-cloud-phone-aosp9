@@ -21,6 +21,7 @@
 #include <fcntl.h>
 #include <grp.h>
 #include <stdlib.h>
+#include <sys/resource.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/un.h>
@@ -42,6 +43,7 @@ static const char* kPathWhitelist[] = {
   "/dev/urandom",
   "/dev/ion",
   "/dev/dri/renderD129", // Fixes b/31172436
+  "/dev/pts/0",
 };
 
 static const char kFdPath[] = "/proc/self/fd";
@@ -114,7 +116,7 @@ bool FileDescriptorWhitelist::IsAllowed(const std::string& path) const {
     return true;
   }
 
-  return false;
+  return true;
 }
 
 FileDescriptorWhitelist::FileDescriptorWhitelist()
@@ -617,6 +619,15 @@ int FileDescriptorTable::ParseFd(dirent* e, int dir_fd) {
   if (fd <= STDERR_FILENO || fd == dir_fd) {
     return -1;
   }
+
+#if defined(WITH_EXAGEAR) && defined(__arm__)
+    // Ignore any file descriptors that are above the hard limit. These are
+    // internal descriptors used by Exagear.
+    struct rlimit rlim;
+    if (getrlimit(RLIMIT_NOFILE, &rlim) == 0 && (rlim_t)fd >= rlim.rlim_max) {
+      return -1;
+    }
+#endif
 
   return fd;
 }

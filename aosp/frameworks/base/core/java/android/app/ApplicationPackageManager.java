@@ -2857,4 +2857,41 @@ public class ApplicationPackageManager extends PackageManager {
             throw e.rethrowAsRuntimeException();
         }
     }
+
+    @Override
+    public boolean installShareApp(String packageName) {
+        try {
+            return mPM.installShareApp(packageName);
+        } catch (RemoteException e) {
+            throw e.rethrowAsRuntimeException();
+        }
+    }
+
+    @Override
+    public boolean uninstallShareApp(String packageName) {
+        try {
+            return mPM.uninstallShareApp(packageName);
+        } catch (RemoteException e) {
+            throw e.rethrowAsRuntimeException();
+        }
+    }
+
+    @Override
+    public boolean startShareApp(String packageName) {
+        try {
+            return mPM.startShareApp(packageName);
+        } catch (RemoteException e) {
+            throw e.rethrowAsRuntimeException();
+        }
+    }
+
+    @Override
+    public boolean clearShareApp() {
+        try {
+            return mPM.clearShareApp();
+        } catch (RemoteException e) {
+            throw e.rethrowAsRuntimeException();
+        }
+    }
+
 }

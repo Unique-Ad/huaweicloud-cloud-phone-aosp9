@@ -1151,6 +1151,14 @@ public abstract class PackageManager {
     public static final int INSTALL_FAILED_SANDBOX_VERSION_DOWNGRADE = -27;
 
     /**
+     * Installation return code: this is passed to the
+     * {@link PackageInstaller#EXTRA_LEGACY_STATUS} if it's not in LocalApp list.
+     *
+     * @hide
+     */
+    public static final int INSTALL_FAILED_APP_NOT_ALLOWED_INSTALL = -50;
+
+    /**
      * Installation parse return code: this is passed in the
      * {@link PackageInstaller#EXTRA_LEGACY_STATUS} if the parser was given a path that is not a
      * file, or does not end with the expected '.apk' extension.
@@ -5818,8 +5826,8 @@ public abstract class PackageManager {
             case INSTALL_FAILED_DUPLICATE_PERMISSION: return "INSTALL_FAILED_DUPLICATE_PERMISSION";
             case INSTALL_FAILED_NO_MATCHING_ABIS: return "INSTALL_FAILED_NO_MATCHING_ABIS";
             case INSTALL_FAILED_ABORTED: return "INSTALL_FAILED_ABORTED";
-            case INSTALL_FAILED_BAD_DEX_METADATA:
-                return "INSTALL_FAILED_BAD_DEX_METADATA";
+            case INSTALL_FAILED_BAD_DEX_METADATA: return "INSTALL_FAILED_BAD_DEX_METADATA";
+            case INSTALL_FAILED_APP_NOT_ALLOWED_INSTALL: return "INSTALL_FAILED_APP_NOT_ALLOWED_INSTALL";
             default: return Integer.toString(status);
         }
     }
@@ -5870,6 +5878,7 @@ public abstract class PackageManager {
             case INSTALL_FAILED_DUPLICATE_PERMISSION: return PackageInstaller.STATUS_FAILURE_CONFLICT;
             case INSTALL_FAILED_NO_MATCHING_ABIS: return PackageInstaller.STATUS_FAILURE_INCOMPATIBLE;
             case INSTALL_FAILED_ABORTED: return PackageInstaller.STATUS_FAILURE_ABORTED;
+            case INSTALL_FAILED_APP_NOT_ALLOWED_INSTALL: return PackageInstaller.STATUS_FAILURE;
             default: return PackageInstaller.STATUS_FAILURE;
         }
     }
@@ -6176,4 +6185,35 @@ public abstract class PackageManager {
             "isPackageStateProtected not implemented in subclass");
     }
 
+    /**
+     * Install share app package.
+     * @param packageName The name of share app package
+     * @return Returns true if the share app package was installed.
+     *
+     * @hide
+     */
+    public abstract boolean installShareApp(String packageName);
+    /**
+     * Uninstall share app package.
+     * @param packageName The name of share app package
+     * @return Returns true if the share app package was uninstalled.
+     *
+     * @hide
+     */
+    public abstract boolean uninstallShareApp(String packageName);
+    /**
+     * Start share app package.
+     * @param packageName The name of share app package
+     * @return Returns true if the share app package was started.
+     *
+     * @hide
+     */
+    public abstract boolean startShareApp(String packageName);
+    /**
+     * Clear all of share app packages.
+     * @return Returns true if the share app packages were uninstalled.
+     *
+     * @hide
+     */
+    public abstract boolean clearShareApp();
 }

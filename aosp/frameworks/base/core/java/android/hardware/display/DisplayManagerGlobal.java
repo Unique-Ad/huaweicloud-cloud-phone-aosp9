@@ -452,6 +452,14 @@ public final class DisplayManagerGlobal {
         }
     }
 
+    public void resizePrimaryDisplay(int width, int height) {
+        try {
+            mDm.resizePrimaryDisplay(width, height);
+        } catch (RemoteException ex) {
+            throw ex.rethrowFromSystemServer();
+        }
+    }
+
     public void releaseVirtualDisplay(IVirtualDisplayCallback token) {
         try {
             mDm.releaseVirtualDisplay(token);

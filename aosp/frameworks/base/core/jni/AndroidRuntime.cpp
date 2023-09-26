@@ -49,6 +49,8 @@
 #include <string>
 #include <vector>
 
+#include <HwAndroidRuntime.h>
+
 using namespace android;
 using android::base::GetProperty;
 
@@ -1084,6 +1086,8 @@ void AndroidRuntime::start(const char* className, const Vector<String8>& options
 
     //const char* kernelHack = getenv("LD_ASSUME_KERNEL");
     //ALOGD("Found LD_ASSUME_KERNEL='%s'\n", kernelHack);
+
+    hwStart(zygote);
 
     /* start the virtual machine */
     JniInvocation jni_invocation;

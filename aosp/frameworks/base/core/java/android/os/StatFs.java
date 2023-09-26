@@ -26,6 +26,8 @@ import android.system.StructStatVfs;
  */
 public class StatFs {
     private StructStatVfs mStat;
+    private IHwStatFs mHwStatFs;
+    private String mPathRecord;
 
     /**
      * Construct a new StatFs for looking at the stats of the filesystem at
@@ -38,7 +40,9 @@ public class StatFs {
      * @throws IllegalArgumentException if the file system access fails
      */
     public StatFs(String path) {
+        mPathRecord = path;
         mStat = doStat(path);
+        mHwStatFs = new HwStatFs();
     }
 
     /**
@@ -68,7 +72,7 @@ public class StatFs {
      */
     @Deprecated
     public int getBlockSize() {
-        return (int) mStat.f_frsize;
+        return mHwStatFs.getBlockSize(mStat, mPathRecord);
     }
 
     /**
@@ -84,7 +88,7 @@ public class StatFs {
      */
     @Deprecated
     public int getBlockCount() {
-        return (int) mStat.f_blocks;
+        return mHwStatFs.getBlockCount(mStat, mPathRecord);
     }
 
     /**
@@ -127,7 +131,7 @@ public class StatFs {
      */
     @Deprecated
     public int getAvailableBlocks() {
-        return (int) mStat.f_bavail;
+        return mHwStatFs.getAvailableBlocks(mStat, mPathRecord);
     }
 
     /**

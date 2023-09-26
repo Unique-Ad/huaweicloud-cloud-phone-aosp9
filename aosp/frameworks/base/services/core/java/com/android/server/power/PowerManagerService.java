@@ -647,6 +647,20 @@ public final class PowerManagerService extends SystemService
     private static native void nativeSendPowerHint(int hintId, int data);
     private static native void nativeSetFeature(int featureId, int data);
 
+    private IHwPowerManagerService mHwPowerManagerService;
+
+    private class PowerManagerServiceInner implements IPowerManagerServiceInner {
+        @Override
+        public void releaseWakeLockInner(IBinder lock, int flags) {
+            PowerManagerService.this.releaseWakeLockInternal(lock, flags);
+        }
+        @Override
+        public ArrayList<PowerManagerService.WakeLock> getWackLocks() {
+            return mWakeLocks;
+        }
+
+    }
+
     public PowerManagerService(Context context) {
         super(context);
         mContext = context;
@@ -663,6 +677,7 @@ public final class PowerManagerService extends SystemService
                 BackgroundThread.get().getLooper(), mBatterySaverPolicy, mBatterySavingStats);
         mBatterySaverStateMachine = new BatterySaverStateMachine(
                 mLock, mContext, mBatterySaverController);
+        mHwPowerManagerService = new HwPowerManagerService(this, new PowerManagerServiceInner());
 
         synchronized (mLock) {
             mWakeLockSuspendBlocker = createSuspendBlockerLocked("PowerManagerService.WakeLocks");
@@ -1388,6 +1403,10 @@ public final class PowerManagerService extends SystemService
     // dozing before really going to sleep.
     @SuppressWarnings("deprecation")
     private boolean goToSleepNoUpdateLocked(long eventTime, int reason, int flags, int uid) {
+        if (mHwPowerManagerService.goToSleepNoUpdateLocked()) {
+            return false;
+        }
+
         if (DEBUG_SPEW) {
             Slog.d(TAG, "goToSleepNoUpdateLocked: eventTime=" + eventTime
                     + ", reason=" + reason + ", flags=" + flags + ", uid=" + uid);
@@ -1493,6 +1512,10 @@ public final class PowerManagerService extends SystemService
 
     // Done dozing, drop everything and go to sleep.
     private boolean reallyGoToSleepNoUpdateLocked(long eventTime, int uid) {
+        if (mHwPowerManagerService.reallyGoToSleepNoUpdateLocked()) {
+            return false;
+        }
+
         if (DEBUG_SPEW) {
             Slog.d(TAG, "reallyGoToSleepNoUpdateLocked: eventTime=" + eventTime
                     + ", uid=" + uid);
@@ -2184,7 +2207,7 @@ public final class PowerManagerService extends SystemService
     }
 
     private void scheduleSandmanLocked() {
-        if (!mSandmanScheduled) {
+        if (mHwPowerManagerService.scheduleSandmanLocked(!mSandmanScheduled)) {
             mSandmanScheduled = true;
             Message msg = mHandler.obtainMessage(MSG_SANDMAN);
             msg.setAsynchronous(true);
@@ -3858,7 +3881,7 @@ public final class PowerManagerService extends SystemService
     /**
      * Represents a wake lock that has been acquired by an application.
      */
-    private final class WakeLock implements IBinder.DeathRecipient {
+    final class WakeLock implements IBinder.DeathRecipient {
         public final IBinder mLock;
         public int mFlags;
         public String mTag;
@@ -4454,6 +4477,7 @@ public final class PowerManagerService extends SystemService
          */
         @Override // Binder call
         public void shutdown(boolean confirm, String reason, boolean wait) {
+            mHwPowerManagerService.shutdown(confirm, reason, wait);
             mContext.enforceCallingOrSelfPermission(android.Manifest.permission.REBOOT, null);
 
             final long ident = Binder.clearCallingIdentity();
@@ -4735,6 +4759,11 @@ public final class PowerManagerService extends SystemService
         @Override
         public void powerHint(int hintId, int data) {
             powerHintInternal(hintId, data);
+        }
+
+        @Override
+        public void releaseAudioWakelock(int uid) {
+            mHwPowerManagerService.releaseAudioWakelock(uid);
         }
     }
 }

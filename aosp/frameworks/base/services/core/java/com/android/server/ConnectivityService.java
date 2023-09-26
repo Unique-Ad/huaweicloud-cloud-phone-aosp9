@@ -51,6 +51,7 @@ import android.content.res.Configuration;
 import android.database.ContentObserver;
 import android.net.ConnectivityManager;
 import android.net.ConnectivityManager.PacketKeepalive;
+import android.net.HwNetConfig;
 import android.net.IConnectivityManager;
 import android.net.IIpConnectivityMetrics;
 import android.net.INetdEventCallback;
@@ -472,8 +473,7 @@ public class ConnectivityService extends IConnectivityManager.Stub
     private NetworkNotificationManager mNotifier;
     private LingerMonitor mLingerMonitor;
 
-    // sequence number for Networks; keep in sync with system/netd/NetworkController.cpp
-    private static final int MIN_NET_ID = 100; // some reserved marks
+    private static final int MIN_NET_ID = 101; // some reserved marks
     private static final int MAX_NET_ID = 65535 - 0x0400; // Top 1024 bits reserved by IpSecService
     private int mNextNetId = MIN_NET_ID;
 
@@ -739,6 +739,8 @@ public class ConnectivityService extends IConnectivityManager.Stub
            doDump(fd, pw, args, asProto);
         }
     };
+
+    private HwConnectivityService mHwConnectivityService = new HwConnectivityService();
 
     public ConnectivityService(Context context, INetworkManagementService netManager,
             INetworkStatsService statsService, INetworkPolicyManager policyManager) {
@@ -1172,6 +1174,7 @@ public class ConnectivityService extends IConnectivityManager.Stub
         final NetworkState state = getUnfilteredActiveNetworkState(uid);
         filterNetworkStateForUid(state, uid, false);
         maybeLogBlockedNetworkInfo(state.networkInfo, uid);
+        mHwConnectivityService.getActiveNetworkState(state, mSystemProperties);
         return state.networkInfo;
     }
 
@@ -2230,7 +2233,7 @@ public class ConnectivityService extends IConnectivityManager.Stub
                     final NetworkAgentInfo nai = getNetworkAgentInfoForNetId(msg.arg2);
                     if (nai == null) break;
 
-                    final boolean valid = (msg.arg1 == NetworkMonitor.NETWORK_TEST_RESULT_VALID);
+                    boolean valid = (msg.arg1 == NetworkMonitor.NETWORK_TEST_RESULT_VALID);
                     final boolean wasValidated = nai.lastValidated;
                     final boolean wasDefault = isDefaultNetwork(nai);
 
@@ -2242,6 +2245,9 @@ public class ConnectivityService extends IConnectivityManager.Stub
                                  : "";
                         log(nai.name() + " validation " + (valid ? "passed" : "failed") + logMsg);
                     }
+
+                    valid = mHwConnectivityService.getValid(valid);
+
                     if (valid != nai.lastValidated) {
                         if (wasDefault) {
                             metricsLogger().defaultNetworkMetrics().logDefaultNetworkValidity(
@@ -2373,7 +2379,9 @@ public class ConnectivityService extends IConnectivityManager.Stub
 
     private void updatePrivateDns(NetworkAgentInfo nai, PrivateDnsConfig newCfg) {
         mDnsManager.updatePrivateDns(nai.network, newCfg);
-        updateDnses(nai.linkProperties, null, nai.network.netId);
+        if (mHwConnectivityService.updateDnses(nai)) {
+            updateDnses(nai.linkProperties, null, nai.network.netId);
+        }
     }
 
     private void handlePrivateDnsValidationUpdate(PrivateDnsValidationUpdate update) {
@@ -2531,12 +2539,10 @@ public class ConnectivityService extends IConnectivityManager.Stub
             // fallback network the default or requested a new network from the
             // NetworkFactories, so network traffic isn't interrupted for an unnecessarily
             // long time.
-            try {
-                mNetd.removeNetwork(nai.network.netId);
-            } catch (Exception e) {
-                loge("Exception removing network: " + e);
+
+            if (mHwConnectivityService.removeNetwork(nai, mNetd)) {
+                mDnsManager.removeNetwork(nai.network);
             }
-            mDnsManager.removeNetwork(nai.network);
         }
         synchronized (mNetworkForNetId) {
             mNetIdInUse.delete(nai.network.netId);
@@ -4653,8 +4659,9 @@ public class ConnectivityService extends IConnectivityManager.Stub
         // TODO: Instead of passing mDefaultRequest, provide an API to determine whether a Network
         // satisfies mDefaultRequest.
         final NetworkCapabilities nc = new NetworkCapabilities(networkCapabilities);
+        final int netId = mHwConnectivityService.getNetId(networkInfo);
         final NetworkAgentInfo nai = new NetworkAgentInfo(messenger, new AsyncChannel(),
-                new Network(reserveNetId()), new NetworkInfo(networkInfo), lp, nc, currentScore,
+                new Network(netId > 0 ? netId : reserveNetId()), new NetworkInfo(networkInfo), lp, nc, currentScore,
                 mContext, mTrackerHandler, new NetworkMisc(networkMisc), mDefaultRequest, this);
         // Make sure the network capabilities reflect what the agent info says.
         nai.networkCapabilities = mixInCapabilities(nai, nc);
@@ -4693,16 +4700,19 @@ public class ConnectivityService extends IConnectivityManager.Stub
             networkAgent.clatd.fixupLinkProperties(oldLp, newLp);
         }
 
-        updateInterfaces(newLp, oldLp, netId, networkAgent.networkCapabilities);
-        updateMtu(newLp, oldLp);
+        if (mHwConnectivityService.updateNetwork(netId)) {
+            updateInterfaces(newLp, oldLp, netId, networkAgent.networkCapabilities);
+            updateMtu(newLp, oldLp);
+            updateTcpBufferSizes(networkAgent);
+            updateRoutes(newLp, oldLp, netId);
+            updateDnses(newLp, oldLp, netId);
+        }
+
         // TODO - figure out what to do for clat
 //        for (LinkProperties lp : newLp.getStackedLinks()) {
 //            updateMtu(lp, null);
 //        }
-        updateTcpBufferSizes(networkAgent);
 
-        updateRoutes(newLp, oldLp, netId);
-        updateDnses(newLp, oldLp, netId);
         // Make sure LinkProperties represents the latest private DNS status.
         // This does not need to be done before updateDnses because the
         // LinkProperties are not the source of the private DNS configuration.
@@ -5179,7 +5189,10 @@ public class ConnectivityService extends IConnectivityManager.Stub
 
         notifyLockdownVpn(newNetwork);
         handleApplyDefaultProxy(newNetwork.linkProperties.getHttpProxy());
-        updateTcpBufferSizes(newNetwork);
+        // CPH WIFI doesn't need this
+        if (mHwConnectivityService.updateNetwork(newNetwork.network.netId)) {
+            updateTcpBufferSizes(newNetwork);
+        }
         mDnsManager.setDefaultDnsSystemProperties(newNetwork.linkProperties.getDnsServers());
         notifyIfacesChangedForNetworkStats();
     }
@@ -5571,7 +5584,8 @@ public class ConnectivityService extends IConnectivityManager.Stub
                             !networkAgent.linkProperties.getDnsServers().isEmpty(),
                             (networkAgent.networkMisc == null ||
                                 !networkAgent.networkMisc.allowBypass));
-                } else {
+                } else if (!HwNetConfig.isCphWifi()) {
+                    // CPH never create network for WIFI because it has been done in netd
                     mNetd.createPhysicalNetwork(networkAgent.network.netId,
                             getNetworkPermission(networkAgent.networkCapabilities));
                 }

@@ -22,6 +22,7 @@ import com.android.internal.util.WakeupMessage;
 
 import android.content.Context;
 import android.net.DhcpResults;
+import android.net.HwNetConfig;
 import android.net.INetd;
 import android.net.IpPrefix;
 import android.net.LinkAddress;
@@ -414,7 +415,7 @@ public class IpClient extends StateMachine {
         }
 
         /* package */ boolean mEnableIPv4 = true;
-        /* package */ boolean mEnableIPv6 = true;
+        /* package */ boolean mEnableIPv6 = !HwNetConfig.isCphWifi();
         /* package */ boolean mUsingMultinetworkPolicyTracker = true;
         /* package */ boolean mUsingIpReachabilityMonitor = true;
         /* package */ int mRequestedPreDhcpActionMs;
@@ -430,7 +431,7 @@ public class IpClient extends StateMachine {
 
         public ProvisioningConfiguration(ProvisioningConfiguration other) {
             mEnableIPv4 = other.mEnableIPv4;
-            mEnableIPv6 = other.mEnableIPv6;
+            mEnableIPv6 = HwNetConfig.isCphWifi() ? false : other.mEnableIPv6;
             mUsingIpReachabilityMonitor = other.mUsingIpReachabilityMonitor;
             mRequestedPreDhcpActionMs = other.mRequestedPreDhcpActionMs;
             mInitialConfig = InitialConfiguration.copy(other.mInitialConfig);
@@ -680,6 +681,8 @@ public class IpClient extends StateMachine {
         }
     }
 
+    private IHwIpClient mHwIpClient;
+
     public IpClient(Context context, String ifName, Callback callback) {
         this(context, ifName, callback, new Dependencies());
     }
@@ -717,6 +720,8 @@ public class IpClient extends StateMachine {
         sPktLogs.putIfAbsent(mInterfaceName, new LocalLog(MAX_PACKET_RECORDS));
         mConnectivityPacketLog = sPktLogs.get(mInterfaceName);
         mMsgStateLogger = new MessageHandlingLogger();
+
+        mHwIpClient = new HwIpClient(this);
 
         // TODO: Consider creating, constructing, and passing in some kind of
         // InterfaceController.Dependencies class.
@@ -1023,6 +1028,9 @@ public class IpClient extends StateMachine {
     }
 
     private void logError(String fmt, Object... args) {
+        if (HwNetConfig.isCphWifi()) {
+            return;
+        }
         final String msg = "ERROR " + String.format(fmt, args);
         Log.e(mTag, msg);
         mLog.log(msg);
@@ -1290,12 +1298,17 @@ public class IpClient extends StateMachine {
     private void handleIPv4Success(DhcpResults dhcpResults) {
         mDhcpResults = new DhcpResults(dhcpResults);
         final LinkProperties newLp = assembleLinkProperties();
-        final ProvisioningChange delta = setLinkProperties(newLp);
+        if (HwNetConfig.isCphWifi()) {
+            mHwIpClient.addLinkAddress(newLp);
+        }
+        ProvisioningChange delta = setLinkProperties(newLp);
 
         if (DBG) {
             Log.d(mTag, "onNewDhcpResults(" + Objects.toString(dhcpResults) + ")");
         }
         mCallback.onNewDhcpResults(dhcpResults);
+        // we have to hack this value because CPH doesn't start DhcpClient
+        delta = mHwIpClient.onNewDhcpResults(delta, mProvisioningTimeoutAlarm);
         dispatchCallback(delta, newLp);
     }
 
@@ -1407,7 +1420,9 @@ public class IpClient extends StateMachine {
         //     - we don't get IPv4 routes from netlink
         // so we neither react to nor need to wait for changes in either.
 
-        mInterfaceCtrl.disableIPv6();
+        if (!HwNetConfig.isCphWifi()) {
+            mInterfaceCtrl.disableIPv6();
+        }
         mInterfaceCtrl.clearAllAddresses();
     }
 
@@ -1711,7 +1726,12 @@ public class IpClient extends StateMachine {
                     // calls completedPreDhcpAction() after provisioning with
                     // a static IP configuration.
                     if (mDhcpClient != null) {
-                        mDhcpClient.sendMessage(DhcpClient.CMD_PRE_DHCP_ACTION_COMPLETE);
+                        // CPH skip the DHCP process
+                        if (HwNetConfig.isCphWifi()) {
+                            mHwIpClient.onPreDhcpActionCompleted();
+                        } else {
+                            mDhcpClient.sendMessage(DhcpClient.CMD_PRE_DHCP_ACTION_COMPLETE);
+                        }
                     }
                     break;
 

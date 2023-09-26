@@ -822,6 +822,8 @@ public class ActivityManager {
     public static final int RESIZE_MODE_USER_FORCED =
             RESIZE_MODE_PRESERVE_WINDOW | RESIZE_MODE_FORCED;
 
+    private final IHwActivityManager mHwActivityManager = new HwActivityManager();
+
     /** @hide */
     public int getFrontActivityScreenCompatMode() {
         try {
@@ -2610,6 +2612,7 @@ public class ActivityManager {
         } catch (RemoteException e) {
             throw e.rethrowFromSystemServer();
         }
+        mHwActivityManager.getMemoryInfo(outInfo, mContext);
     }
 
     /**

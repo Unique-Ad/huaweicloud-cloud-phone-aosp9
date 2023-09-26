@@ -949,6 +949,9 @@ public class Process {
     
     /** @hide */
     public static final native long getTotalMemory();
+
+    /** @hide */
+    public static final native long getTotalMemoryBySysinfo();
     
     /** @hide */
     public static final native void readProcLines(String path,

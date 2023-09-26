@@ -94,7 +94,7 @@ public class WindowManagerShellCommand extends ShellCommand {
             Point initialSize = new Point();
             Point baseSize = new Point();
             try {
-                mInterface.getInitialDisplaySize(Display.DEFAULT_DISPLAY, initialSize);
+                mInterface.getOrigDisplaySize(Display.DEFAULT_DISPLAY, initialSize);
                 mInterface.getBaseDisplaySize(Display.DEFAULT_DISPLAY, baseSize);
                 pw.println("Physical size: " + initialSize.x + "x" + initialSize.y);
                 if (!initialSize.equals(baseSize)) {

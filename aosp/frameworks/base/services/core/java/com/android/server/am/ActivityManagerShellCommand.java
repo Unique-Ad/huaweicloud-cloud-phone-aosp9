@@ -140,11 +140,14 @@ final class ActivityManagerShellCommand extends ShellCommand {
 
     final boolean mDumping;
 
+    private IHwActivityManagerShellCommand mHwActivityManagerShellCommand;
+
     ActivityManagerShellCommand(ActivityManagerService service, boolean dumping) {
         mInterface = service;
         mInternal = service;
         mPm = AppGlobals.getPackageManager();
         mDumping = dumping;
+        mHwActivityManagerShellCommand = new HwActivityManagerShellCommand(this, mInternal);
     }
 
     @Override
@@ -285,6 +288,14 @@ final class ActivityManagerShellCommand extends ShellCommand {
         return -1;
     }
 
+    @Override
+    public int handleDefaultCommands(String cmd) {
+        if (mHwActivityManagerShellCommand.onCommand(cmd) < 0) {
+            return super.handleDefaultCommands(cmd);
+        }
+        return 0;
+    }
+
     private Intent makeIntent(int defUser) throws URISyntaxException {
         mStartFlags = 0;
         mWaitOption = false;
@@ -359,6 +370,8 @@ final class ActivityManagerShellCommand extends ShellCommand {
                     mIsTaskOverlay = true;
                 } else if (opt.equals("--lock-task")) {
                     mIsLockTask = true;
+                } else if (mHwActivityManagerShellCommand.handleOption(opt)) {
+                    return true;
                 } else {
                     return false;
                 }
@@ -463,6 +476,7 @@ final class ActivityManagerShellCommand extends ShellCommand {
                     options.setTaskOverlay(true, true /* canResume */);
                 }
             }
+            mHwActivityManagerShellCommand.runStartActivity(options);
             if (mIsLockTask) {
                 if (options == null) {
                     options = ActivityOptions.makeBasic();
@@ -2384,7 +2398,7 @@ final class ActivityManagerShellCommand extends ShellCommand {
     }
 
 
-    private Rect getBounds() {
+    Rect getBounds() {
         String leftStr = getNextArgRequired();
         int left = Integer.parseInt(leftStr);
         String topStr = getNextArgRequired();
@@ -3077,6 +3091,7 @@ final class ActivityManagerShellCommand extends ShellCommand {
             pw.println("      without restarting any processes.");
             pw.println("  write");
             pw.println("      Write all pending state to storage.");
+            HwActivityManagerShellCommand.onHelp(pw);
             pw.println();
             Intent.printIntentArgsHelp(pw, "");
         }

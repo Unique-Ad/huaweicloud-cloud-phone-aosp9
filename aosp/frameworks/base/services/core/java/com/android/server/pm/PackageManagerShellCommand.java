@@ -89,10 +89,13 @@ import com.android.internal.util.ArrayUtils;
 import com.android.server.LocalServices;
 import com.android.server.SystemConfig;
 import dalvik.system.DexFile;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.URISyntaxException;
@@ -126,9 +129,19 @@ class PackageManagerShellCommand extends ShellCommand {
     int mTargetUser;
     boolean mBrief;
     boolean mComponents;
+    final HwPackageManagerShellCommand mHwPackageManagerShellCommand;
 
     PackageManagerShellCommand(PackageManagerService service) {
         mInterface = service;
+        mHwPackageManagerShellCommand = new HwPackageManagerShellCommand(this, service);
+    }
+
+    @Override
+    public int handleDefaultCommands(String cmd) {
+        if (mHwPackageManagerShellCommand.onCommand(cmd) < 0) {
+            return super.handleDefaultCommands(cmd);
+        }
+        return 0;
     }
 
     @Override
@@ -2926,6 +2939,7 @@ class PackageManagerShellCommand extends ShellCommand {
         pw.println("    Remove updates to all system applications and fall back to their /system " +
                 "version.");
         pw.println();
+        mHwPackageManagerShellCommand.onHelp(pw);
         Intent.printIntentArgsHelp(pw , "");
     }
 

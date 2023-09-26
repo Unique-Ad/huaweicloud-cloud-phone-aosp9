@@ -55,7 +55,9 @@ cc_library_static {
     include_dirs: [
         "frameworks/base/libs",
         "frameworks/native/services",
+        "frameworks/native/libs/sensor/include",
         "system/gatekeeper/include",
+        "system/core/libsuspend/include",
     ],
 
     product_variables: {

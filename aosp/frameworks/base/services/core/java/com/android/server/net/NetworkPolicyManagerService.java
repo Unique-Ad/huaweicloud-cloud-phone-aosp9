@@ -712,6 +712,7 @@ public class NetworkPolicyManagerService extends INetworkPolicyManager.Stub {
             Process.setThreadPriority(Process.THREAD_PRIORITY_FOREGROUND);
             if (!isBandwidthControlEnabled()) {
                 Slog.w(TAG, "bandwidth controls disabled, unable to enforce policy");
+                initCompleteSignal.countDown();
                 return;
             }
 
@@ -3858,7 +3859,7 @@ public class NetworkPolicyManagerService extends INetworkPolicyManager.Stub {
 
         if (packages != null) {
             for (String packageName : packages) {
-                if (!mUsageStats.isAppIdle(packageName, uid, userId)) {
+                if (mUsageStats!=null && !mUsageStats.isAppIdle(packageName, uid, userId)) {
                     return false;
                 }
             }
@@ -4147,7 +4148,8 @@ public class NetworkPolicyManagerService extends INetworkPolicyManager.Stub {
         final boolean restrictMode = isIdle || mRestrictPower || mDeviceIdleMode;
         final boolean isForeground = isUidForegroundOnRestrictPowerUL(uid);
 
-        final boolean isWhitelisted = isWhitelistedBatterySaverUL(uid, mDeviceIdleMode);
+        /* no need to check battery saver policy */
+        final boolean isWhitelisted = true;
         final int oldRule = oldUidRules & MASK_ALL_NETWORKS;
         int newRule = RULE_NONE;
 

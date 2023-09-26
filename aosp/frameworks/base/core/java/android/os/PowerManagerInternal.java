@@ -200,4 +200,6 @@ public abstract class PowerManagerInternal {
      * PowerHint defined in android/hardware/power/<version 1.0 & up>/IPower.h
      */
     public abstract void powerHint(int hintId, int data);
+
+    public abstract void releaseAudioWakelock(int uid);
 }

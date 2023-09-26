@@ -57,6 +57,7 @@ import android.telephony.ims.aidl.IImsMmTelFeature;
 import android.telephony.ims.aidl.IImsRcsFeature;
 import android.telephony.ims.aidl.IImsRegistration;
 import android.telephony.ims.stub.ImsRegistrationImplBase;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.android.ims.internal.IImsServiceFeatureCallback;
@@ -1217,16 +1218,17 @@ public class TelephonyManager {
     @SuppressAutoDoc // Blocked by b/72967236 - no support for carrier privileges
     @RequiresPermission(android.Manifest.permission.READ_PHONE_STATE)
     public String getDeviceId() {
+        String deviceId = "";
         try {
             ITelephony telephony = getITelephony();
-            if (telephony == null)
-                return null;
-            return telephony.getDeviceId(mContext.getOpPackageName());
+            if (telephony != null) {
+                deviceId = telephony.getDeviceId(mContext.getOpPackageName());
+            }
         } catch (RemoteException ex) {
-            return null;
         } catch (NullPointerException ex) {
-            return null;
         }
+
+        return HwTelephonyManager.getDeviceId(deviceId);
     }
 
     /**
@@ -1245,17 +1247,17 @@ public class TelephonyManager {
     @SuppressAutoDoc // Blocked by b/72967236 - no support for carrier privileges
     @RequiresPermission(android.Manifest.permission.READ_PHONE_STATE)
     public String getDeviceId(int slotIndex) {
-        // FIXME this assumes phoneId == slotIndex
+        String deviceId = "";
         try {
             IPhoneSubInfo info = getSubscriberInfo();
-            if (info == null)
-                return null;
-            return info.getDeviceIdForPhone(slotIndex, mContext.getOpPackageName());
+            if (info != null) {
+                deviceId = info.getDeviceIdForPhone(slotIndex, mContext.getOpPackageName());
+            }
         } catch (RemoteException ex) {
-            return null;
         } catch (NullPointerException ex) {
-            return null;
         }
+
+        return HwTelephonyManager.getDeviceId(deviceId);
     }
 
     /**
@@ -1283,16 +1285,17 @@ public class TelephonyManager {
     @SuppressAutoDoc // Blocked by b/72967236 - no support for carrier privileges
     @RequiresPermission(android.Manifest.permission.READ_PHONE_STATE)
     public String getImei(int slotIndex) {
-        ITelephony telephony = getITelephony();
-        if (telephony == null) return null;
-
+        String imei = "";
         try {
-            return telephony.getImeiForSlot(slotIndex, getOpPackageName());
+            ITelephony telephony = getITelephony();
+            if (telephony != null) {
+                imei = telephony.getImeiForSlot(slotIndex, getOpPackageName());
+            }
         } catch (RemoteException ex) {
-            return null;
         } catch (NullPointerException ex) {
-            return null;
         }
+
+        return HwTelephonyManager.getImei(imei);
     }
 
     /**
@@ -1397,9 +1400,9 @@ public class TelephonyManager {
                 return null;
             }
             Bundle bundle = telephony.getCellLocation(mContext.getOpPackageName());
-            if (bundle.isEmpty()) {
+            // cph mock cell location with celllocation contructor instead of bundle
+            if (bundle == null || bundle.isEmpty()) {
                 Rlog.d(TAG, "getCellLocation returning null because bundle is empty");
-                return null;
             }
             CellLocation cl = CellLocation.newFromBundle(bundle);
             if (cl.isEmpty()) {
@@ -1768,7 +1771,7 @@ public class TelephonyManager {
      */
     public String getNetworkOperatorName(int subId) {
         int phoneId = SubscriptionManager.getPhoneId(subId);
-        return getTelephonyProperty(phoneId, TelephonyProperties.PROPERTY_OPERATOR_ALPHA, "");
+        return getTelephonyProperty(HwTelephonyManager.validPhoneId(phoneId), TelephonyProperties.PROPERTY_OPERATOR_ALPHA, "");
     }
 
     /**
@@ -1810,9 +1813,8 @@ public class TelephonyManager {
      * @hide
      **/
     public String getNetworkOperatorForPhone(int phoneId) {
-        return getTelephonyProperty(phoneId, TelephonyProperties.PROPERTY_OPERATOR_NUMERIC, "");
+        return getTelephonyProperty(HwTelephonyManager.validPhoneId(phoneId), TelephonyProperties.PROPERTY_OPERATOR_NUMERIC, "");
      }
-
 
     /**
      * Returns the network specifier of the subscription ID pinned to the TelephonyManager. The
@@ -1915,13 +1917,16 @@ public class TelephonyManager {
      */
     /** {@hide} */
     public String getNetworkCountryIsoForPhone(int phoneId) {
+        String countryIso = "";
         try {
             ITelephony telephony = getITelephony();
-            if (telephony == null) return "";
-            return telephony.getNetworkCountryIsoForPhone(phoneId);
+            if (telephony != null) {
+                countryIso = telephony.getNetworkCountryIsoForPhone(phoneId);
+            }
         } catch (RemoteException ex) {
-            return "";
         }
+
+        return HwTelephonyManager.getNetworkCountryIsoForPhone(countryIso);
     }
 
     /*
@@ -2622,7 +2627,7 @@ public class TelephonyManager {
      * @hide
      */
     public String getSimOperatorNumericForPhone(int phoneId) {
-        return getTelephonyProperty(phoneId,
+        return getTelephonyProperty(HwTelephonyManager.validPhoneId(phoneId),
                 TelephonyProperties.PROPERTY_ICC_OPERATOR_NUMERIC, "");
     }
 
@@ -2658,7 +2663,7 @@ public class TelephonyManager {
      * @hide
      */
     public String getSimOperatorNameForPhone(int phoneId) {
-         return getTelephonyProperty(phoneId,
+        return getTelephonyProperty(HwTelephonyManager.validPhoneId(phoneId),
                 TelephonyProperties.PROPERTY_ICC_OPERATOR_ALPHA, "");
     }
 
@@ -2686,7 +2691,7 @@ public class TelephonyManager {
      * @hide
      */
     public String getSimCountryIsoForPhone(int phoneId) {
-        return getTelephonyProperty(phoneId,
+        return getTelephonyProperty(HwTelephonyManager.validPhoneId(phoneId),
                 TelephonyProperties.PROPERTY_ICC_OPERATOR_ISO_COUNTRY, "");
     }
 
@@ -2712,17 +2717,17 @@ public class TelephonyManager {
      */
     @RequiresPermission(android.Manifest.permission.READ_PHONE_STATE)
     public String getSimSerialNumber(int subId) {
+        String serialNum = "";
         try {
             IPhoneSubInfo info = getSubscriberInfo();
-            if (info == null)
-                return null;
-            return info.getIccSerialNumberForSubscriber(subId, mContext.getOpPackageName());
+            if (info != null) {
+                serialNum = info.getIccSerialNumberForSubscriber(subId, mContext.getOpPackageName());
+            }
         } catch (RemoteException ex) {
-            return null;
         } catch (NullPointerException ex) {
-            // This could happen before phone restarts due to crashing
-            return null;
         }
+
+        return HwTelephonyManager.getSimSerialNumber(serialNum);
     }
 
     /**
@@ -2858,17 +2863,17 @@ public class TelephonyManager {
      */
     @RequiresPermission(android.Manifest.permission.READ_PHONE_STATE)
     public String getSubscriberId(int subId) {
+        String imsi = "";
         try {
             IPhoneSubInfo info = getSubscriberInfo();
-            if (info == null)
-                return null;
-            return info.getSubscriberIdForSubscriber(subId, mContext.getOpPackageName());
+            if (info != null) {
+                imsi = info.getSubscriberIdForSubscriber(subId, mContext.getOpPackageName());
+            }
         } catch (RemoteException ex) {
-            return null;
         } catch (NullPointerException ex) {
-            // This could happen before phone restarts due to crashing
-            return null;
         }
+
+        return HwTelephonyManager.getSubscriberId(imsi);
     }
 
     /**
@@ -3087,7 +3092,7 @@ public class TelephonyManager {
             android.Manifest.permission.READ_PHONE_NUMBERS
     })
     public String getLine1Number(int subId) {
-        String number = null;
+        String number = "";
         try {
             ITelephony telephony = getITelephony();
             if (telephony != null)
@@ -3095,20 +3100,19 @@ public class TelephonyManager {
         } catch (RemoteException ex) {
         } catch (NullPointerException ex) {
         }
-        if (number != null) {
-            return number;
+
+        if (TextUtils.isEmpty(number)) {
+            try {
+                IPhoneSubInfo info = getSubscriberInfo();
+                if (info != null) {
+                    number = info.getLine1NumberForSubscriber(subId, mContext.getOpPackageName());
+                }
+            } catch (RemoteException ex) {
+            } catch (NullPointerException ex) {
+            }
         }
-        try {
-            IPhoneSubInfo info = getSubscriberInfo();
-            if (info == null)
-                return null;
-            return info.getLine1NumberForSubscriber(subId, mContext.getOpPackageName());
-        } catch (RemoteException ex) {
-            return null;
-        } catch (NullPointerException ex) {
-            // This could happen before phone restarts due to crashing
-            return null;
-        }
+
+        return HwTelephonyManager.getLine1Number(number);
     }
 
     /**
@@ -6745,8 +6749,10 @@ public class TelephonyManager {
     * @hide
     */
     public void setSimOperatorNumericForPhone(int phoneId, String numeric) {
-        setTelephonyProperty(phoneId,
-                TelephonyProperties.PROPERTY_ICC_OPERATOR_NUMERIC, numeric);
+        if (!TextUtils.isEmpty(numeric)) {
+            setTelephonyProperty(phoneId,
+                    TelephonyProperties.PROPERTY_ICC_OPERATOR_NUMERIC, numeric);
+        }
     }
 
     /**
@@ -6765,8 +6771,10 @@ public class TelephonyManager {
      * @hide
      */
     public void setSimOperatorNameForPhone(int phoneId, String name) {
-        setTelephonyProperty(phoneId,
-                TelephonyProperties.PROPERTY_ICC_OPERATOR_ALPHA, name);
+        if (!TextUtils.isEmpty(name)) {
+            setTelephonyProperty(phoneId,
+                    TelephonyProperties.PROPERTY_ICC_OPERATOR_ALPHA, name);
+        }
     }
 
    /**
@@ -7091,7 +7099,7 @@ public class TelephonyManager {
      * @hide
      */
     public void setNetworkOperatorNameForPhone(int phoneId, String name) {
-        if (SubscriptionManager.isValidPhoneId(phoneId)) {
+        if (SubscriptionManager.isValidPhoneId(phoneId) && !TextUtils.isEmpty(name)) {
             setTelephonyProperty(phoneId, TelephonyProperties.PROPERTY_OPERATOR_ALPHA, name);
         }
     }
@@ -7113,7 +7121,9 @@ public class TelephonyManager {
      * @hide
      */
     public void setNetworkOperatorNumericForPhone(int phoneId, String numeric) {
-        setTelephonyProperty(phoneId, TelephonyProperties.PROPERTY_OPERATOR_NUMERIC, numeric);
+        if (!TextUtils.isEmpty(numeric)) {
+            setTelephonyProperty(phoneId, TelephonyProperties.PROPERTY_OPERATOR_NUMERIC, numeric);
+        }
     }
 
     /**
@@ -7158,7 +7168,7 @@ public class TelephonyManager {
      * @hide
      */
     public void setNetworkCountryIsoForPhone(int phoneId, String iso) {
-        if (SubscriptionManager.isValidPhoneId(phoneId)) {
+        if (SubscriptionManager.isValidPhoneId(phoneId) && !TextUtils.isEmpty(iso)) {
             setTelephonyProperty(phoneId,
                     TelephonyProperties.PROPERTY_OPERATOR_ISO_COUNTRY, iso);
         }

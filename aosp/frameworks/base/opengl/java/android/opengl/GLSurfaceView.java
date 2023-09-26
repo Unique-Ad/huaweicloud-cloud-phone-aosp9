@@ -439,8 +439,10 @@ public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback
      */
     public void setEGLConfigChooser(int redSize, int greenSize, int blueSize,
             int alphaSize, int depthSize, int stencilSize) {
-        setEGLConfigChooser(new ComponentSizeChooser(redSize, greenSize,
-                blueSize, alphaSize, depthSize, stencilSize));
+        //setEGLConfigChooser(new ComponentSizeChooser(redSize, greenSize,
+        //        blueSize, alphaSize, depthSize, stencilSize));
+        setEGLConfigChooser(new ComponentSizeChooser(8, 8,
+                8, alphaSize, depthSize, stencilSize));
     }
 
     /**
@@ -1051,6 +1053,21 @@ public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback
                 mEglContext = null;
             } else {
                 mEglConfig = view.mEGLConfigChooser.chooseConfig(mEgl, mEglDisplay);
+                // in null case set a default config (CPH)
+                if (mEglConfig == null) {
+                    EGLConfig[] configs = new EGLConfig[1];
+                    int[] num_config = new int[1];
+                    int[] attributes = new int[] {
+                            EGL10.EGL_RED_SIZE, 8,
+                            EGL10.EGL_GREEN_SIZE, 8,
+                            EGL10.EGL_BLUE_SIZE, 8,
+                            EGL10.EGL_ALPHA_SIZE, 8,
+                            EGL10.EGL_DEPTH_SIZE, 16,
+                            EGL10.EGL_RENDERABLE_TYPE, 4,
+                            EGL10.EGL_NONE };
+                    mEgl.eglChooseConfig(mEglDisplay, attributes, configs, 1, num_config);
+                    mEglConfig = configs[0];
+                }
 
                 /*
                 * Create an EGL context. We want to do this as rarely as we can, because an

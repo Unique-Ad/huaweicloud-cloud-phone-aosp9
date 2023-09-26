@@ -547,7 +547,6 @@ public final class ProcessStats implements Parcelable {
         mReadError = null;
         mFlags = 0;
         evaluateSystemProperties(true);
-        updateFragmentation();
     }
 
     public boolean evaluateSystemProperties(boolean update) {

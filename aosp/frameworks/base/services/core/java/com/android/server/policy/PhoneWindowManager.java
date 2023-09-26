@@ -2189,7 +2189,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 new SystemGesturesPointerEventListener.Callbacks() {
                     @Override
                     public void onSwipeFromTop() {
-                        if (mStatusBar != null) {
+                        if (mStatusBar != null && HwPhoneWindowManager.enableStatusBar()) {
                             requestTransientBars(mStatusBar);
                         }
                     }
@@ -2384,12 +2384,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
         // Allow a system property to override this. Used by the emulator.
         // See also hasNavigationBar().
-        String navBarOverride = SystemProperties.get("qemu.hw.mainkeys");
-        if ("1".equals(navBarOverride)) {
-            mHasNavigationBar = false;
-        } else if ("0".equals(navBarOverride)) {
-            mHasNavigationBar = true;
-        }
+        mHasNavigationBar = HwPhoneWindowManager.hasNavigationBar();
 
         // For demo purposes, allow the rotation of the HDMI display to be controlled.
         // By default, HDMI locks rotation to landscape.
@@ -7101,8 +7096,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     /** {@inheritDoc} */
     @Override
     public boolean isKeyguardSecure(int userId) {
-        if (mKeyguardDelegate == null) return false;
-        return mKeyguardDelegate.isSecure(userId);
+        return true;
     }
 
     /** {@inheritDoc} */
@@ -8502,7 +8496,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     }
 
     // Use this instead of checking config_showNavigationBar so that it can be consistently
-    // overridden by qemu.hw.mainkeys in the emulator.
+    // overridden by com.cph.mainkeys in the emulator.
     @Override
     public boolean hasNavigationBar() {
         return mHasNavigationBar;

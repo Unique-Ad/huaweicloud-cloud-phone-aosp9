@@ -237,6 +237,17 @@ public class NetworkInfo implements Parcelable {
     }
 
     /**
+     * Set the network type name
+     * for example "WIFI" or "MOBILE"
+     * @hide
+     */
+    public void setTypeName(String typeName) {
+        synchronized (this) {
+            mTypeName = typeName;
+        }
+    }
+
+    /**
      * Return a human-readable name describing the subtype of the network.
      * @return the name of the network subtype
      */

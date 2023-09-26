@@ -16,6 +16,7 @@
 
 package android.net.ip;
 
+import android.net.HwNetConfig;
 import android.net.INetd;
 import android.net.InterfaceConfiguration;
 import android.net.LinkAddress;
@@ -53,6 +54,10 @@ public class InterfaceController {
     }
 
     public boolean setIPv4Address(LinkAddress address) {
+        // CPH doesn't change IP address
+        if (HwNetConfig.isCphWifi()) {
+            return true;
+        }
         final InterfaceConfiguration ifcg = new InterfaceConfiguration();
         ifcg.setLinkAddress(address);
         try {
@@ -66,6 +71,10 @@ public class InterfaceController {
     }
 
     public boolean clearIPv4Address() {
+        // CPH doesn't change IP address
+        if (HwNetConfig.isCphWifi()) {
+            return true;
+        }
         try {
             final InterfaceConfiguration ifcg = new InterfaceConfiguration();
             ifcg.setLinkAddress(new LinkAddress("0.0.0.0/0"));
@@ -157,6 +166,9 @@ public class InterfaceController {
     }
 
     private void logError(String fmt, Object... args) {
+        if (HwNetConfig.isCphWifi()) {
+            return;
+        }
         mLog.e(String.format(fmt, args));
     }
 }

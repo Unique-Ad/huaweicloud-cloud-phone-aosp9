@@ -15,6 +15,7 @@
 # Warning: this is actually a product definition, to be inherited from
 
 PRODUCT_PACKAGES := \
+    DroidSansFallback.ttf \
     DroidSansMono.ttf \
     AndroidClock.ttf \
     fonts.xml

@@ -343,6 +343,7 @@ public class DecorCaptionView extends ViewGroup implements View.OnTouchListener,
      * Maximize the window by moving it to the maximized workspace stack.
      **/
     private void maximizeWindow() {
+        /*
         Window.WindowControllerCallback callback = mOwner.getWindowControllerCallback();
         if (callback != null) {
             try {
@@ -351,6 +352,7 @@ public class DecorCaptionView extends ViewGroup implements View.OnTouchListener,
                 Log.e(TAG, "Cannot change task workspace.");
             }
         }
+        */
     }
 
     public boolean isCaptionShowing() {

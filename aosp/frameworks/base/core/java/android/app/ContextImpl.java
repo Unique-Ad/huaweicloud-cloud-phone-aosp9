@@ -2490,7 +2490,7 @@ class ContextImpl extends Context {
     }
 
     private void checkMode(int mode) {
-        if (getApplicationInfo().targetSdkVersion >= Build.VERSION_CODES.N) {
+        if (getApplicationInfo().targetSdkVersion > Build.VERSION_CODES.N) {
             if ((mode & MODE_WORLD_READABLE) != 0) {
                 throw new SecurityException("MODE_WORLD_READABLE no longer supported");
             }

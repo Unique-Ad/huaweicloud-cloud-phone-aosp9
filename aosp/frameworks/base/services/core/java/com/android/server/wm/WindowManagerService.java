@@ -923,6 +923,7 @@ public class WindowManagerService extends IWindowManager.Stub
         new WindowManagerShellCommand(this).exec(this, in, out, err, args, callback, result);
     }
 
+    private final IHwWindowManagerService mHwWindowManagerService;
     private WindowManagerService(Context context, InputManagerService inputManager,
             boolean haveInputMethods, boolean showBootMsgs, boolean onlyCore,
             WindowManagerPolicy policy) {
@@ -1070,6 +1071,8 @@ public class WindowManagerService extends IWindowManager.Stub
         mTaskPositioningController = new TaskPositioningController(
                 this, mInputManager, mInputMonitor, mActivityManager, mH.getLooper());
         mDragDropController = new DragDropController(this, mH.getLooper());
+
+        mHwWindowManagerService = new HwWindowManagerService(this);
 
         LocalServices.addService(WindowManagerInternal.class, new LocalService());
     }
@@ -5151,6 +5154,11 @@ public class WindowManagerService extends IWindowManager.Stub
     }
 
     @Override
+    public void getOrigDisplaySize(int displayId, Point size) {
+        mHwWindowManagerService.getOrigDisplaySize(displayId, size);
+    }
+
+    @Override
     public void getBaseDisplaySize(int displayId, Point size) {
         synchronized (mWindowMap) {
             final DisplayContent displayContent = mRoot.getDisplayContent(displayId);
@@ -5172,21 +5180,13 @@ public class WindowManagerService extends IWindowManager.Stub
         if (displayId != DEFAULT_DISPLAY) {
             throw new IllegalArgumentException("Can only set the default display");
         }
+        mHwWindowManagerService.setForcedDisplaySize(width, height);
         final long ident = Binder.clearCallingIdentity();
         try {
             synchronized(mWindowMap) {
-                // Set some sort of reasonable bounds on the size of the display that we
-                // will try to emulate.
-                final int MIN_WIDTH = 200;
-                final int MIN_HEIGHT = 200;
-                final int MAX_SCALE = 2;
                 final DisplayContent displayContent = mRoot.getDisplayContent(displayId);
                 if (displayContent != null) {
-                    width = Math.min(Math.max(width, MIN_WIDTH),
-                            displayContent.mInitialDisplayWidth * MAX_SCALE);
-                    height = Math.min(Math.max(height, MIN_HEIGHT),
-                            displayContent.mInitialDisplayHeight * MAX_SCALE);
-                    setForcedDisplaySizeLocked(displayContent, width, height);
+                    setForcedDisplaySizeLocked(displayContent, width, height, displayContent.mBaseDisplayDensity);
                     Settings.Global.putString(mContext.getContentResolver(),
                             Settings.Global.DISPLAY_SIZE_FORCED, width + "," + height);
                 }
@@ -5250,6 +5250,7 @@ public class WindowManagerService extends IWindowManager.Stub
                         Slog.i(TAG_WM, "FORCED DISPLAY SIZE: " + width + "x" + height);
                         displayContent.updateBaseDisplayMetrics(width, height,
                                 displayContent.mBaseDisplayDensity);
+                        mHwWindowManagerService.readForcedDisplayPropertiesLocked(displayContent, width, height);
                     }
                 } catch (NumberFormatException ex) {
                 }
@@ -5272,9 +5273,10 @@ public class WindowManagerService extends IWindowManager.Stub
     }
 
     // displayContent must not be null
-    private void setForcedDisplaySizeLocked(DisplayContent displayContent, int width, int height) {
+    private void setForcedDisplaySizeLocked(DisplayContent displayContent, int width, int height, int density) {
         Slog.i(TAG_WM, "Using new display size: " + width + "x" + height);
-        displayContent.updateBaseDisplayMetrics(width, height, displayContent.mBaseDisplayDensity);
+        displayContent.updateBaseDisplayMetrics(width, height, density);
+        mDisplayManager.resizePrimaryDisplay(width, height);
         reconfigureDisplayLocked(displayContent);
     }
 
@@ -5294,8 +5296,8 @@ public class WindowManagerService extends IWindowManager.Stub
             synchronized(mWindowMap) {
                 final DisplayContent displayContent = mRoot.getDisplayContent(displayId);
                 if (displayContent != null) {
-                    setForcedDisplaySizeLocked(displayContent, displayContent.mInitialDisplayWidth,
-                            displayContent.mInitialDisplayHeight);
+                    setForcedDisplaySizeLocked(displayContent, displayContent.mOrigDisplayWidth,
+                            displayContent.mOrigDisplayHeight, displayContent.mOrigDisplayDensity);
                     Settings.Global.putString(mContext.getContentResolver(),
                             Settings.Global.DISPLAY_SIZE_FORCED, "");
                 }
@@ -7416,6 +7418,11 @@ public class WindowManagerService extends IWindowManager.Stub
             synchronized (mWindowMap) {
                 return getDefaultDisplayContentLocked().getDockedDividerController().isResizing();
             }
+        }
+
+        @Override
+        public boolean hasFloatingWindow(String packageName) {
+            return mHwWindowManagerService.hasFloatingWindow(packageName);
         }
 
         @Override

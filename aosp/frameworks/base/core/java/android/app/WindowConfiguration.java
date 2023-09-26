@@ -503,7 +503,7 @@ public class WindowConfiguration implements Parcelable, Comparable<WindowConfigu
      * @hide
      */
     public static boolean isFloating(int windowingMode) {
-        return windowingMode == WINDOWING_MODE_FREEFORM || windowingMode == WINDOWING_MODE_PINNED;
+        return windowingMode == WINDOWING_MODE_PINNED;
     }
 
     /**

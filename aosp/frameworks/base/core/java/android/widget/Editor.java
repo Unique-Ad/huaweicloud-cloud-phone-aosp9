@@ -2792,10 +2792,12 @@ public class Editor {
                 com.android.internal.R.string.paste_as_plain_text)
                 .setEnabled(mTextView.canPasteAsPlainText())
                 .setOnMenuItemClickListener(mOnContextMenuItemClickListener);
-        menu.add(Menu.NONE, TextView.ID_SHARE, MENU_ITEM_ORDER_SHARE,
-                com.android.internal.R.string.share)
-                .setEnabled(mTextView.canShare())
-                .setOnMenuItemClickListener(mOnContextMenuItemClickListener);
+        if (HwEditor.canShare()) {
+            menu.add(Menu.NONE, TextView.ID_SHARE, MENU_ITEM_ORDER_SHARE,
+                    com.android.internal.R.string.share)
+                    .setEnabled(mTextView.canShare())
+                    .setOnMenuItemClickListener(mOnContextMenuItemClickListener);
+        }
         menu.add(Menu.NONE, TextView.ID_SELECT_ALL, MENU_ITEM_ORDER_SELECT_ALL,
                 com.android.internal.R.string.selectAll)
                 .setAlphabeticShortcut('a')
@@ -3985,13 +3987,11 @@ public class Editor {
                                 .setAlphabeticShortcut('v')
                                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
             }
-
-            if (mTextView.canShare()) {
+            if (HwEditor.canShare() && mTextView.canShare()) {
                 menu.add(Menu.NONE, TextView.ID_SHARE, MENU_ITEM_ORDER_SHARE,
                         com.android.internal.R.string.share)
                         .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
             }
-
             if (mTextView.canRequestAutofill()) {
                 final String selected = mTextView.getSelectedText();
                 if (selected == null || selected.isEmpty()) {

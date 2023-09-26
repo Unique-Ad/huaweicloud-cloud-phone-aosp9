@@ -63,7 +63,10 @@ cc_library_shared {
 
     header_libs: ["libhardware_headers"],
 
-    static_libs: ["libgrallocusage"],
+    static_libs: [
+        "libgrallocusage",
+        "libmedia_jni_vendor",
+    ],
 
     include_dirs: [
         "frameworks/base/core/jni",
@@ -150,6 +153,8 @@ cc_library_shared {
         "libutilscallstack",
         "libz",
         "libziparchive",
+        "libmedia_jni_vendor",
+        "libbinder_vendor"
     ],
 
     group_static_libs: true,

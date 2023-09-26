@@ -118,7 +118,7 @@ public class Am extends BaseCommand {
                 System.err.println(msg);
                 throw new IllegalArgumentException(msg);
             }
-            if (seLinuxContext != null) {
+            if (SELinux.isSELinuxEnabled() && seLinuxContext != null) {
                 final String tcon = SELinux.getFileContext(file.getAbsolutePath());
                 if (!SELinux.checkSELinuxAccess(seLinuxContext, tcon, "file", "write")) {
                     try {

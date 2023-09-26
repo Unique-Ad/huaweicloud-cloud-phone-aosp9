@@ -1696,7 +1696,8 @@ public class NetworkStatsService extends INetworkStatsService.Stub {
 
     private void assertBandwidthControlEnabled() {
         if (!isBandwidthControlEnabled()) {
-            throw new IllegalStateException("Bandwidth module disabled");
+            // just throws common RuntimeException in order for the client to try-catch.
+            throw new RuntimeException("Bandwidth module disabled");
         }
     }
 

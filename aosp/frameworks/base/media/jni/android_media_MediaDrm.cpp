@@ -35,6 +35,7 @@
 #include <media/stagefright/MediaErrors.h>
 #include <mediadrm/IDrm.h>
 #include <mediadrm/IMediaDrmService.h>
+#include <hw_android_media_MediaDrm.h>
 
 using ::android::os::PersistableBundle;
 
@@ -1466,6 +1467,10 @@ static jstring android_media_MediaDrm_getPropertyString(
 
 static jbyteArray android_media_MediaDrm_getPropertyByteArray(
     JNIEnv *env, jobject thiz, jstring jname) {
+    jbyteArray ret = hw_android_media_MediaDrm_getPropertyByteArray(env, jname);
+    if (ret != NULL) {
+        return ret;
+    }
     sp<IDrm> drm = GetDrm(env, thiz);
 
     if (!CheckDrm(env, drm)) {

@@ -1102,13 +1102,8 @@ public class SettingsProvider extends ContentProvider {
 
                 // As of Android O, the SSAID is read from an app-specific entry in table
                 // SETTINGS_FILE_SSAID, unless accessed by a system process.
-                final Setting setting;
-                if (isNewSsaidSetting(name)) {
-                    setting = getSsaidSettingLocked(ssaidCallingPkg, owningUserId);
-                } else {
-                    setting = mSettingsRegistry.getSettingLocked(SETTINGS_TYPE_SECURE, owningUserId,
+                final Setting setting = mSettingsRegistry.getSettingLocked(SETTINGS_TYPE_SECURE, owningUserId,
                             name);
-                }
                 appendSettingToCursor(result, setting);
             }
 
@@ -1142,14 +1137,6 @@ public class SettingsProvider extends ContentProvider {
             return settings != null ? settings.getNullSetting() : null;
         }
 
-        // As of Android O, the SSAID is read from an app-specific entry in table
-        // SETTINGS_FILE_SSAID, unless accessed by a system process.
-        if (isNewSsaidSetting(name)) {
-            PackageInfo callingPkg = getCallingPackageInfo(owningUserId);
-            synchronized (mLock) {
-                return getSsaidSettingLocked(callingPkg, owningUserId);
-            }
-        }
         if (enableOverride) {
             if (Secure.LOCATION_PROVIDERS_ALLOWED.equals(name)) {
                 final Setting overridden = getLocationProvidersAllowedSetting(owningUserId);
