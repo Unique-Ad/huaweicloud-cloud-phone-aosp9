@@ -33,14 +33,8 @@
 #include "MediaExtractorService.h"
 #include "MediaExtractorUpdateService.h"
 #include "MediaUtils.h"
-#include "minijail.h"
 
 using namespace android;
-
-static const char kSystemSeccompPolicyPath[] =
-        "/system/etc/seccomp_policy/mediaextractor.policy";
-static const char kVendorSeccompPolicyPath[] =
-        "/vendor/etc/seccomp_policy/mediaextractor.policy";
 
 int main(int argc __unused, char** argv)
 {
@@ -56,8 +50,6 @@ int main(int argc __unused, char** argv)
     //as pread64 are used by linker but aren't allowed in the minijail. By
     //calling the function before entering minijail, we can force dlopen.
     android::report_sysprop_change();
-
-    SetUpMinijail(kSystemSeccompPolicyPath, kVendorSeccompPolicyPath);
 
     InitializeIcuOrDie();
 

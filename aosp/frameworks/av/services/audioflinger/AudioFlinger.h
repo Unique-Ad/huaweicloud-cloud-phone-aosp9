@@ -287,6 +287,7 @@ private:
     Vector< sp<NBLog::Writer> > mUnregisteredWriters;
     Mutex               mUnregisteredWritersLock;
 
+    String8 checkAudioParameters(const String8& keys) const;
 public:
 
     class SyncEvent;

@@ -17,9 +17,6 @@
 
 #include <android-base/logging.h>
 
-// from LOCAL_C_INCLUDES
-#include "minijail.h"
-
 #include <binder/ProcessState.h>
 #include <hidl/HidlTransportSupport.h>
 #include <media/stagefright/omx/1.0/Omx.h>
@@ -30,18 +27,11 @@
 
 using namespace android;
 
-// Must match location in Android.mk.
-static const char kSystemSeccompPolicyPath[] =
-        "/system/etc/seccomp_policy/mediacodec.policy";
-static const char kVendorSeccompPolicyPath[] =
-        "/vendor/etc/seccomp_policy/mediacodec.policy";
-
 int main(int argc __unused, char** argv)
 {
     strcpy(argv[0], "media.codec");
     LOG(INFO) << "mediacodecservice starting";
     signal(SIGPIPE, SIG_IGN);
-    SetUpMinijail(kSystemSeccompPolicyPath, kVendorSeccompPolicyPath);
 
     android::ProcessState::initWithDriver("/dev/vndbinder");
     android::ProcessState::self()->startThreadPool();

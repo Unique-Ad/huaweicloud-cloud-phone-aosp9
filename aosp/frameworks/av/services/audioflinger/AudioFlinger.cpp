@@ -1301,12 +1301,57 @@ status_t AudioFlinger::setParameters(audio_io_handle_t ioHandle, const String8& 
     return BAD_VALUE;
 }
 
+String8 AudioFlinger::checkAudioParameters(const String8& keys) const
+{
+    // keys: "CphAstate#uid"
+    String8 audio_8 = String8("");
+    const char* key = "CphAstate#";
+    ssize_t index = keys.find(key);
+    if (index < 0) {
+        return audio_8;
+    }
+    String8 uidStr(keys.string() + index + strlen(key));
+    const int uid = atoi(uidStr.string());
+    ALOGV("checkAudioParameters uid: %d", uid);
+    if (uid == 0) {
+       return audio_8;
+    }
+
+    // check audio playing
+    for (size_t i = 0; i < mPlaybackThreads.size(); i++) {
+        sp<PlaybackThread> thread = mPlaybackThreads.valueAt(i);
+        if (thread->isPlaying(uid)) {
+            audio_8 += String8("Playing");
+            break;
+        }
+    }
+
+    // check audio recording
+    for (size_t i = 0; i < mRecordThreads.size(); i++) {
+        sp<RecordThread> thread = mRecordThreads.valueAt(i);
+        if (thread->isRecording(uid)) {
+            if (!audio_8.isEmpty()) {
+                audio_8 += String8("&");
+            }
+            audio_8 += String8("Recording");
+            break;
+        }
+    }
+
+    return audio_8;
+}
+
 String8 AudioFlinger::getParameters(audio_io_handle_t ioHandle, const String8& keys) const
 {
     ALOGVV("getParameters() io %d, keys %s, calling pid %d",
             ioHandle, keys.string(), IPCThreadState::self()->getCallingPid());
 
     Mutex::Autolock _l(mLock);
+
+    String8 audio_s8 = checkAudioParameters(keys);
+    if (!audio_s8.isEmpty()) {
+        return audio_s8;
+    }
 
     if (ioHandle == AUDIO_IO_HANDLE_NONE) {
         String8 out_s8;

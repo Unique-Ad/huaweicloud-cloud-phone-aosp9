@@ -10,6 +10,7 @@ cc_library_shared {
     include_dirs: [
         "frameworks/av/media/libstagefright/include",
         "frameworks/native/include/media/openmax",
+        "external/libopus/include",
     ],
 
     shared_libs: [

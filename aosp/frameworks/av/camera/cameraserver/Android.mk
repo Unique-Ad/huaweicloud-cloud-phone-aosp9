@@ -33,7 +33,7 @@ LOCAL_SHARED_LIBRARIES := \
 	android.hardware.camera.device@3.2
 
 LOCAL_MODULE:= cameraserver
-LOCAL_32_BIT_ONLY := true
+LOCAL_32_BIT_ONLY := false
 
 LOCAL_CFLAGS += -Wall -Wextra -Werror -Wno-unused-parameter
 

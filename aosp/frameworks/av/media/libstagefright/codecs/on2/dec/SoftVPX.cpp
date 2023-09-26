@@ -91,7 +91,7 @@ status_t SoftVPX::initDecoder() {
     vpx_codec_flags_t flags;
     memset(&cfg, 0, sizeof(vpx_codec_dec_cfg_t));
     memset(&flags, 0, sizeof(vpx_codec_flags_t));
-    cfg.threads = GetCPUCoreCount();
+    cfg.threads = 1;
 
     if (mFrameParallelMode) {
         flags |= VPX_CODEC_USE_FRAME_THREADING;
@@ -342,11 +342,13 @@ void SoftVPX::onReset() {
 android::SoftOMXComponent *createSoftOMXComponent(
         const char *name, const OMX_CALLBACKTYPE *callbacks,
         OMX_PTR appData, OMX_COMPONENTTYPE **component) {
-    if (!strcmp(name, "OMX.google.vp8.decoder")) {
+    if (!strcmp(name, "OMX.google.vp8.decoder") ||
+        !strcmp(name, "OMX.hisi.video.decoder.vp8")) {
         return new android::SoftVPX(
                 name, "video_decoder.vp8", OMX_VIDEO_CodingVP8,
                 callbacks, appData, component);
-    } else if (!strcmp(name, "OMX.google.vp9.decoder")) {
+    } else if (!strcmp(name, "OMX.google.vp9.decoder") ||
+               !strcmp(name, "OMX.hisi.video.decoder.vp9")) {
         return new android::SoftVPX(
                 name, "video_decoder.vp9", OMX_VIDEO_CodingVP9,
                 callbacks, appData, component);
