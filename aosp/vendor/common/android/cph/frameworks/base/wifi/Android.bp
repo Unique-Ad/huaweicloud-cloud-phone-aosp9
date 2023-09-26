@@ -1,0 +1,7 @@
+
+java_import {
+    name: "framework.wifi-vendor",
+    installable: false,
+    required: ["framework.wifi-vendor-impl"],
+    jars: ["framework.wifi-vendor-impl.jar"],
+}

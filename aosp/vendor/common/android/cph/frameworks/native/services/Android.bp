@@ -1,0 +1,51 @@
+
+cc_prebuilt_library_static {
+    name: "libinputflinger_vendor",
+    compile_multilib: "both",
+    export_include_dirs: ["./include"],
+    multilib: {
+        lib64: {
+            srcs: ["lib64/libinputflinger_vendor_impl.a"],
+        },
+        lib32: {
+            srcs: ["lib/libinputflinger_vendor_impl.a"],
+        },
+    },
+    strip : {
+        none: true,
+    },
+}
+
+cc_prebuilt_library_static {
+    name: "libsensorservice_vendor",
+    compile_multilib: "both",
+    export_include_dirs: ["./include"],
+    multilib: {
+        lib64: {
+            srcs: ["lib64/libsensorservice_vendor_impl.a"],
+        },
+        lib32: {
+            srcs: ["lib/libsensorservice_vendor_impl.a"],
+        },
+    },
+    strip : {
+        none: true,
+    },
+}
+
+cc_prebuilt_library_static {
+    name: "libsurfaceflinger_vendor",
+    compile_multilib: "both",
+    export_include_dirs: ["./include"],
+    multilib: {
+        lib64: {
+            srcs: ["lib64/libsurfaceflinger_vendor_impl.a"],
+        },
+        lib32: {
+            srcs: ["lib/libsurfaceflinger_vendor_impl.a"],
+        },
+    },
+    strip : {
+        none: true,
+    },
+}

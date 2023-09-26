@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- For low mem notification -->
+    <java-symbol type="string" name="notification_lowmem_title" />
+    <java-symbol type="string" name="notification_lowmem_text" />
+    <java-symbol type="string" name="notification_lowmem_bigtext" />
+</resources>

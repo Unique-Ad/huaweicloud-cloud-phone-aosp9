@@ -1,0 +1,7 @@
+java_import {
+    name: "SettingsProvider-vendor",
+    installable: false,
+    required: ["SettingsProvider-vendor-impl"],
+    jars: ["SettingsProvider-vendor-impl.jar"],
+}
+
