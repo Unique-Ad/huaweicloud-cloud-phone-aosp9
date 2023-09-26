@@ -87,25 +87,7 @@ Loader& Loader::getInstance() {
 static int
 checkGlesEmulationStatus(void)
 {
-    /* We're going to check for the following kernel parameters:
-     *
-     *    qemu=1                      -> tells us that we run inside the emulator
-     *    android.qemu.gles=<number>  -> tells us the GLES GPU emulation status
-     *
-     * Note that we will return <number> if we find it. This let us support
-     * more additionnal emulation modes in the future.
-     */
-    char  prop[PROPERTY_VALUE_MAX];
-    int   result = -1;
-
-    /* First, check for qemu=1 */
-    property_get("ro.kernel.qemu",prop,"0");
-    if (atoi(prop) != 1)
-        return -1;
-
-    /* We are in the emulator, get GPU status value */
-    property_get("qemu.gles",prop,"0");
-    return atoi(prop);
+    return 0;
 }
 
 static void* do_dlopen(const char* path, int mode) {
@@ -327,9 +309,9 @@ static void* load_system_driver(const char* kind) {
             switch (emulationStatus) {
                 case 0:
 #if defined(__LP64__)
-                    result = "/vendor/lib64/egl/libGLES_android.so";
+                    result = "/vendor/lib64/egl/libGLES_mesa.so";
 #else
-                    result = "/vendor/lib/egl/libGLES_android.so";
+                    result = "/vendor/lib/egl/libGLES_mesa.so";
 #endif
                     return result;
                 case 1:

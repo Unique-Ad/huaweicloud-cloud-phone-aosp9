@@ -93,6 +93,7 @@
 #include <configstore/Utils.h>
 
 #include <layerproto/LayerProtoParser.h>
+#include <HwSurfaceFlinger.h>
 
 #define DISPLAY_COUNT       1
 
@@ -127,6 +128,8 @@ private:
 }  // namespace anonymous
 
 // ---------------------------------------------------------------------------
+
+static int transactionTimeoutMs = SF_TRANSACTION_TIMEOUT_MS;
 
 const String16 sHardwareTest("android.permission.HARDWARE_TEST");
 const String16 sAccessSurfaceFlinger("android.permission.ACCESS_SURFACE_FLINGER");
@@ -638,9 +641,17 @@ void SurfaceFlinger::init() {
     ALOGI(  "SurfaceFlinger's main thread ready to run. "
             "Initializing graphics H/W...");
 
-    ALOGI("Phase offest NS: %" PRId64 "", vsyncPhaseOffsetNs);
-
     Mutex::Autolock _l(mStateLock);
+
+    if (hwCheckFps()) {
+        vsyncPhaseOffsetNs = vsyncPhaseOffsetNs / 2;
+        sfVsyncPhaseOffsetNs = sfVsyncPhaseOffsetNs / 2;
+        transactionTimeoutMs = transactionTimeoutMs / 2;
+    }
+
+    vsyncPhaseOffsetNs = hwGetAppVsync(vsyncPhaseOffsetNs);
+    sfVsyncPhaseOffsetNs = hwGetSfVsync(sfVsyncPhaseOffsetNs);
+    transactionTimeoutMs = hwGetTransactionTimeout(transactionTimeoutMs);
 
     // start the EventThread
     mEventThreadSource =
@@ -735,7 +746,7 @@ void SurfaceFlinger::init() {
     mLegacySrgbSaturationMatrix = getBE().mHwc->getDataspaceSaturationMatrix(HWC_DISPLAY_PRIMARY,
             Dataspace::SRGB_LINEAR);
 
-    ALOGV("Done initializing");
+    ALOGI("Done initializing");
 }
 
 void SurfaceFlinger::readPersistentProperties() {
@@ -1748,6 +1759,11 @@ void SurfaceFlinger::postComposition(nsecs_t refreshStartTime)
         }
     });
 
+    //CPH disable unnecessary hardware vsync
+    if (mHWVsyncAvailable) {
+        disableHardwareVsync(true);
+    }
+
     if (presentFenceTime->isValid()) {
         if (mPrimaryDispSync.addPresentFence(presentFenceTime)) {
             enableHardwareVsync();
@@ -2394,12 +2410,13 @@ void SurfaceFlinger::processDisplayChangesLocked() {
                     if (state.layerStack != draw[i].layerStack) {
                         disp->setLayerStack(state.layerStack);
                     }
+                    if (state.width != draw[i].width || state.height != draw[i].height) {
+                        disp->setDisplaySize(state.width, state.height);
+                        getHwComposer().updateActiveConfigSize(state.type, state.width, state.height);
+                    }
                     if ((state.orientation != draw[i].orientation) ||
                         (state.viewport != draw[i].viewport) || (state.frame != draw[i].frame)) {
                         disp->setProjection(state.orientation, state.viewport, state.frame);
-                    }
-                    if (state.width != draw[i].width || state.height != draw[i].height) {
-                        disp->setDisplaySize(state.width, state.height);
                     }
                 }
             }
@@ -3232,7 +3249,7 @@ void SurfaceFlinger::setTransactionState(
         // For window updates that are part of an animation we must wait for
         // previous animation "frames" to be handled.
         while (mAnimTransactionPending) {
-            status_t err = mTransactionCV.waitRelative(mStateLock, s2ns(5));
+            status_t err = mTransactionCV.waitRelative(mStateLock, ms2ns(transactionTimeoutMs));
             if (CC_UNLIKELY(err != NO_ERROR)) {
                 // just in case something goes wrong in SF, return to the
                 // caller after a few seconds.
@@ -3338,6 +3355,7 @@ uint32_t SurfaceFlinger::setDisplayStateLocked(const DisplayState& s)
             }
         }
         if (what & DisplayState::eDisplaySizeChanged) {
+            ALOGI("eDisplaySizeChanged [%dx%d]", s.width, s.height);
             if (disp.width != s.width) {
                 disp.width = s.width;
                 flags |= eDisplayTransactionNeeded;
@@ -4258,6 +4276,12 @@ void SurfaceFlinger::dumpAllLocked(const Vector<String16>& args, size_t& index,
         " ns, present offset %" PRId64 " ns (refresh %" PRId64 " ns)",
         vsyncPhaseOffsetNs, sfVsyncPhaseOffsetNs, mVsyncModulator.getEarlyPhaseOffset(),
         dispSyncPresentTimeOffset, activeConfig->getVsyncPeriod());
+    result.append("\n");
+
+    colorizer.bold(result);
+    result.append("AnimTransaction timeout: ");
+    colorizer.reset(result);
+    result.appendFormat("%d ms", transactionTimeoutMs);
     result.append("\n");
 
     // Dump static screen stats

@@ -516,6 +516,18 @@ Error Composer::setActiveConfig(Display display, Config config)
     return unwrapRet(ret);
 }
 
+Error Composer::updateActiveConfigSize(Display display, uint32_t width, uint32_t height)
+{
+    auto ret = mClient->updateActiveConfigSize(display, width, height);
+    return unwrapRet(ret);
+}
+
+Error Composer::eventControl(Display display, int32_t event, int32_t enabled)
+{
+    auto ret = mClient->eventControl(display, event, enabled);
+    return unwrapRet(ret);
+}
+
 Error Composer::setClientTarget(Display display, uint32_t slot,
         const sp<GraphicBuffer>& target,
         int acquireFence, Dataspace dataspace,

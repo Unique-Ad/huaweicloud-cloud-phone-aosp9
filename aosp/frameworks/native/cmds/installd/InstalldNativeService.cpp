@@ -64,6 +64,7 @@
 
 #include "CacheTracker.h"
 #include "MatchExtensionGen.h"
+#include <HwInstalldNativeService.h>
 
 #ifndef LOG_TAG
 #define LOG_TAG "installd"
@@ -447,6 +448,7 @@ static bool prepare_app_profile_dir(const std::string& packageName, int32_t appI
 binder::Status InstalldNativeService::createAppData(const std::unique_ptr<std::string>& uuid,
         const std::string& packageName, int32_t userId, int32_t flags, int32_t appId,
         const std::string& seInfo, int32_t targetSdkVersion, int64_t* _aidl_return) {
+    (void) seInfo;
     ENFORCE_UID(AID_SYSTEM);
     CHECK_ARGUMENT_UUID(uuid);
     CHECK_ARGUMENT_PACKAGE_NAME(packageName);
@@ -470,17 +472,17 @@ binder::Status InstalldNativeService::createAppData(const std::unique_ptr<std::s
     if (flags & FLAG_STORAGE_CE) {
         auto path = create_data_user_ce_package_path(uuid_, userId, pkgname);
         bool existing = (access(path.c_str(), F_OK) == 0);
-
+        (void) existing;
         if (prepare_app_dir(path, targetMode, uid) ||
                 prepare_app_cache_dir(path, "cache", 02771, uid, cacheGid) ||
                 prepare_app_cache_dir(path, "code_cache", 02771, uid, cacheGid)) {
-            return error("Failed to prepare " + path);
+            fix_app_path(path.c_str(), uid, uid);
         }
 
         // Consider restorecon over contents if label changed
-        if (restorecon_app_data_lazy(path, seInfo, uid, existing) ||
+        if (is_selinux_enabled() && (restorecon_app_data_lazy(path, seInfo, uid, existing) ||
                 restorecon_app_data_lazy(path, "cache", seInfo, uid, existing) ||
-                restorecon_app_data_lazy(path, "code_cache", seInfo, uid, existing)) {
+                restorecon_app_data_lazy(path, "code_cache", seInfo, uid, existing))) {
             return error("Failed to restorecon " + path);
         }
 
@@ -501,7 +503,7 @@ binder::Status InstalldNativeService::createAppData(const std::unique_ptr<std::s
     if (flags & FLAG_STORAGE_DE) {
         auto path = create_data_user_de_package_path(uuid_, userId, pkgname);
         bool existing = (access(path.c_str(), F_OK) == 0);
-
+        (void) existing;
         if (prepare_app_dir(path, targetMode, uid) ||
                 prepare_app_cache_dir(path, "cache", 02771, uid, cacheGid) ||
                 prepare_app_cache_dir(path, "code_cache", 02771, uid, cacheGid)) {
@@ -509,9 +511,9 @@ binder::Status InstalldNativeService::createAppData(const std::unique_ptr<std::s
         }
 
         // Consider restorecon over contents if label changed
-        if (restorecon_app_data_lazy(path, seInfo, uid, existing) ||
+        if (is_selinux_enabled() && (restorecon_app_data_lazy(path, seInfo, uid, existing) ||
                 restorecon_app_data_lazy(path, "cache", seInfo, uid, existing) ||
-                restorecon_app_data_lazy(path, "code_cache", seInfo, uid, existing)) {
+                restorecon_app_data_lazy(path, "code_cache", seInfo, uid, existing))) {
             return error("Failed to restorecon " + path);
         }
 
@@ -846,7 +848,7 @@ binder::Status InstalldNativeService::moveCompleteApp(const std::unique_ptr<std:
             goto fail;
         }
 
-        if (selinux_android_restorecon(to.c_str(), SELINUX_ANDROID_RESTORECON_RECURSE) != 0) {
+        if (is_selinux_enabled() && selinux_android_restorecon(to.c_str(), SELINUX_ANDROID_RESTORECON_RECURSE) != 0) {
             res = error("Failed to restorecon " + to);
             goto fail;
         }
@@ -2327,7 +2329,7 @@ binder::Status InstalldNativeService::createOatDir(const std::string& oatDir,
     if (fs_prepare_dir(oat_dir, S_IRWXU | S_IRWXG | S_IXOTH, AID_SYSTEM, AID_INSTALL)) {
         return error("Failed to prepare " + oatDir);
     }
-    if (selinux_android_restorecon(oat_dir, 0)) {
+    if (is_selinux_enabled() && selinux_android_restorecon(oat_dir, 0)) {
         return error("Failed to restorecon " + oatDir);
     }
     snprintf(oat_instr_dir, PKG_PATH_MAX, "%s/%s", oat_dir, instruction_set);

@@ -1825,6 +1825,10 @@ void MultiTouchMotionAccumulator::reset(InputDevice* device) {
             initialSlot = -1;
         }
         clearSlots(initialSlot);
+        int pressure = device->getEventHub()->getDefaultPressure(device->getId());
+        if (pressure > 0) {
+            setDefaultPressure(pressure);
+        }
     } else {
         clearSlots(-1);
     }
@@ -1838,6 +1842,16 @@ void MultiTouchMotionAccumulator::clearSlots(int32_t initialSlot) {
         }
     }
     mCurrentSlot = initialSlot;
+}
+
+void MultiTouchMotionAccumulator::setDefaultPressure(int pressure) {
+    if (mSlots == NULL) {
+        return;
+    }
+    for (size_t i = 0; i < mSlotCount; i++) {
+        mSlots[i].mAbsMTPressure = pressure;
+    }
+    ALOGI("set default pressure %d", pressure);
 }
 
 void MultiTouchMotionAccumulator::process(const RawEvent* rawEvent) {

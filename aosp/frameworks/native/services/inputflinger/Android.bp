@@ -13,7 +13,7 @@
 // limitations under the License.
 
 cc_library_shared {
-    name: "libinputflinger_orig",
+    name: "libinputflinger",
 
     srcs: [
         "EventHub.cpp",
@@ -35,6 +35,10 @@ cc_library_shared {
         "libutils",
         "libui",
         "libhardware_legacy",
+    ],
+
+    static_libs: [
+        "libinputflinger_vendor",
     ],
 
     cflags: [

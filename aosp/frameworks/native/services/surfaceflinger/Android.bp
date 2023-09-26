@@ -137,10 +137,12 @@ cc_library_shared {
     cflags: [
         "-fvisibility=hidden",
         "-Werror=format",
+        "-DSF_TRANSACTION_TIMEOUT_MS=30",
     ],
     srcs: [
         ":libsurfaceflinger_sources",
     ],
+    static_libs: ["libsurfaceflinger_vendor"],
     logtags: ["EventLog/EventLogTags.logtags"],
     include_dirs: [
         "frameworks/native/vulkan/vkjson",
@@ -155,7 +157,7 @@ cc_library_shared {
 }
 
 cc_binary {
-    name: "surfaceflinger_orig",
+    name: "surfaceflinger",
     defaults: ["surfaceflinger_defaults"],
     init_rc: ["surfaceflinger.rc"],
     srcs: ["main_surfaceflinger.cpp"],

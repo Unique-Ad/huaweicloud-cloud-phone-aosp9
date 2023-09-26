@@ -25,6 +25,7 @@
 #include "CorrectedGyroSensor.h"
 #include "SensorDevice.h"
 #include "SensorFusion.h"
+#include <HwSensorInterface.h>
 
 namespace android {
 // ---------------------------------------------------------------------------
@@ -40,7 +41,7 @@ CorrectedGyroSensor::CorrectedGyroSensor(sensor_t const* list, size_t count)
 
     const sensor_t sensor = {
             .name       = "Corrected Gyroscope Sensor",
-            .vendor     = "AOSP",
+            .vendor     = hwGetCorrectedGyroSensorVendor(),
             .version    = 1,
             .handle     = '_cgy',
             .type       = SENSOR_TYPE_GYROSCOPE,

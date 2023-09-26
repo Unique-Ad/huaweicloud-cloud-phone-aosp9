@@ -51,6 +51,7 @@
 
 #include <android/hardware/configstore/1.0/ISurfaceFlingerConfigs.h>
 #include <configstore/Utils.h>
+#include <HwDisplayDevice.h>
 
 namespace android {
 
@@ -647,7 +648,11 @@ void DisplayDevice::setProjection(int orientation,
                 transform = Transform::ROT_270;
                 break;
         }
+        if (sPrimaryDisplayOrientation != transform) {
+            mFlinger->getBE().mHwc->eventControl(HWC_DISPLAY_PRIMARY, HWC_EVENT_ORIENTATION_CHANGED, mOrientation);
+        }
         sPrimaryDisplayOrientation = transform;
+        hwSetProjection(mOrientation, mType);
     }
     mViewport = viewport;
     mFrame = frame;

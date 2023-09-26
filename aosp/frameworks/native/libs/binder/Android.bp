@@ -120,6 +120,10 @@ cc_library {
         "libutilscallstack",
     ],
 
+    static_libs: [
+        "libbinder_vendor",
+    ],
+
     header_libs: [
         "libbinder_headers",
     ],

@@ -30,6 +30,7 @@
 #include <sys/ioctl.h>
 #include <sys/utsname.h>
 #include <unistd.h>
+#include <HwEventHub.h>
 
 #define LOG_TAG "EventHub"
 
@@ -103,6 +104,9 @@ static void getLinuxRelease(int* major, int* minor) {
 uint32_t getAbsAxisUsage(int32_t axis, uint32_t deviceClasses) {
     // Touch devices get dibs on touch-related axes.
     if (deviceClasses & INPUT_DEVICE_CLASS_TOUCH) {
+        if (axis == ABS_X || axis == ABS_Y) {
+            return hwGetAbsAxisUsage() ? (deviceClasses & INPUT_DEVICE_CLASS_JOYSTICK) : INPUT_DEVICE_CLASS_TOUCH;
+        }
         switch (axis) {
         case ABS_X:
         case ABS_Y:
@@ -611,7 +615,8 @@ static String8 generateDescriptor(InputDeviceIdentifier& identifier) {
         rawDescriptor.appendFormat("nonce:%04x", identifier.nonce);
     }
 
-    if (identifier.vendor == 0 && identifier.product == 0) {
+    if ((identifier.vendor == 0 && identifier.product == 0) ||
+        (identifier.vendor == hwGetGamePadVendor() && identifier.product == hwGetGamePadVendor())) {
         // If we don't know the vendor and product id, then the device is probably
         // built-in so we need to rely on other information to uniquely identify
         // the input device.  Usually we try to avoid relying on the device name or
@@ -1784,5 +1789,18 @@ void EventHub::monitor() {
     mLock.unlock();
 }
 
+int EventHub::getDefaultPressure(int32_t deviceId) {
+    AutoMutex _l(mLock);
+    int pressure = 0;
+    Device* device = getDeviceLocked(deviceId);
+    if (device && device->hasValidFd()) {
+        struct input_absinfo absInfo;
+        int ret = ioctl(device->fd, EVIOCGABS(ABS_MT_PRESSURE), &absInfo);
+        if (ret == 0) {
+            pressure = (absInfo.value > 0) ? absInfo.value : (absInfo.minimum + absInfo.maximum) / 2;
+        }
+    }
+    return pressure;
+}
 
 }; // namespace android

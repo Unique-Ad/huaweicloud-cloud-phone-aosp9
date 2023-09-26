@@ -63,6 +63,10 @@ static struct selabel_handle* sehandle;
 
 static bool check_mac_perms(pid_t spid, uid_t uid, const char *tctx, const char *perm, const char *name)
 {
+    if (!is_selinux_enabled()) {
+        return true;
+    }
+
     char *sctx = NULL;
     const char *class = "service_manager";
     bool allowed;
@@ -91,6 +95,10 @@ static bool check_mac_perms_from_getcon(pid_t spid, uid_t uid, const char *perm)
 
 static bool check_mac_perms_from_lookup(pid_t spid, uid_t uid, const char *perm, const char *name)
 {
+    if (!is_selinux_enabled()) {
+        return true;
+    }
+
     bool allowed;
     char *tctx = NULL;
 
@@ -285,7 +293,7 @@ int svcmgr_handler(struct binder_state *bs,
         return -1;
     }
 
-    if (sehandle && selinux_status_updated() > 0) {
+    if (is_selinux_enabled() && sehandle && selinux_status_updated() > 0) {
 #ifdef VENDORSERVICEMANAGER
         struct selabel_handle *tmp_sehandle = selinux_android_vendor_service_context_handle();
 #else
@@ -401,6 +409,7 @@ int main(int argc, char** argv)
         return -1;
     }
 
+    if (is_selinux_enabled()) {
     cb.func_audit = audit_callback;
     selinux_set_callback(SELINUX_CB_AUDIT, cb);
     cb.func_log = selinux_log_callback;
@@ -423,6 +432,7 @@ int main(int argc, char** argv)
         abort();
     }
 
+    }
 
     binder_loop(bs, svcmgr_handler);
 

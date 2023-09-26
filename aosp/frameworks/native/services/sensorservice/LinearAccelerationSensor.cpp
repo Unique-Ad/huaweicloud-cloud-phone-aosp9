@@ -25,6 +25,7 @@
 #include "LinearAccelerationSensor.h"
 #include "SensorDevice.h"
 #include "SensorFusion.h"
+#include <HwSensorInterface.h>
 
 namespace android {
 // ---------------------------------------------------------------------------
@@ -34,7 +35,7 @@ LinearAccelerationSensor::LinearAccelerationSensor(sensor_t const* list, size_t 
     const Sensor &gsensor = mGravitySensor.getSensor();
     const sensor_t sensor = {
         .name       = "Linear Acceleration Sensor",
-        .vendor     = "AOSP",
+        .vendor     = hwGetLinearAccelerationSensorVendor(),
         .version    = gsensor.getVersion(),
         .handle     = '_lin',
         .type       = SENSOR_TYPE_LINEAR_ACCELERATION,

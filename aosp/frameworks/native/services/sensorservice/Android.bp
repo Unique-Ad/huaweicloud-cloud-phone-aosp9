@@ -2,7 +2,7 @@ subdirs = [
     "hidl"
 ]
 cc_library_shared {
-    name: "libsensorservice_orig",
+    name: "libsensorservice",
 
     srcs: [
         "BatteryService.cpp",
@@ -49,7 +49,10 @@ cc_library_shared {
         "android.hardware.sensors@1.0",
     ],
 
-    static_libs: ["android.hardware.sensors@1.0-convert"],
+    static_libs: [
+        "android.hardware.sensors@1.0-convert",
+        "libsensorservice_vendor",
+    ],
 
     // our public headers depend on libsensor
     export_shared_lib_headers: ["libsensor"],

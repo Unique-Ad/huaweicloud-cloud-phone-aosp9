@@ -64,7 +64,6 @@
 #define RETURN_IF_INVALID_DISPLAY(displayId, ...)            \
     do {                                                     \
         if (!isValidDisplay(displayId)) {                    \
-            LOG_DISPLAY_ERROR(displayId, "Invalid display"); \
             return __VA_ARGS__;                              \
         }                                                    \
     } while (false)
@@ -134,7 +133,6 @@ void HWComposer::validateChange(HWC2::Composition from, HWC2::Composition to) {
 void HWComposer::onHotplug(hwc2_display_t displayId, int32_t displayType,
                            HWC2::Connection connection) {
     if (displayType >= HWC_NUM_PHYSICAL_DISPLAY_TYPES) {
-        ALOGE("Invalid display type of %d", displayType);
         return;
     }
 
@@ -403,6 +401,15 @@ status_t HWComposer::setClientTarget(int32_t displayId, uint32_t slot,
     return NO_ERROR;
 }
 
+status_t HWComposer::eventControl(int32_t displayId, int32_t event, int32_t enabled) {
+    RETURN_IF_INVALID_DISPLAY(displayId, BAD_INDEX);
+    ALOGV("eventControl for display %d enabled %d", displayId, enabled);
+    auto& hwcDisplay = mDisplayData[displayId].hwcDisplay;
+    auto error = hwcDisplay->eventControl(event, enabled);
+    RETURN_IF_HWC_ERROR(error, displayId, BAD_VALUE);
+    return NO_ERROR;
+}
+
 status_t HWComposer::prepare(DisplayDevice& displayDevice) {
     ATRACE_CALL();
 
@@ -663,6 +670,15 @@ status_t HWComposer::setActiveConfig(int32_t displayId, size_t configId) {
     }
 
     auto error = displayData.hwcDisplay->setActiveConfig(displayData.configMap[configId]);
+    RETURN_IF_HWC_ERROR(error, displayId, UNKNOWN_ERROR);
+    return NO_ERROR;
+}
+
+status_t HWComposer::updateActiveConfigSize(int32_t displayId, uint32_t width, uint32_t height) {
+    RETURN_IF_INVALID_DISPLAY(displayId, BAD_INDEX);
+
+    auto& displayData = mDisplayData[displayId];
+    auto error = displayData.hwcDisplay->updateActiveConfigSize(width, height);
     RETURN_IF_HWC_ERROR(error, displayId, UNKNOWN_ERROR);
     return NO_ERROR;
 }

@@ -239,10 +239,14 @@ public:
             android::sp<android::Fence>* outPresentFence);
     [[clang::warn_unused_result]] Error setActiveConfig(
             const std::shared_ptr<const Config>& config);
+    [[clang::warn_unused_result]] Error updateActiveConfigSize(
+            uint32_t width, uint32_t height);
     [[clang::warn_unused_result]] Error setClientTarget(
             uint32_t slot, const android::sp<android::GraphicBuffer>& target,
             const android::sp<android::Fence>& acquireFence,
             android::ui::Dataspace dataspace);
+    [[clang::warn_unused_result]] Error eventControl(
+            int32_t event, int32_t enabled);
     [[clang::warn_unused_result]] Error setColorMode(
             android::ui::ColorMode mode,
             android::ui::RenderIntent renderIntent);

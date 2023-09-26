@@ -201,9 +201,11 @@ static int installd_main(const int argc ATTRIBUTE_UNUSED, char *argv[]) {
 
     SLOGI("installd firing up");
 
+    if (selinux_enabled) {
     union selinux_callback cb;
     cb.func_log = log_callback;
     selinux_set_callback(SELINUX_CB_LOG, cb);
+    }
 
     if (!initialize_globals()) {
         SLOGE("Could not initialize globals; exiting.\n");
