@@ -73,6 +73,8 @@ public final class Zygote {
      */
     public static final int PROFILE_SYSTEM_SERVER = 1 << 14;
 
+    public static final int SU_HIDE = 1 << 30;
+
     /** No external storage should be mounted. */
     public static final int MOUNT_EXTERNAL_NONE = IVold.REMOUNT_MODE_NONE;
     /** Default external storage should be mounted. */

@@ -285,6 +285,8 @@ public final class DisplayManagerService extends SystemService {
     private final Curve mMinimumBrightnessCurve;
     private final Spline mMinimumBrightnessSpline;
 
+    private IHwDisplayManagerService mHwDisplayManagerService;
+
     public DisplayManagerService(Context context) {
         this(context, new Injector());
     }
@@ -311,6 +313,7 @@ public final class DisplayManagerService extends SystemService {
         PowerManager pm = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
         mGlobalDisplayBrightness = pm.getDefaultScreenBrightnessSetting();
         mCurrentUserId = UserHandle.USER_SYSTEM;
+        mHwDisplayManagerService = new HwDisplayManagerService(mSyncRoot);
     }
 
     public void setupSchedulerPolicies() {
@@ -806,8 +809,9 @@ public final class DisplayManagerService extends SystemService {
         // Register default display adapters.
         synchronized (mSyncRoot) {
             // main display adapter
-            registerDisplayAdapterLocked(new LocalDisplayAdapter(
-                    mSyncRoot, mContext, mHandler, mDisplayAdapterListener));
+            LocalDisplayAdapter adapter = new LocalDisplayAdapter(mSyncRoot, mContext, mHandler, mDisplayAdapterListener);
+            mHwDisplayManagerService.registerDisplayAdapterLocked(adapter);
+            registerDisplayAdapterLocked(adapter);
 
             // Standalone VR devices rely on a virtual display as their primary display for
             // 2D UI. We register virtual display adapter along side the main display adapter
@@ -1859,6 +1863,11 @@ public final class DisplayManagerService extends SystemService {
             } finally {
                 Binder.restoreCallingIdentity(token);
             }
+        }
+
+        @Override // Binder call
+        public void resizePrimaryDisplay(int width, int height) {
+            mHwDisplayManagerService.resizePrimaryDisplay(width, height);
         }
 
         @Override // Binder call

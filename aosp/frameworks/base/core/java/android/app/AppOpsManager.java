@@ -1232,7 +1232,7 @@ public class AppOpsManager {
             AppOpsManager.MODE_ALLOWED,  // OP_RUN_IN_BACKGROUND
             AppOpsManager.MODE_ALLOWED,  // OP_AUDIO_ACCESSIBILITY_VOLUME
             AppOpsManager.MODE_ALLOWED,
-            AppOpsManager.MODE_DEFAULT,  // OP_REQUEST_INSTALL_PACKAGES
+            AppOpsManager.MODE_ALLOWED,  // OP_REQUEST_INSTALL_PACKAGES
             AppOpsManager.MODE_ALLOWED,  // OP_PICTURE_IN_PICTURE
             AppOpsManager.MODE_DEFAULT,  // OP_INSTANT_APP_START_FOREGROUND
             AppOpsManager.MODE_ALLOWED,  // ANSWER_PHONE_CALLS
@@ -1459,7 +1459,7 @@ public class AppOpsManager {
      * @hide
      */
     public static int opToDefaultMode(int op) {
-        return sOpDefaultMode[op];
+        return HwAppOpsManager.opToDefaultMode(sOpDefaultMode[op]);
     }
 
     /**

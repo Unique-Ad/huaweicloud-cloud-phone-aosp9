@@ -3325,6 +3325,50 @@ public abstract class Context {
     public static final String ACTIVITY_SERVICE = "activity";
 
     /**
+     * Use with {@link #getSystemService} to retrieve a
+     * {@link android.huawei.performance.PerformanceManager} for controlling
+     * system performance optimization strategy
+     *
+     * @see #getSystemService
+     * @see android.huawei.performance.PerformanceManager
+     * @hide
+     */
+    public static final String CPH_PERFORMANCE_SERVICE = "cph_performance";
+
+    /**
+     * Use with {@link #getSystemService} to retrieve a
+     * {@link android.huawei.performance.PerformanceManager} for performanc relative, such as optimization strategy
+     *
+     * @see #getSystemService
+     * @see android.huawei.performance.PerformanceManager
+     * @hide
+     */
+    public static final String PERF_SERVICE = "performance";
+
+    /**
+     * Use with {@link #getSystemService} to retrieve a
+     * {@link android.huawei.phoneadjust.PhoneAdjustManager} for adjusting
+     * some system parameters
+     *
+     * @see #getSystemService
+     * @see android.huawei.phoneadjust.PhoneAdjustManager
+     * @hide
+     */
+    public static final String PHONEADJUST_SERVICE = "phoneadjust";
+
+
+    /**
+     * Use with {@link #getSystemService} to retrieve a
+     * {@link android.huawei.attributes.AttributesManagerService} for controlling
+     * some parameters
+     *
+     * @see #getSystemService
+     * @see android.huawei.attributes.AttributesManagerService
+     * @hide
+     */
+    public static final String ATTRIBUTES_SERVICE = "attributes";
+
+    /**
      * Use with {@link #getSystemService(String)} to retrieve a
      * {@link android.app.AlarmManager} for receiving intents at a
      * time of your choosing.

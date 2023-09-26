@@ -76,6 +76,7 @@ import com.android.server.dreams.DreamManagerService;
 import com.android.server.emergency.EmergencyAffordanceService;
 import com.android.server.fingerprint.FingerprintService;
 import com.android.server.hdmi.HdmiControlService;
+import com.android.server.huawei.CloudPhoneManagerService;
 import com.android.server.input.InputManagerService;
 import com.android.server.job.JobSchedulerService;
 import com.android.server.lights.LightsService;
@@ -395,8 +396,8 @@ public final class SystemServer {
             BinderInternal.setMaxThreads(sMaxBinderThreads);
 
             // Prepare the main looper thread (this thread).
-            android.os.Process.setThreadPriority(
-                android.os.Process.THREAD_PRIORITY_FOREGROUND);
+            // android.os.Process.setThreadPriority(
+            //    android.os.Process.THREAD_PRIORITY_FOREGROUND);
             android.os.Process.setCanSelfBackground(false);
             Looper.prepareMainLooper();
             Looper.getMainLooper().setSlowLogThresholdMs(
@@ -694,7 +695,26 @@ public final class SystemServer {
     private void startCoreServices() {
         traceBeginAndSlog("StartBatteryService");
         // Tracks the battery level.  Requires LightService.
-        mSystemServiceManager.startService(BatteryService.class);
+        // ANBOX. We are too fast some times and a race condition appears while
+        // creating the BatteryService. Retry.
+        boolean created = false;
+        final int RETRY_TIME_MS = 20;
+        final int MAX_WAIT_TIME_MS = 400;
+        int retry = 0;
+        do {
+            try {
+                mSystemServiceManager.startService(BatteryService.class);
+                created = true;
+            } catch (RuntimeException ex) {
+                Slog.i(TAG, "Error when trying to start BatteryService");
+                if (++retry == MAX_WAIT_TIME_MS/RETRY_TIME_MS) {
+                    throw ex;
+                }
+                try {
+                    Thread.sleep(RETRY_TIME_MS);  // in ms
+                } catch (InterruptedException ex2) {}
+            }
+        } while(!created);
         traceEnd();
 
         // Tracks application usage stats.
@@ -1339,6 +1359,12 @@ public final class SystemServer {
             traceBeginAndSlog("StartSoundTrigger");
             mSystemServiceManager.startService(SoundTriggerService.class);
             traceEnd();
+
+            // start cph services
+            traceBeginAndSlog("StartCloudPhoneManagerService");
+            CloudPhoneManagerService cps = mSystemServiceManager.startService(CloudPhoneManagerService.class);
+            cps.setActivityManager(mActivityManagerService);
+            Trace.traceEnd(Trace.TRACE_TAG_SYSTEM_SERVER);
 
             traceBeginAndSlog("StartTrustManager");
             mSystemServiceManager.startService(TrustManagerService.class);

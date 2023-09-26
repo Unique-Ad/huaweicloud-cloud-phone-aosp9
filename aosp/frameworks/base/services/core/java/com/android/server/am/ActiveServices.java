@@ -449,6 +449,8 @@ public final class ActiveServices {
         ServiceLookupResult res =
             retrieveServiceLocked(service, resolvedType, callingPackage,
                     callingPid, callingUid, userId, true, callerFg, false, false);
+        res = HwActiveServices.startServiceLocked(res, service, callingPid, callingUid, callingPackage,
+                true, mAm.mBooted);
         if (res == null) {
             return null;
         }
@@ -770,6 +772,8 @@ public final class ActiveServices {
         // If this service is active, make sure it is stopped.
         ServiceLookupResult r = retrieveServiceLocked(service, resolvedType, null,
                 Binder.getCallingPid(), Binder.getCallingUid(), userId, false, false, false, false);
+        r = HwActiveServices.startServiceLocked(r, service, Binder.getCallingPid(), Binder.getCallingUid(), null,
+                true, mAm.mBooted);
         if (r != null) {
             if (r.record != null) {
                 final long origId = Binder.clearCallingIdentity();
@@ -840,7 +844,8 @@ public final class ActiveServices {
         ServiceLookupResult r = retrieveServiceLocked(service, resolvedType, callingPackage,
                 Binder.getCallingPid(), Binder.getCallingUid(),
                 UserHandle.getCallingUserId(), false, false, false, false);
-
+        r = HwActiveServices.startServiceLocked(r, service, Binder.getCallingPid(), Binder.getCallingUid(), callingPackage,
+                true, mAm.mBooted);
         IBinder ret = null;
         if (r != null) {
             // r.record is null if findServiceLocked() failed the caller permission check
@@ -1542,6 +1547,8 @@ public final class ActiveServices {
         ServiceLookupResult res =
             retrieveServiceLocked(service, resolvedType, callingPackage, Binder.getCallingPid(),
                     Binder.getCallingUid(), userId, true, callerFg, isBindExternal, allowInstant);
+        res = HwActiveServices.startServiceLocked(res, service, Binder.getCallingPid(), Binder.getCallingUid(),
+                callingPackage, true, mAm.mBooted);
         if (res == null) {
             return 0;
         }
@@ -1885,7 +1892,7 @@ public final class ActiveServices {
         return r == token ? r : null;
     }
 
-    private final class ServiceLookupResult {
+    final class ServiceLookupResult {
         final ServiceRecord record;
         final String permission;
 

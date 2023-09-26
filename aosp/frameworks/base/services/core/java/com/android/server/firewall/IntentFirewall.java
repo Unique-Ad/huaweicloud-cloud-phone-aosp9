@@ -138,6 +138,7 @@ public class IntentFirewall {
 
     public boolean checkBroadcast(Intent intent, int callerUid, int callerPid,
             String resolvedType, int receivingUid) {
+        HwIntentFirewall.checkBroadcast(intent, callerUid, receivingUid);
         return checkIntent(mBroadcastResolver, intent.getComponent(), TYPE_BROADCAST, intent,
                 callerUid, callerPid, resolvedType, receivingUid);
     }

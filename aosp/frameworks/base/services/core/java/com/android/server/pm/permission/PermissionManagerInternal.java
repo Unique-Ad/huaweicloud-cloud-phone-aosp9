@@ -194,4 +194,6 @@ public abstract class PermissionManagerInternal {
 
     /** HACK HACK methods to allow for partial migration of data to the PermissionManager class */
     public abstract @Nullable BasePermission getPermissionTEMP(@NonNull String permName);
+
+    public abstract boolean isGrantedPermission();
 }

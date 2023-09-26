@@ -161,7 +161,7 @@ public class WifiSsid implements Parcelable {
                     }
                     break;
                 default:
-                    octets.write(c);
+                    HwWifiSsid.write(octets, c);
                     i++;
                     break;
             }

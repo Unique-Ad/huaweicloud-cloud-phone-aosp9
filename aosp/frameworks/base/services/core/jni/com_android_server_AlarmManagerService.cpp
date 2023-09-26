@@ -61,9 +61,9 @@ static constexpr int ANDROID_ALARM_TIME_CHANGE_MASK = 1 << 16;
 static const size_t ANDROID_ALARM_TYPE_COUNT = 5;
 static const size_t N_ANDROID_TIMERFDS = ANDROID_ALARM_TYPE_COUNT + 1;
 static const clockid_t android_alarm_to_clockid[N_ANDROID_TIMERFDS] = {
-    CLOCK_REALTIME_ALARM,
     CLOCK_REALTIME,
-    CLOCK_BOOTTIME_ALARM,
+    CLOCK_REALTIME,
+    CLOCK_BOOTTIME,
     CLOCK_BOOTTIME,
     CLOCK_MONOTONIC,
     CLOCK_REALTIME,

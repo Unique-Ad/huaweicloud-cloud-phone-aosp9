@@ -27,6 +27,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.DhcpResults;
+import android.net.HwNetConfig;
 import android.net.InterfaceConfiguration;
 import android.net.LinkAddress;
 import android.net.NetworkUtils;
@@ -293,6 +294,9 @@ public class DhcpClient extends StateMachine {
     }
 
     private boolean initPacketSocket() {
+        if (HwNetConfig.isCphWifi()) {
+            return true;
+        }
         try {
             mPacketSock = Os.socket(AF_PACKET, SOCK_RAW, ETH_P_IP);
             PacketSocketAddress addr = new PacketSocketAddress((short) ETH_P_IP, mIface.index);
@@ -306,6 +310,9 @@ public class DhcpClient extends StateMachine {
     }
 
     private boolean initUdpSocket() {
+        if (HwNetConfig.isCphWifi()) {
+            return true;
+        }
         final int oldTag = TrafficStats.getAndSetThreadStatsTag(TrafficStats.TAG_SYSTEM_DHCP);
         try {
             mUdpSock = Os.socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
@@ -325,6 +332,9 @@ public class DhcpClient extends StateMachine {
     }
 
     private boolean connectUdpSock(Inet4Address to) {
+        if (HwNetConfig.isCphWifi()) {
+            return true;
+        }
         try {
             Os.connect(mUdpSock, to, DhcpPacket.DHCP_SERVER);
             return true;
@@ -335,6 +345,9 @@ public class DhcpClient extends StateMachine {
     }
 
     private static void closeQuietly(FileDescriptor fd) {
+        if (HwNetConfig.isCphWifi()) {
+            return;
+        }
         try {
             IoBridge.closeAndSignalBlockedThreads(fd);
         } catch (IOException ignored) {}
@@ -358,6 +371,11 @@ public class DhcpClient extends StateMachine {
         @Override
         public void run() {
             if (DBG) Log.d(TAG, "Receive thread started");
+            // CPH never start DHCP
+            if (HwNetConfig.isCphWifi()) {
+                if (DBG) Log.d(TAG, "Receive thread stopped");
+                return;
+            }
             while (!mStopped) {
                 int length = 0;  // Or compiler can't tell it's initialized if a parse error occurs.
                 try {
@@ -395,6 +413,10 @@ public class DhcpClient extends StateMachine {
     }
 
     private boolean transmitPacket(ByteBuffer buf, String description, int encap, Inet4Address to) {
+        if (HwNetConfig.isCphWifi()) {
+            return true;
+        }
+
         try {
             if (encap == DhcpPacket.ENCAP_L2) {
                 if (DBG) Log.d(TAG, "Broadcasting " + description);
@@ -423,6 +445,9 @@ public class DhcpClient extends StateMachine {
     }
 
     private boolean sendDiscoverPacket() {
+        if (HwNetConfig.isCphWifi()) {
+            return true;
+        }
         ByteBuffer packet = DhcpPacket.buildDiscoverPacket(
                 DhcpPacket.ENCAP_L2, mTransactionId, getSecs(), mHwAddr,
                 DO_UNICAST, REQUESTED_PARAMS);
@@ -432,6 +457,9 @@ public class DhcpClient extends StateMachine {
     private boolean sendRequestPacket(
             Inet4Address clientAddress, Inet4Address requestedAddress,
             Inet4Address serverAddress, Inet4Address to) {
+        if (HwNetConfig.isCphWifi()) {
+            return true;
+        }
         // TODO: should we use the transaction ID from the server?
         final int encap = INADDR_ANY.equals(clientAddress)
                 ? DhcpPacket.ENCAP_L2 : DhcpPacket.ENCAP_BOOTP;
@@ -448,6 +476,9 @@ public class DhcpClient extends StateMachine {
     }
 
     private void scheduleLeaseTimers() {
+        if (HwNetConfig.isCphWifi()) {
+            return;
+        }
         if (mDhcpLeaseExpiry == 0) {
             Log.d(TAG, "Infinite lease, no timer scheduling needed");
             return;
@@ -655,7 +686,7 @@ public class DhcpClient extends StateMachine {
         if (!Arrays.equals(packet.getClientMac(), mHwAddr)) {
             Log.d(TAG, "MAC addr mismatch: got " +
                     HexDump.toHexString(packet.getClientMac()) + ", expected " +
-                    HexDump.toHexString(packet.getClientMac()));
+                    HexDump.toHexString(mHwAddr));
             return false;
         }
         return true;
@@ -1025,6 +1056,9 @@ public class DhcpClient extends StateMachine {
     }
 
     private void logError(int errorCode) {
+        if (HwNetConfig.isCphWifi()) {
+            return;
+        }
         mMetricsLog.log(mIfaceName, new DhcpErrorEvent(errorCode));
     }
 

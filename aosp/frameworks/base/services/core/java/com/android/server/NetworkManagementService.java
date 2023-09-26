@@ -327,6 +327,8 @@ public class NetworkManagementService extends INetworkManagementService.Stub
             new RemoteCallbackList<>();
     private boolean mNetworkActive;
 
+    private IHwNetworkManagementService mHwNetworkManagementService;
+
     /**
      * Constructs a new NetworkManagementService instance
      *
@@ -362,6 +364,8 @@ public class NetworkManagementService extends INetworkManagementService.Stub
         synchronized (mTetheringStatsProviders) {
             mTetheringStatsProviders.put(new NetdTetheringStatsProvider(), "netd");
         }
+
+        mHwNetworkManagementService = new HwNetworkManagementService();
     }
 
     @VisibleForTesting
@@ -1069,6 +1073,10 @@ public class NetworkManagementService extends INetworkManagementService.Stub
 
     @Override
     public void setInterfaceDown(String iface) {
+        if (mHwNetworkManagementService.isCPHWlan0(iface)) {
+            return;
+        }
+
         mContext.enforceCallingOrSelfPermission(CONNECTIVITY_INTERNAL, TAG);
         final InterfaceConfiguration ifcg = getInterfaceConfig(iface);
         ifcg.setInterfaceDown();
@@ -1077,6 +1085,9 @@ public class NetworkManagementService extends INetworkManagementService.Stub
 
     @Override
     public void setInterfaceUp(String iface) {
+        if (mHwNetworkManagementService.isCPHWlan0(iface)) {
+            return;
+        }
         mContext.enforceCallingOrSelfPermission(CONNECTIVITY_INTERNAL, TAG);
         final InterfaceConfiguration ifcg = getInterfaceConfig(iface);
         ifcg.setInterfaceUp();
@@ -1085,6 +1096,9 @@ public class NetworkManagementService extends INetworkManagementService.Stub
 
     @Override
     public void setInterfaceIpv6PrivacyExtensions(String iface, boolean enable) {
+        if (mHwNetworkManagementService.isCPHWlan0(iface)) {
+            return;
+        }
         mContext.enforceCallingOrSelfPermission(CONNECTIVITY_INTERNAL, TAG);
         try {
             mConnector.execute(
@@ -1098,6 +1112,9 @@ public class NetworkManagementService extends INetworkManagementService.Stub
        IPv6 addresses on interface down, but we need to do full clean up here */
     @Override
     public void clearInterfaceAddresses(String iface) {
+        if (mHwNetworkManagementService.isCPHWlan0(iface)) {
+            return;
+        }
         mContext.enforceCallingOrSelfPermission(CONNECTIVITY_INTERNAL, TAG);
         try {
             mConnector.execute("interface", "clearaddrs", iface);
@@ -1108,6 +1125,9 @@ public class NetworkManagementService extends INetworkManagementService.Stub
 
     @Override
     public void enableIpv6(String iface) {
+        if (mHwNetworkManagementService.isCPHWlan0(iface)) {
+            return;
+        }
         mContext.enforceCallingOrSelfPermission(CONNECTIVITY_INTERNAL, TAG);
         try {
             mConnector.execute("interface", "ipv6", iface, "enable");
@@ -1118,6 +1138,9 @@ public class NetworkManagementService extends INetworkManagementService.Stub
 
     @Override
     public void setIPv6AddrGenMode(String iface, int mode) throws ServiceSpecificException {
+        if (mHwNetworkManagementService.isCPHWlan0(iface)) {
+            return;
+        }
         try {
             mNetdService.setIPv6AddrGenMode(iface, mode);
         } catch (RemoteException e) {
@@ -1127,6 +1150,9 @@ public class NetworkManagementService extends INetworkManagementService.Stub
 
     @Override
     public void disableIpv6(String iface) {
+        if (mHwNetworkManagementService.isCPHWlan0(iface)) {
+            return;
+        }
         mContext.enforceCallingOrSelfPermission(CONNECTIVITY_INTERNAL, TAG);
         try {
             mConnector.execute("interface", "ipv6", iface, "disable");
@@ -1146,6 +1172,9 @@ public class NetworkManagementService extends INetworkManagementService.Stub
     }
 
     private void modifyRoute(String action, String netId, RouteInfo route) {
+        if (mHwNetworkManagementService.isCPHNetId(Integer.parseInt(netId))) {
+            return;
+        }
         mContext.enforceCallingOrSelfPermission(CONNECTIVITY_INTERNAL, TAG);
 
         final Command cmd = new Command("network", "route", action, netId);
@@ -1205,6 +1234,9 @@ public class NetworkManagementService extends INetworkManagementService.Stub
 
     @Override
     public void setMtu(String iface, int mtu) {
+        if (mHwNetworkManagementService.isCPHWlan0(iface)) {
+            return;
+        }
         mContext.enforceCallingOrSelfPermission(CONNECTIVITY_INTERNAL, TAG);
 
         final NativeDaemonEvent event;
@@ -1477,6 +1509,9 @@ public class NetworkManagementService extends INetworkManagementService.Stub
 
     @Override
     public void addIdleTimer(String iface, int timeout, final int type) {
+        if (mHwNetworkManagementService.isCPHWlan0(iface)) {
+            return;
+        }
         mContext.enforceCallingOrSelfPermission(CONNECTIVITY_INTERNAL, TAG);
 
         if (DBG) Slog.d(TAG, "Adding idletimer");
@@ -1513,6 +1548,9 @@ public class NetworkManagementService extends INetworkManagementService.Stub
 
     @Override
     public void removeIdleTimer(String iface) {
+        if (mHwNetworkManagementService.isCPHWlan0(iface)) {
+            return;
+        }
         mContext.enforceCallingOrSelfPermission(CONNECTIVITY_INTERNAL, TAG);
 
         if (DBG) Slog.d(TAG, "Removing idletimer");
@@ -1945,6 +1983,9 @@ public class NetworkManagementService extends INetworkManagementService.Stub
     @Override
     public void setDnsConfigurationForNetwork(int netId, String[] servers, String[] domains,
                     int[] params, String tlsHostname, String[] tlsServers) {
+        if (mHwNetworkManagementService.isCPHNetId(netId)) {
+            return;
+        }
         mContext.enforceCallingOrSelfPermission(CONNECTIVITY_INTERNAL, TAG);
 
         final String[] tlsFingerprints = new String[0];
@@ -2305,6 +2346,9 @@ public class NetworkManagementService extends INetworkManagementService.Stub
 
     @Override
     public void startClatd(String interfaceName) throws IllegalStateException {
+        if (mHwNetworkManagementService.isCPHWlan0(interfaceName)) {
+            return;
+        }
         mContext.enforceCallingOrSelfPermission(CONNECTIVITY_INTERNAL, TAG);
 
         try {
@@ -2316,6 +2360,9 @@ public class NetworkManagementService extends INetworkManagementService.Stub
 
     @Override
     public void stopClatd(String interfaceName) throws IllegalStateException {
+        if (mHwNetworkManagementService.isCPHWlan0(interfaceName)) {
+            return;
+        }
         mContext.enforceCallingOrSelfPermission(CONNECTIVITY_INTERNAL, TAG);
 
         try {
@@ -2471,6 +2518,9 @@ public class NetworkManagementService extends INetworkManagementService.Stub
 
     @Override
     public void createPhysicalNetwork(int netId, String permission) {
+        if (mHwNetworkManagementService.isCPHNetId(netId)) {
+            return;
+        }
         mContext.enforceCallingOrSelfPermission(CONNECTIVITY_INTERNAL, TAG);
 
         try {
@@ -2498,6 +2548,9 @@ public class NetworkManagementService extends INetworkManagementService.Stub
 
     @Override
     public void removeNetwork(int netId) {
+        if (mHwNetworkManagementService.isCPHNetId(netId)) {
+            return;
+        }
         mContext.enforceCallingOrSelfPermission(NETWORK_STACK, TAG);
 
         try {
@@ -2522,6 +2575,9 @@ public class NetworkManagementService extends INetworkManagementService.Stub
     }
 
     private void modifyInterfaceInNetwork(String action, String netId, String iface) {
+        if (mHwNetworkManagementService.isCPHWlan0(iface)) {
+            return;
+        }
         mContext.enforceCallingOrSelfPermission(CONNECTIVITY_INTERNAL, TAG);
         try {
             mConnector.execute("network", "interface", action, netId, iface);
@@ -2532,6 +2588,9 @@ public class NetworkManagementService extends INetworkManagementService.Stub
 
     @Override
     public void addLegacyRouteForNetId(int netId, RouteInfo routeInfo, int uid) {
+        if (mHwNetworkManagementService.isCPHNetId(netId)) {
+            return;
+        }
         mContext.enforceCallingOrSelfPermission(CONNECTIVITY_INTERNAL, TAG);
 
         final Command cmd = new Command("network", "route", "legacy", uid, "add", netId);
@@ -2553,6 +2612,9 @@ public class NetworkManagementService extends INetworkManagementService.Stub
 
     @Override
     public void setDefaultNetId(int netId) {
+        if (mHwNetworkManagementService.isCPHWifi()) {
+            return;
+        }
         mContext.enforceCallingOrSelfPermission(CONNECTIVITY_INTERNAL, TAG);
 
         try {
@@ -2564,6 +2626,9 @@ public class NetworkManagementService extends INetworkManagementService.Stub
 
     @Override
     public void clearDefaultNetId() {
+        if (mHwNetworkManagementService.isCPHWifi()) {
+            return;
+        }
         mContext.enforceCallingOrSelfPermission(CONNECTIVITY_INTERNAL, TAG);
 
         try {

@@ -2302,6 +2302,8 @@ class ActivityStack<T extends StackWindowController> extends ConfigurationContai
             if (next == null || !next.canTurnScreenOn()) {
                 checkReadyForSleep();
             }
+
+            mService.mHwActivityManagerService.resumeTopActivityUncheckedLocked(result, next);
         } finally {
             mStackSupervisor.inResumeTopActivity = false;
         }
@@ -2337,6 +2339,8 @@ class ActivityStack<T extends StackWindowController> extends ConfigurationContai
         // focusable. If it is not focusable, we will fall into the case below to resume the
         // top activity in the next focusable task.
         final ActivityRecord next = topRunningActivityLocked(true /* focusableOnly */);
+
+        mService.mHwActivityManagerService.resumeTopActivityInnerLocked(next);
 
         final boolean hasRunningActivity = next != null;
 

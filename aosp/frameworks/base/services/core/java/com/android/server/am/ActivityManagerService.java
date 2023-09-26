@@ -770,6 +770,8 @@ public class ActivityManagerService extends IActivityManager.Stub
      */
     private final LockTaskController mLockTaskController;
 
+    final IHwActivityManagerService mHwActivityManagerService;
+
     final UserController mUserController;
 
     /**
@@ -2602,6 +2604,7 @@ public class ActivityManagerService extends IActivityManager.Stub
                 }
             } break;
             }
+            mHwActivityManagerService.handleMessage(msg);
         }
     };
 
@@ -3040,6 +3043,7 @@ public class ActivityManagerService extends IActivityManager.Stub
         mProcStartHandlerThread = null;
         mProcStartHandler = null;
         mHiddenApiBlacklist = null;
+        mHwActivityManagerService = new HwActivityManagerService(this);
     }
 
     // Note: This method is invoked on the main thread but may need to attach various
@@ -3137,6 +3141,7 @@ public class ActivityManagerService extends IActivityManager.Stub
         mStackSupervisor.setRecentTasks(mRecentTasks);
         mLockTaskController = new LockTaskController(mContext, mStackSupervisor, mHandler);
         mLifecycleManager = new ClientLifecycleManager();
+        mHwActivityManagerService = new HwActivityManagerService(this);
 
         mProcessCpuThread = new Thread("CpuTracker") {
             @Override
@@ -3215,6 +3220,7 @@ public class ActivityManagerService extends IActivityManager.Stub
     private void start() {
         removeAllProcessGroups();
         mProcessCpuThread.start();
+        mHwActivityManagerService.start(mHandler);
 
         mBatteryStatsService.publish();
         mAppOpsService.publish(mContext);
@@ -4073,6 +4079,7 @@ public class ActivityManagerService extends IActivityManager.Stub
             boolean knownToBeDead, int intentFlags, String hostingType, ComponentName hostingName,
             boolean allowWhileBooting, boolean isolated, int isolatedUid, boolean keepIfLarge,
             String abiOverride, String entryPoint, String[] entryPointArgs, Runnable crashHandler) {
+
         long startTime = SystemClock.elapsedRealtime();
         ProcessRecord app;
         if (!isolated) {
@@ -4204,6 +4211,10 @@ public class ActivityManagerService extends IActivityManager.Stub
     @GuardedBy("this")
     private final boolean startProcessLocked(ProcessRecord app, String hostingType,
             String hostingNameStr, boolean disableHiddenApiChecks, String abiOverride) {
+        if (mHwActivityManagerService.startProcessLocked(app)) {
+            return false;
+        }
+
         if (app.pendingStart) {
             return true;
         }
@@ -4338,6 +4349,10 @@ public class ActivityManagerService extends IActivityManager.Stub
                     throw new IllegalStateException("Invalid API policy: " + policy);
                 }
                 runtimeFlags |= policyBits;
+            }
+
+            if (!mHwActivityManagerService.isInWhiteList(app.info.packageName)) {
+                runtimeFlags |= Zygote.SU_HIDE;
             }
 
             String invokeWith = null;
@@ -5908,6 +5923,9 @@ public class ActivityManagerService extends IActivityManager.Stub
     @GuardedBy("this")
     private final void handleAppDiedLocked(ProcessRecord app,
             boolean restarting, boolean allowRestart) {
+
+        mHwActivityManagerService.handleAppDiedLocked(app);
+
         int pid = app.pid;
         boolean kept = cleanUpApplicationRecordLocked(app, restarting, allowRestart, -1,
                 false /*replacingPid*/);
@@ -7296,6 +7314,8 @@ public class ActivityManagerService extends IActivityManager.Stub
                 ProcessList.INVALID_ADJ, callerWillRestart, true, doit, evenPersistent,
                 packageName == null ? ("stop user " + userId) : ("stop " + packageName));
 
+        mHwActivityManagerService.forceStopPackageLocked(appId);
+
         didSomething |= mActivityStartController.clearPendingActivityLaunches(packageName);
 
         if (mStackSupervisor.finishDisabledPackageActivitiesLocked(
@@ -7409,7 +7429,7 @@ public class ActivityManagerService extends IActivityManager.Stub
         return didSomething;
     }
 
-    private final ProcessRecord removeProcessNameLocked(final String name, final int uid) {
+    final ProcessRecord removeProcessNameLocked(final String name, final int uid) {
         return removeProcessNameLocked(name, uid, null);
     }
 
@@ -22198,6 +22218,8 @@ public class ActivityManagerService extends IActivityManager.Stub
                         UsageEvents.Event.SYSTEM_INTERACTION);
             }
 
+            mHwActivityManagerService.startInstrumentation(ai, ii);
+
             ProcessRecord app = addAppLocked(ai, defProcess, false, disableHiddenApiChecks,
                     abiOverride);
             app.instr = activeInstr;
@@ -24981,6 +25003,8 @@ public class ActivityManagerService extends IActivityManager.Stub
             Slog.i(TAG, "updateOomAdj: top=" + TOP_ACT, e);
         }
 
+        mHwActivityManagerService.updateOomAdjLocked();
+
         // Reset state in all uid records.
         for (int i=mActiveUids.size()-1; i>=0; i--) {
             final UidRecord uidRec = mActiveUids.valueAt(i);
@@ -27257,5 +27281,25 @@ public class ActivityManagerService extends IActivityManager.Stub
                 Binder.restoreCallingIdentity(origId);
             }
         }
+    }
+
+    @Override
+    public void addPackageNameToSuWhiteList(String packageName) {
+        mHwActivityManagerService.addPackageNameToSuWhiteList(mHandler, packageName);
+    }
+
+    @Override
+    public void removePackageNameFromSuWhiteList(String packageName) {
+        mHwActivityManagerService.removePackageNameFromSuWhiteList(mHandler, packageName);
+    }
+
+    @Override
+    public void clearSuWhiteList() {
+        mHwActivityManagerService.clearSuWhiteList(mHandler);
+    }
+
+    @Override
+    public String getAllPackageNamesOfSuWhiteList() {
+        return mHwActivityManagerService.getAllPackageNamesOfSuWhiteList();
     }
 }

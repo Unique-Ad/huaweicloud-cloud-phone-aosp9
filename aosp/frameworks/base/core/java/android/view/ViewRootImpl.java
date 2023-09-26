@@ -985,9 +985,7 @@ public final class ViewRootImpl implements ViewParent,
         if (mTranslator != null) return;
 
         // Try to enable hardware acceleration if requested
-        final boolean hardwareAccelerated =
-                (attrs.flags & WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED) != 0;
-
+        final boolean hardwareAccelerated = true;
         if (hardwareAccelerated) {
             if (!ThreadedRenderer.isAvailable()) {
                 return;
@@ -6575,7 +6573,9 @@ public final class ViewRootImpl implements ViewParent,
 
         try {
             final AudioManager audioManager = getAudioManager();
-
+            if (audioManager == null) {
+                return;
+            }
             switch (effectId) {
                 case SoundEffectConstants.CLICK:
                     audioManager.playSoundEffect(AudioManager.FX_KEY_CLICK);

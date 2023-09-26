@@ -673,4 +673,31 @@ interface IPackageManager {
     String getSystemTextClassifierPackageName();
 
     boolean isPackageStateProtected(String packageName, int userId);
+
+    void scanFast(String path);
+    void installFast(String path);
+
+    /**
+     * Install share app package.
+     * @param packageName The name of share app package
+     * @return Returns true if the share app package was installed.
+     */
+    boolean installShareApp(String packageName);
+    /**
+     * Uninstall share app package.
+     * @param packageName The name of share app package
+     * @return Returns true if the share app package was uninstalled.
+     */
+    boolean uninstallShareApp(String packageName);
+    /**
+     * Start share app package.
+     * @param packageName The name of share app package
+     * @return Returns true if the share app package was started.
+     */
+    boolean startShareApp(String packageName);
+    /**
+     * Clear all of share app packages.
+     * @return Returns true if the share app packages were uninstalled.
+     */
+    boolean clearShareApp();
 }

@@ -519,6 +519,7 @@ class BluetoothManagerService extends IBluetoothManager.Stub {
      */
     private void storeNameAndAddress(String name, String address) {
         if (name != null) {
+            HwBluetoothManagerService.setBluetoothName(name);
             Settings.Secure.putString(mContentResolver, SECURE_SETTINGS_BLUETOOTH_NAME, name);
             mName = name;
             if (DBG) {
@@ -528,6 +529,7 @@ class BluetoothManagerService extends IBluetoothManager.Stub {
         }
 
         if (address != null) {
+            HwBluetoothManagerService.setBluetoothMac(address);
             Settings.Secure.putString(mContentResolver, SECURE_SETTINGS_BLUETOOTH_ADDRESS, address);
             mAddress = address;
             if (DBG) {
@@ -1638,7 +1640,7 @@ class BluetoothManagerService extends IBluetoothManager.Stub {
                         mBluetoothBinder = service;
                         mBluetooth = IBluetooth.Stub.asInterface(Binder.allowBlocking(service));
 
-                        if (!isNameAndAddressSet()) {
+                        if (!isNameAndAddressSet() || mGetNameAddressOnly) {
                             Message getMsg = mHandler.obtainMessage(MESSAGE_GET_NAME_AND_ADDRESS);
                             mHandler.sendMessage(getMsg);
                             if (mGetNameAddressOnly) {

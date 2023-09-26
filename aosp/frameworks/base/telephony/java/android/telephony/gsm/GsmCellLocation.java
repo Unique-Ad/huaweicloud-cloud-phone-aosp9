@@ -23,9 +23,10 @@ import android.telephony.CellLocation;
  * Represents the cell location on a GSM phone.
  */
 public class GsmCellLocation extends CellLocation {
-    private int mLac;
-    private int mCid;
-    private int mPsc;
+
+    private int mLac = -1;
+    private int mCid = -1;
+    private int mPsc = -1;
 
     /**
      * Empty constructor.  Initializes the LAC and CID to -1.
@@ -40,9 +41,17 @@ public class GsmCellLocation extends CellLocation {
      * Initialize the object from a bundle.
      */
     public GsmCellLocation(Bundle bundle) {
-        mLac = bundle.getInt("lac", -1);
-        mCid = bundle.getInt("cid", -1);
-        mPsc = bundle.getInt("psc", -1);
+        if (bundle != null) {
+            mLac = bundle.getInt("lac", -1);
+            mCid = bundle.getInt("cid", -1);
+            mPsc = bundle.getInt("psc", -1);
+		}
+
+        if (mLac < 0 || mCid < 0) {
+            mLac = HwGsmCellLocation.initLac();
+            mCid = HwGsmCellLocation.initCid();
+		}
+
     }
 
     /**

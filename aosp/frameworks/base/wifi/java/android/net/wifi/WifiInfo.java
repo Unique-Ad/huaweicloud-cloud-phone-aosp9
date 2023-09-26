@@ -244,7 +244,7 @@ public class WifiInfo implements Parcelable {
                 return (hex != null) ? hex : WifiSsid.NONE;
             }
         }
-        return WifiSsid.NONE;
+        return HwWifiInfo.getSSID();
     }
 
     /** @hide */

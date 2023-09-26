@@ -278,7 +278,8 @@ public class CellularTile extends QSTileImpl<SignalState> {
     }
 
     static Intent getCellularSettingIntent() {
-        return new Intent(Settings.ACTION_DATA_USAGE_SETTINGS);
+        // cph has no data usage module, just replace it with operator settings activity.
+        return new Intent(Settings.ACTION_NETWORK_OPERATOR_SETTINGS);
     }
 
     private final class CellularDetailAdapter implements DetailAdapter {

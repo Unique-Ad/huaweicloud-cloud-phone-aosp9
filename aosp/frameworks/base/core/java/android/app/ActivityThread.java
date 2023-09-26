@@ -5657,6 +5657,8 @@ public final class ActivityThread extends ClientTransactionHandler {
             /* ignore */
         }
 
+        HwActivityThread.modifyBuildField();
+
         if (data.debugMode != ApplicationThreadConstants.DEBUG_OFF) {
             // XXX should have option to change the port.
             Debug.changeDebugPort(8100);

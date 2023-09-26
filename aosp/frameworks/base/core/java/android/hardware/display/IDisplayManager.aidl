@@ -79,6 +79,9 @@ interface IDisplayManager {
     void resizeVirtualDisplay(in IVirtualDisplayCallback token,
             int width, int height, int densityDpi);
 
+    // No permissions required, but must be same Uid as the creator.
+    void resizePrimaryDisplay(int width, int height);
+
     // No permissions required but must be same Uid as the creator.
     void setVirtualDisplaySurface(in IVirtualDisplayCallback token, in Surface surface);
 

@@ -314,7 +314,7 @@ public final class Settings {
             mRestoredUserGrants =
                 new SparseArray<ArrayMap<String, ArraySet<RestoredPermissionGrant>>>();
 
-    private static int mFirstAvailableUid = 0;
+    private static int mFirstAvailableUid = HwSettings.getFirstAvailableUid();
 
     /** Map from volume UUID to {@link VersionInfo} */
     private ArrayMap<String, VersionInfo> mVersion = new ArrayMap<>();
@@ -420,6 +420,8 @@ public final class Settings {
     public final KeySetManagerService mKeySetManagerService = new KeySetManagerService(mPackages);
     /** Settings and other information about permissions */
     final PermissionSettings mPermissions;
+
+    private final IHwSettings mHwSettings = new HwSettings();
 
     Settings(PermissionSettings permissions, Object lock) {
         this(Environment.getDataDirectory(), permissions, lock);
@@ -4217,7 +4219,10 @@ public final class Settings {
     private int newUserIdLPw(Object obj) {
         // Let's be stupidly inefficient for now...
         final int N = mUserIds.size();
-        for (int i = mFirstAvailableUid; i < N; i++) {
+        if (mHwSettings.isLastApplicationUid(mFirstAvailableUid, mUserIds, N)) {
+            mFirstAvailableUid = HwSettings.getFirstAvailableUid();
+        }
+        for (int i = mFirstAvailableUid - HwSettings.getFirstAvailableUid(); i < N; i++) {
             if (mUserIds.get(i) == null) {
                 mUserIds.set(i, obj);
                 return Process.FIRST_APPLICATION_UID + i;

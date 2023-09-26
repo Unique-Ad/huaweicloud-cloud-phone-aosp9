@@ -320,7 +320,6 @@ public class ResourcesManager {
         if (apkAssetsRef != null) {
             apkAssets = apkAssetsRef.get();
             if (apkAssets != null) {
-                mLoadedApkAssets.put(newKey, apkAssets);
                 return apkAssets;
             } else {
                 // Clean up the reference.
@@ -335,7 +334,6 @@ public class ResourcesManager {
         } else {
             apkAssets = ApkAssets.loadFromPath(path, false /*system*/, sharedLib);
         }
-        mLoadedApkAssets.put(newKey, apkAssets);
         mCachedApkAssets.put(newKey, new WeakReference<>(apkAssets));
         return apkAssets;
     }

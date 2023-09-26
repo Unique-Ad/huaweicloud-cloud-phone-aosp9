@@ -618,6 +618,11 @@ public final class DisplayManager {
                 name, width, height, densityDpi, surface, flags, callback, handler, uniqueId);
     }
 
+    /** @hide */
+    public void resizePrimaryDisplay(int width, int height) {
+        mGlobal.resizePrimaryDisplay(width, height);
+    }
+
     /**
      * Gets the stable device display size, in pixels.
      *

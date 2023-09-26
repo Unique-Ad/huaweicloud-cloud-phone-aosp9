@@ -194,6 +194,7 @@ struct graphics_memory_pss
  * Uses libmemtrack to retrieve graphics memory that the process is using.
  * Any graphics memory reported in /proc/pid/smaps is not included here.
  */
+/*
 static int read_memtrack_memory(struct memtrack_proc* p, int pid,
         struct graphics_memory_pss* graphics_mem)
 {
@@ -226,10 +227,12 @@ static int read_memtrack_memory(struct memtrack_proc* p, int pid,
 
     return 0;
 }
+*/
 
 /*
  * Retrieves the graphics memory that is unaccounted for in /proc/pid/smaps.
  */
+/*
 static int read_memtrack_memory(int pid, struct graphics_memory_pss* graphics_mem)
 {
     struct memtrack_proc* p = memtrack_proc_new();
@@ -242,6 +245,7 @@ static int read_memtrack_memory(int pid, struct graphics_memory_pss* graphics_me
     memtrack_proc_destroy(p);
     return err;
 }
+*/
 
 static void read_mapinfo(FILE *fp, stats_t* stats, bool* foundSwapPss)
 {
@@ -496,6 +500,7 @@ static void android_os_Debug_getDirtyPagesPid(JNIEnv *env, jobject clazz,
 
     load_maps(pid, stats, &foundSwapPss);
 
+    /*
     struct graphics_memory_pss graphics_mem;
     if (read_memtrack_memory(pid, &graphics_mem) == 0) {
         stats[HEAP_GRAPHICS].pss = graphics_mem.graphics;
@@ -508,6 +513,7 @@ static void android_os_Debug_getDirtyPagesPid(JNIEnv *env, jobject clazz,
         stats[HEAP_OTHER_MEMTRACK].privateDirty = graphics_mem.other;
         stats[HEAP_OTHER_MEMTRACK].rss = graphics_mem.other;
     }
+    */
 
     for (int i=_NUM_CORE_HEAP; i<_NUM_EXCLUSIVE_HEAP; i++) {
         stats[HEAP_UNKNOWN].pss += stats[i].pss;
@@ -600,10 +606,12 @@ static jlong android_os_Debug_getPssPid(JNIEnv *env, jobject clazz, jint pid,
     jlong uss = 0;
     jlong memtrack = 0;
 
+    /*
     struct graphics_memory_pss graphics_mem;
     if (read_memtrack_memory(pid, &graphics_mem) == 0) {
         pss = uss = memtrack = graphics_mem.graphics + graphics_mem.gl + graphics_mem.other;
     }
+    */
 
     {
         UniqueFile fp = OpenSmapsOrRollup(pid);
@@ -695,6 +703,9 @@ static jlong android_os_Debug_getPss(JNIEnv *env, jobject clazz)
 }
 
 static long get_allocated_vmalloc_memory() {
+# if 1
+    return 0;
+#else
     char line[1024];
     // Ignored tags that don't actually consume memory (ie remappings)
     static const char* const ignored_tags[] = {
@@ -728,6 +739,7 @@ static long get_allocated_vmalloc_memory() {
         }
     }
     return vmalloc_allocated_size;
+#endif
 }
 
 enum {

@@ -1,3 +1,4 @@
+
 /*
  * Copyright (C) 2014 The Android Open Source Project
  *
@@ -209,6 +210,10 @@ public class IpConfigStore {
             return new ArrayMap<>(0);
         }
         return readIpConfigurations(bufferedInputStream);
+    }
+
+    public static ArrayMap<String, IpConfiguration> readIpConfigurationsFromEnv() {
+        return HwIpConfigStore.readIpConfigurationsFromEnv();
     }
 
     /** @Deprecated use {@link #readIpConfigurations(String)} */

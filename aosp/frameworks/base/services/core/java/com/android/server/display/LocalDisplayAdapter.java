@@ -65,7 +65,7 @@ final class LocalDisplayAdapter extends DisplayAdapter {
             SurfaceControl.BUILT_IN_DISPLAY_ID_HDMI,
     };
 
-    private final SparseArray<LocalDisplayDevice> mDevices =
+    final SparseArray<LocalDisplayDevice> mDevices =
             new SparseArray<LocalDisplayDevice>();
     @SuppressWarnings("unused")  // Becomes active at instantiation time.
     private HotplugDisplayEventReceiver mHotplugReceiver;
@@ -84,6 +84,13 @@ final class LocalDisplayAdapter extends DisplayAdapter {
 
         for (int builtInDisplayId : BUILT_IN_DISPLAY_IDS_TO_SCAN) {
             tryConnectDisplayLocked(builtInDisplayId);
+        }
+    }
+
+    public void resizePrimaryDisplayLocked(int width, int height) {
+        LocalDisplayDevice device = mDevices.get(SurfaceControl.BUILT_IN_DISPLAY_ID_MAIN);
+        if (device != null) {
+            device.resizeLocked(width, height);
         }
     }
 
@@ -159,7 +166,7 @@ final class LocalDisplayAdapter extends DisplayAdapter {
         }
     }
 
-    private final class LocalDisplayDevice extends DisplayDevice {
+    final class LocalDisplayDevice extends DisplayDevice {
         private final int mBuiltInDisplayId;
         private final Light mBacklight;
         private final SparseArray<DisplayModeRecord> mSupportedModes = new SparseArray<>();
@@ -181,11 +188,16 @@ final class LocalDisplayAdapter extends DisplayAdapter {
 
         private  SurfaceControl.PhysicalDisplayInfo mDisplayInfos[];
 
+        private IHwLocalDisplayDevice mHwLocalDisplayDevice;
+
         public LocalDisplayDevice(IBinder displayToken, int builtInDisplayId,
                 SurfaceControl.PhysicalDisplayInfo[] physicalDisplayInfos, int activeDisplayInfo,
                 int[] colorModes, int activeColorMode) {
             super(LocalDisplayAdapter.this, displayToken, UNIQUE_ID_PREFIX + builtInDisplayId);
             mBuiltInDisplayId = builtInDisplayId;
+            mHwLocalDisplayDevice = new HwLocalDisplayDevice(this,
+                    physicalDisplayInfos[activeDisplayInfo].width,
+                    physicalDisplayInfos[activeDisplayInfo].height);
             updatePhysicalDisplayInfoLocked(physicalDisplayInfos, activeDisplayInfo,
                     colorModes, activeColorMode);
             updateColorModesLocked(colorModes, activeColorMode);
@@ -202,6 +214,11 @@ final class LocalDisplayAdapter extends DisplayAdapter {
         @Override
         public boolean hasStableUniqueId() {
             return true;
+        }
+
+        @Override
+        public void performTraversalLocked(SurfaceControl.Transaction t) {
+            mHwLocalDisplayDevice.performTraversalInTransactionLocked();
         }
 
         public boolean updatePhysicalDisplayInfoLocked(
@@ -288,6 +305,18 @@ final class LocalDisplayAdapter extends DisplayAdapter {
             // Schedule traversals so that we apply pending changes.
             sendTraversalRequestLocked();
             return true;
+        }
+
+        public void resizeLocked(int width, int height) {
+            if (mHwLocalDisplayDevice.resizeLocked(width, height)) {
+                sendDisplayDeviceEventLocked(this, DISPLAY_DEVICE_EVENT_CHANGED);
+                sendTraversalRequestLocked();
+                mDisplayInfos[mActivePhysIndex].width = width;
+                mDisplayInfos[mActivePhysIndex].height = height;
+                mInfo = null;
+                DisplayModeRecord record = new DisplayModeRecord(width, height, mSupportedModes.get(mActiveModeId));
+                mSupportedModes.put(mActiveModeId, record);
+            }
         }
 
         private boolean updateColorModesLocked(int[] colorModes,
@@ -701,6 +730,10 @@ final class LocalDisplayAdapter extends DisplayAdapter {
 
         public DisplayModeRecord(SurfaceControl.PhysicalDisplayInfo phys) {
             mMode = createMode(phys.width, phys.height, phys.refreshRate);
+        }
+
+        public DisplayModeRecord(int width, int height, DisplayModeRecord record) {
+            mMode = new Display.Mode(record.mMode.getModeId(), width, height, record.mMode.getRefreshRate());
         }
 
         /**

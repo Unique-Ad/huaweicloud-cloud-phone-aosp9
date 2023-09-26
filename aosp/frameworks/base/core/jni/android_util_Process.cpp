@@ -42,6 +42,7 @@
 #include <sys/errno.h>
 #include <sys/resource.h>
 #include <sys/stat.h>
+#include <sys/sysinfo.h>
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -184,12 +185,12 @@ void android_os_Process_setThreadGroupAndCpuset(JNIEnv* env, jobject clazz, int 
     int res = set_sched_policy(tid, sp);
 
     if (res != NO_ERROR) {
-        signalExceptionForGroupError(env, -res, tid);
+        ALOGV("set_sched_policy err");
     }
 
     res = set_cpuset_policy(tid, sp);
     if (res != NO_ERROR) {
-        signalExceptionForGroupError(env, -res, tid);
+        ALOGV("set_cpuset_policy err");
     }
 }
 
@@ -542,6 +543,7 @@ jint android_os_Process_getThreadPriority(JNIEnv* env, jobject clazz,
 jboolean android_os_Process_setSwappiness(JNIEnv *env, jobject clazz,
                                           jint pid, jboolean is_increased)
 {
+#if 0
     char text[64];
 
     if (is_increased) {
@@ -561,6 +563,7 @@ jboolean android_os_Process_setSwappiness(JNIEnv *env, jobject clazz,
         write(fd, text, strlen(text));
         close(fd);
     }
+#endif
 
     return true;
 }
@@ -661,6 +664,13 @@ static jlong android_os_Process_getTotalMemory(JNIEnv* env, jobject clazz)
     static const char* const sums[] = { "MemTotal:", NULL };
     static const size_t sumsLen[] = { strlen("MemTotal:"), 0 };
     return getFreeMemoryImpl(sums, sumsLen, 1);
+}
+
+static jlong android_os_Process_getTotalMemoryBySysinfo(JNIEnv* env, jobject clazz)
+{
+    struct sysinfo info;
+    sysinfo(&info);
+    return info.totalram;
 }
 
 void android_os_Process_readProcLines(JNIEnv* env, jobject clazz, jstring fileStr,
@@ -1230,6 +1240,7 @@ static const JNINativeMethod methods[] = {
     {"sendSignal", "(II)V", (void*)android_os_Process_sendSignal},
     {"sendSignalQuiet", "(II)V", (void*)android_os_Process_sendSignalQuiet},
     {"getFreeMemory", "()J", (void*)android_os_Process_getFreeMemory},
+    {"getTotalMemoryBySysinfo", "()J", (void*)android_os_Process_getTotalMemoryBySysinfo},
     {"getTotalMemory", "()J", (void*)android_os_Process_getTotalMemory},
     {"readProcLines", "(Ljava/lang/String;[Ljava/lang/String;[J)V", (void*)android_os_Process_readProcLines},
     {"getPids", "(Ljava/lang/String;[I)[I", (void*)android_os_Process_getPids},

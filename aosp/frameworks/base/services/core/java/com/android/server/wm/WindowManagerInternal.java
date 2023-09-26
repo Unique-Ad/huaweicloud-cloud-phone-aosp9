@@ -425,4 +425,11 @@ public abstract class WindowManagerInternal {
      * the window token is not found.
      */
     public abstract int getWindowOwnerUserId(IBinder windowToken);
+
+    /**
+     * add for background app killer
+     *
+     * @param packageName
+     */
+    public abstract boolean hasFloatingWindow(String packageName);
 }

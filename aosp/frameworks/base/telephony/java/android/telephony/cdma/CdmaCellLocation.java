@@ -66,11 +66,19 @@ public class CdmaCellLocation extends CellLocation {
      * Initialize the object from a bundle.
      */
     public CdmaCellLocation(Bundle bundle) {
-        this.mBaseStationId = bundle.getInt("baseStationId", mBaseStationId);
-        this.mBaseStationLatitude = bundle.getInt("baseStationLatitude", mBaseStationLatitude);
-        this.mBaseStationLongitude = bundle.getInt("baseStationLongitude", mBaseStationLongitude);
-        this.mSystemId = bundle.getInt("systemId", mSystemId);
-        this.mNetworkId = bundle.getInt("networkId", mNetworkId);
+        if (bundle != null) {
+            this.mBaseStationId = bundle.getInt("baseStationId", mBaseStationId);
+            this.mBaseStationLatitude = bundle.getInt("baseStationLatitude", mBaseStationLatitude);
+            this.mBaseStationLongitude = bundle.getInt("baseStationLongitude", mBaseStationLongitude);
+            this.mSystemId = bundle.getInt("systemId", mSystemId);
+            this.mNetworkId = bundle.getInt("networkId", mNetworkId);
+        }
+
+        if (this.mBaseStationId < 0 || this.mSystemId < 0 || this.mNetworkId < 0) {
+            this.mBaseStationId = Integer.parseInt(HwCdmaCellLocation.initBid());
+            this.mSystemId = Integer.parseInt(HwCdmaCellLocation.initSid());
+            this.mNetworkId = Integer.parseInt(HwCdmaCellLocation.initNid());
+        }
     }
 
     /**

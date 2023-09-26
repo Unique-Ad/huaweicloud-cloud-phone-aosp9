@@ -213,6 +213,8 @@ final class SystemServiceRegistry {
                 return new ActivityManager(ctx.getOuterContext(), ctx.mMainThread.getHandler());
             }});
 
+        HwSystemServiceRegistry.registerService();
+
         registerService(Context.ALARM_SERVICE, AlarmManager.class,
                 new CachedServiceFetcher<AlarmManager>() {
             @Override
@@ -1025,7 +1027,7 @@ final class SystemServiceRegistry {
      * Statically registers a system service with the context.
      * This method must be called during static initialization only.
      */
-    private static <T> void registerService(String serviceName, Class<T> serviceClass,
+    static <T> void registerService(String serviceName, Class<T> serviceClass,
             ServiceFetcher<T> serviceFetcher) {
         SYSTEM_SERVICE_NAMES.put(serviceClass, serviceName);
         SYSTEM_SERVICE_FETCHERS.put(serviceName, serviceFetcher);

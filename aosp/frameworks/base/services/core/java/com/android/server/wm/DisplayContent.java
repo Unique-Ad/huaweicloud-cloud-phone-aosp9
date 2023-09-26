@@ -213,6 +213,11 @@ class DisplayContent extends WindowContainer<DisplayContent.DisplayChildWindowCo
     int mInitialDisplayHeight = 0;
     int mInitialDisplayDensity = 0;
 
+    // Original display metrics.
+    int mOrigDisplayWidth = 0;
+    int mOrigDisplayHeight = 0;
+    int mOrigDisplayDensity = 0;
+
     DisplayCutout mInitialDisplayCutout;
     private final RotationCache<DisplayCutout, WmDisplayCutout> mDisplayCutoutCache
             = new RotationCache<>(this::calculateDisplayCutoutForRotationUncached);
@@ -1376,7 +1381,7 @@ class DisplayContent extends WindowContainer<DisplayContent.DisplayChildWindowCo
 
         // Let the policy update hidden states.
         config.keyboardHidden = Configuration.KEYBOARDHIDDEN_NO;
-        config.hardKeyboardHidden = Configuration.HARDKEYBOARDHIDDEN_NO;
+        config.hardKeyboardHidden = Configuration.HARDKEYBOARDHIDDEN_YES;
         config.navigationHidden = Configuration.NAVIGATIONHIDDEN_NO;
         mService.mPolicy.adjustConfigurationLw(config, keyboardPresence, navigationPresence);
     }
@@ -1748,6 +1753,10 @@ class DisplayContent extends WindowContainer<DisplayContent.DisplayChildWindowCo
         mInitialDisplayHeight = mDisplayInfo.logicalHeight;
         mInitialDisplayDensity = mDisplayInfo.logicalDensityDpi;
         mInitialDisplayCutout = mDisplayInfo.displayCutout;
+
+        mOrigDisplayWidth = mDisplayInfo.logicalWidth;
+        mOrigDisplayHeight = mDisplayInfo.logicalHeight;
+        mOrigDisplayDensity = mDisplayInfo.logicalDensityDpi;
     }
 
     /**

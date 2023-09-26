@@ -64,6 +64,7 @@
 #include "fd_utils.h"
 
 #include "nativebridge/native_bridge.h"
+#include "hw_com_android_internal_os_Zygote.h"
 
 namespace {
 
@@ -379,7 +380,7 @@ static int UnmountTree(const char* path) {
 // Create a private mount namespace and bind mount appropriate emulated
 // storage for the given user.
 static bool MountEmulatedStorage(uid_t uid, jint mount_mode,
-        bool force_mount_namespace, std::string* error_msg) {
+        bool force_mount_namespace, std::string* error_msg, jint runtime_flags) {
     // See storage config details at http://source.android.com/tech/storage/
 
     String8 storageSource;
@@ -399,6 +400,8 @@ static bool MountEmulatedStorage(uid_t uid, jint mount_mode,
         *error_msg = CREATE_ERROR("Failed to unshare(): %s", strerror(errno));
         return false;
     }
+
+    HwMountEmulatedStorage(runtime_flags);
 
     // Handle force_mount_namespace with MOUNT_EXTERNAL_NONE.
     if (mount_mode == MOUNT_EXTERNAL_NONE) {
@@ -611,9 +614,6 @@ static pid_t ForkAndSpecializeCommon(JNIEnv* env, uid_t uid, gid_t gid, jintArra
 
     // Re-open all remaining open file descriptors so that they aren't shared
     // with the zygote across a fork.
-    if (!gOpenFdTable->ReopenOrDetach(&error_msg)) {
-      fail_fn(error_msg);
-    }
 
     if (sigprocmask(SIG_UNBLOCK, &sigchld, nullptr) == -1) {
       fail_fn(CREATE_ERROR("sigprocmask(SIG_SETMASK, { SIGCHLD }) failed: %s", strerror(errno)));
@@ -648,7 +648,7 @@ static pid_t ForkAndSpecializeCommon(JNIEnv* env, uid_t uid, gid_t gid, jintArra
       ALOGW("Native bridge will not be used because dataDir == NULL.");
     }
 
-    if (!MountEmulatedStorage(uid, mount_external, use_native_bridge, &error_msg)) {
+    if (!MountEmulatedStorage(uid, mount_external, use_native_bridge, &error_msg, runtime_flags)) {
       ALOGW("Failed to mount emulated storage: %s (%s)", error_msg.c_str(), strerror(errno));
       if (errno == ENOTCONN || errno == EROFS) {
         // When device is actively encrypting, we get ENOTCONN here
@@ -801,7 +801,7 @@ namespace android {
 static void com_android_internal_os_Zygote_nativeSecurityInit(JNIEnv*, jclass) {
   // security_getenforce is not allowed on app process. Initialize and cache the value before
   // zygote forks.
-  g_is_security_enforced = security_getenforce();
+  g_is_security_enforced = (security_getenforce() > 0);
 }
 
 static void com_android_internal_os_Zygote_nativePreApplicationInit(JNIEnv*, jclass) {

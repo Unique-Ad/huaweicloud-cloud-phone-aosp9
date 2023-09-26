@@ -157,7 +157,7 @@ void EglManager::initExtensions() {
     // that EGL_EXT_buffer_age provides.
     EglExtensions.bufferAge =
             extensions.has("EGL_EXT_buffer_age") || extensions.has("EGL_KHR_partial_update");
-    EglExtensions.setDamage = extensions.has("EGL_KHR_partial_update");
+    EglExtensions.setDamage = false;
     LOG_ALWAYS_FATAL_IF(!extensions.has("EGL_KHR_swap_buffers_with_damage"),
                         "Missing required extension EGL_KHR_swap_buffers_with_damage");
 
