@@ -27,6 +27,7 @@
 
 #include "../hooks.h"
 #include "../egl_impl.h"
+#include <hw_egl.h>
 
 using namespace android;
 
@@ -347,6 +348,11 @@ extern "C" {
 extern "C" const GLubyte * __glGetString(GLenum name);
 
 const GLubyte * glGetString(GLenum name) {
+    hw_egl_init();
+    const GLubyte * r = hw_egl_get_string_for_current_context(name);
+    if (r) {
+        return r;
+    }
     const GLubyte * ret = egl_get_string_for_current_context(name);
     if (ret == NULL) {
         gl_hooks_t::gl_t const * const _c = &getGlThreadSpecific()->gl;

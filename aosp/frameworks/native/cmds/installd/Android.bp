@@ -32,6 +32,9 @@ cc_defaults {
         "libselinux",
         "libutils",
     ],
+    static_libs: [
+        "libinstalld_vendor",
+    ],
 
     clang: true,
 
@@ -66,7 +69,7 @@ cc_library_static {
 //
 
 cc_binary {
-    name: "installd_orig",
+    name: "installd",
     defaults: ["installd_defaults"],
     srcs: ["installd.cpp"],
 

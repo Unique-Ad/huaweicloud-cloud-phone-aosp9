@@ -958,6 +958,7 @@ private:
     uint32_t mDeviceTimestamp;
 
     void clearSlots(int32_t initialSlot);
+    void setDefaultPressure(int pressure);
 };
 
 

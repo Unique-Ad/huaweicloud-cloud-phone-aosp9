@@ -25,6 +25,7 @@
 #include "OrientationSensor.h"
 #include "SensorDevice.h"
 #include "SensorFusion.h"
+#include <HwSensorInterface.h>
 
 namespace android {
 // ---------------------------------------------------------------------------
@@ -32,7 +33,7 @@ namespace android {
 OrientationSensor::OrientationSensor() {
     const sensor_t sensor = {
         .name       = "Orientation Sensor",
-        .vendor     = "AOSP",
+        .vendor     = hwGetOrientationSensorVendor(),
         .version    = 1,
         .handle     = '_ypr',
         .type       = SENSOR_TYPE_ORIENTATION,

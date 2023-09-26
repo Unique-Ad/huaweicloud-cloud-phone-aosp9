@@ -240,6 +240,16 @@ public:
     }
 
 private:
+
+    status_t readyToRun() {
+        struct sched_param param = {0};
+        param.sched_priority = 2;
+        if (sched_setscheduler(0, SCHED_FIFO, &param) != 0) {
+            ALOGE("Couldn't set SCHED_FIFO for DispSyncThread");
+        }
+        return NO_ERROR;
+    }
+
     struct EventListener {
         const char* mName;
         nsecs_t mPhase;
@@ -393,11 +403,7 @@ void DispSync::init(bool hasSyncFramework, int64_t dispSyncPresentTimeOffset) {
     mThread->run("DispSync", PRIORITY_URGENT_DISPLAY + PRIORITY_MORE_FAVORABLE);
 
     // set DispSync to SCHED_FIFO to minimize jitter
-    struct sched_param param = {0};
-    param.sched_priority = 2;
-    if (sched_setscheduler(mThread->getTid(), SCHED_FIFO, &param) != 0) {
-        ALOGE("Couldn't set SCHED_FIFO for DispSyncThread");
-    }
+    // CPH move sched_setscheduler to readyToRun()
 
     reset();
     beginResync();

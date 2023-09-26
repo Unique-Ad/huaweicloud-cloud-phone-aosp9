@@ -126,6 +126,8 @@ public:
 
     virtual Error setActiveConfig(Display display, Config config) = 0;
 
+    virtual Error updateActiveConfigSize(Display display, uint32_t width, uint32_t height) = 0;
+
     /*
      * The composer caches client targets internally.  When target is nullptr,
      * the composer uses slot to look up the client target from its cache.
@@ -134,6 +136,7 @@ public:
     virtual Error setClientTarget(Display display, uint32_t slot, const sp<GraphicBuffer>& target,
                                   int acquireFence, Dataspace dataspace,
                                   const std::vector<IComposerClient::Rect>& damage) = 0;
+    virtual Error eventControl(Display display, int32_t event, int32_t enabled) = 0;
     virtual Error setColorMode(Display display, ColorMode mode, RenderIntent renderIntent) = 0;
     virtual Error setColorTransform(Display display, const float* matrix, ColorTransform hint) = 0;
     virtual Error setOutputBuffer(Display display, const native_handle_t* buffer,
@@ -323,6 +326,8 @@ public:
 
     Error setActiveConfig(Display display, Config config) override;
 
+    Error updateActiveConfigSize(Display display, uint32_t width, uint32_t height) override;
+
     /*
      * The composer caches client targets internally.  When target is nullptr,
      * the composer uses slot to look up the client target from its cache.
@@ -331,6 +336,7 @@ public:
     Error setClientTarget(Display display, uint32_t slot, const sp<GraphicBuffer>& target,
                           int acquireFence, Dataspace dataspace,
                           const std::vector<IComposerClient::Rect>& damage) override;
+    Error eventControl(Display display, int32_t event, int32_t enabled) override;
     Error setColorMode(Display display, ColorMode mode, RenderIntent renderIntent) override;
     Error setColorTransform(Display display, const float* matrix, ColorTransform hint) override;
     Error setOutputBuffer(Display display, const native_handle_t* buffer,

@@ -40,6 +40,8 @@
 #include "selinux/selinux.h"
 #include "selinux/android.h"
 
+#include <hw_cmd.h>
+
 #define DEBUG 0
 
 using namespace android;
@@ -192,7 +194,8 @@ int main(int argc, char* const argv[])
         return 20;
     }
 
-    if ((argc == 2) && (strcmp(argv[1], "-l") == 0)) {
+    if (argc == 2) {
+    if (strcmp(argv[1], "-l") == 0) {
         Vector<String16> services = sm->listServices();
         services.sort(sort_func);
         aout << "Currently running services:" << endl;
@@ -204,6 +207,15 @@ int main(int argc, char* const argv[])
             }
         }
         return 0;
+    } else if (strcmp(argv[1], "-v") == 0) {
+        aout << "cmd " << hw_cmd_version() << endl;
+        return 0;
+    } else if (strcmp(argv[1], "-h") == 0) {
+        aout << hw_cmd_help() << endl;
+        return 0;
+    } else {
+        // do nothing
+    }
     }
 
     Vector<String16> args;

@@ -26,7 +26,6 @@
 #include <utils/String8.h>
 #include <utils/String8.h>
 #include <utils/threads.h>
-#include <cutils/properties.h>
 
 #include <private/binder/binder_module.h>
 #include <private/binder/Static.h>
@@ -40,6 +39,7 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <HwProcessState.h>
 
 #define BINDER_VM_SIZE ((1 * 1024 * 1024) - sysconf(_SC_PAGE_SIZE) * 2)
 
@@ -361,15 +361,7 @@ void ProcessState::spawnPooledThread(bool isMain)
 
 status_t ProcessState::setThreadPoolMaxThreadCount(size_t maxThreads) {
     status_t result = NO_ERROR;
-    char maxThProp[PROPERTY_VALUE_MAX];
-    size_t maxTh;
-
-    property_get("ro.hardware.binder.thread_max", maxThProp, "3");
-    maxTh = std::stoi(std::string(maxThProp));
-    if (maxThreads > maxTh) {
-        ALOGI("setThreadPoolMaxThreadCount limit %u to %u", (unsigned int)maxThreads, (unsigned int)maxTh);
-        maxThreads = maxTh;
-    }
+    maxThreads = hwGetMaxThreads(maxThreads);
     if (ioctl(mDriverFD, BINDER_SET_MAX_THREADS, &maxThreads) != -1) {
         mMaxThreads = maxThreads;
     } else {
@@ -424,11 +416,8 @@ ProcessState::ProcessState(const char *driver)
     , mThreadPoolStarted(false)
     , mThreadPoolSeq(1)
 {
-    char maxThProp[PROPERTY_VALUE_MAX];
-    property_get("ro.hardware.binder.default_thread_max", maxThProp, "3");
-    mMaxThreads = std::stoi(std::string(maxThProp));
     if (mDriverFD >= 0) {
-        setThreadPoolMaxThreadCount(mMaxThreads);
+        setThreadPoolMaxThreadCount(hwGetDefaultMaxThreads());
         // mmap the binder, providing a chunk of virtual address space to receive transactions.
         mVMStart = mmap(0, BINDER_VM_SIZE, PROT_READ, MAP_PRIVATE | MAP_NORESERVE, mDriverFD, 0);
         if (mVMStart == MAP_FAILED) {

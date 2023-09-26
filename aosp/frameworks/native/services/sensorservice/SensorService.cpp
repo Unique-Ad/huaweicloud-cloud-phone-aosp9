@@ -280,9 +280,6 @@ void SensorService::onFirstRef() {
             mAckReceiver->run("SensorEventAckReceiver", PRIORITY_URGENT_DISPLAY);
             run("SensorService", PRIORITY_URGENT_DISPLAY);
 
-            // priority can only be changed after run
-            enableSchedFifoMode();
-
             // Start watching UID changes to apply policy.
             mUidPolicy->registerSelf();
         }

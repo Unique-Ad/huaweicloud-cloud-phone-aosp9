@@ -25,6 +25,7 @@
 #include "GravitySensor.h"
 #include "SensorDevice.h"
 #include "SensorFusion.h"
+#include <HwSensorInterface.h>
 
 namespace android {
 // ---------------------------------------------------------------------------
@@ -39,7 +40,7 @@ GravitySensor::GravitySensor(sensor_t const* list, size_t count) {
 
     const sensor_t sensor = {
         .name       = "Gravity Sensor",
-        .vendor     = "AOSP",
+        .vendor     = hwGetGravitySensorVendor(),
         .version    = 3,
         .handle     = '_grv',
         .type       = SENSOR_TYPE_GRAVITY,

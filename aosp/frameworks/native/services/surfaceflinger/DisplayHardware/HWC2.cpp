@@ -593,6 +593,12 @@ Error Display::setActiveConfig(const std::shared_ptr<const Config>& config)
     return static_cast<Error>(intError);
 }
 
+Error Display::updateActiveConfigSize(uint32_t width, uint32_t height)
+{
+    auto intError = mComposer.updateActiveConfigSize(mId, width, height);
+    return static_cast<Error>(intError);
+}
+
 Error Display::setClientTarget(uint32_t slot, const sp<GraphicBuffer>& target,
         const sp<Fence>& acquireFence, Dataspace dataspace)
 {
@@ -600,6 +606,12 @@ Error Display::setClientTarget(uint32_t slot, const sp<GraphicBuffer>& target,
     int32_t fenceFd = acquireFence->dup();
     auto intError = mComposer.setClientTarget(mId, slot, target,
             fenceFd, dataspace, std::vector<Hwc2::IComposerClient::Rect>());
+    return static_cast<Error>(intError);
+}
+
+Error Display::eventControl(int32_t event, int32_t enabled)
+{
+    auto intError = mComposer.eventControl(mId, event, enabled);
     return static_cast<Error>(intError);
 }
 

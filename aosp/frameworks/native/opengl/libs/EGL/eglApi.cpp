@@ -46,6 +46,7 @@
 #include "egl_object.h"
 #include "egl_tls.h"
 #include "egl_trace.h"
+#include <hw_egl.h>
 
 using namespace android;
 
@@ -911,6 +912,7 @@ EGLContext eglCreateContext(EGLDisplay dpy, EGLConfig config,
 {
     clearError();
 
+    hw_egl_context_init();
     egl_connection_t* cnx = NULL;
     const egl_display_ptr dp = validate_display_connection(dpy, cnx);
     if (dp) {
@@ -921,6 +923,11 @@ EGLContext eglCreateContext(EGLDisplay dpy, EGLConfig config,
             egl_context_t* const c = get_context(share_list);
             share_list = c->context;
         }
+
+        if (hw_egl_create_context(attrib_list)) {
+            return EGL_NO_CONTEXT;
+        }
+
         EGLContext context = cnx->egl.eglCreateContext(
                 dp->disp.dpy, config, share_list, attrib_list);
         if (context != EGL_NO_CONTEXT) {
@@ -1368,6 +1375,8 @@ EGLBoolean eglSwapBuffersWithDamageKHR(EGLDisplay dpy, EGLSurface draw,
 {
     ATRACE_CALL();
     clearError();
+
+    hw_egl_print_fps(__FUNCTION__);
 
     const egl_display_ptr dp = validate_display(dpy);
     if (!dp) return EGL_FALSE;

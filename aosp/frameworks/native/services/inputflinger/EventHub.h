@@ -274,6 +274,9 @@ public:
 
     /* Disable an input device. Closes file descriptor to that device. */
     virtual status_t disableDevice(int32_t deviceId) = 0;
+
+    /* get default pressure */
+    virtual int getDefaultPressure(int32_t deviceId) = 0;
 };
 
 class EventHub : public EventHubInterface
@@ -334,6 +337,7 @@ public:
 
     virtual void dump(std::string& dump);
     virtual void monitor();
+    virtual int getDefaultPressure(int32_t deviceId);
 
 protected:
     virtual ~EventHub();

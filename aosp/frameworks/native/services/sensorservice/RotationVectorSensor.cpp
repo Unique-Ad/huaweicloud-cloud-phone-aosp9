@@ -23,6 +23,7 @@
 #include <hardware/sensors.h>
 
 #include "RotationVectorSensor.h"
+#include <HwSensorInterface.h>
 
 namespace android {
 // ---------------------------------------------------------------------------
@@ -31,7 +32,7 @@ RotationVectorSensor::RotationVectorSensor(int mode) :
       mMode(mode) {
     const sensor_t sensor = {
         .name       = getSensorName(),
-        .vendor     = "AOSP",
+        .vendor     = hwGetRotationVectorSensorVendor(),
         .version    = 3,
         .handle     = getSensorToken(),
         .type       = getSensorType(),
@@ -117,7 +118,7 @@ int RotationVectorSensor::getSensorToken() const {
 GyroDriftSensor::GyroDriftSensor() {
     const sensor_t sensor = {
         .name       = "Gyroscope Bias (debug)",
-        .vendor     = "AOSP",
+        .vendor     = hwGetGyroDriftSensorVendor(),
         .version    = 1,
         .handle     = '_gbs',
         .type       = SENSOR_TYPE_ACCELEROMETER,

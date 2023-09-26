@@ -10,6 +10,8 @@ LOCAL_SHARED_LIBRARIES := \
     libselinux \
 	libbinder
 
+LOCAL_STATIC_LIBRARIES := libcmd_vendor
+
 LOCAL_CFLAGS := -Wall -Werror
 
 LOCAL_C_INCLUDES += \
@@ -20,6 +22,6 @@ ifeq ($(TARGET_OS),linux)
 	#LOCAL_SHARED_LIBRARIES += librt
 endif
 
-LOCAL_MODULE:= cmd_orig
+LOCAL_MODULE:= cmd
 
 include $(BUILD_EXECUTABLE)

@@ -111,7 +111,7 @@ int main(int, char**) {
     startDisplayService(); // dependency on SF getting registered above
 
     struct sched_param param = {0};
-    param.sched_priority = 2;
+    param.sched_priority = 1;
     if (sched_setscheduler(0, SCHED_FIFO, &param) != 0) {
         ALOGE("Couldn't set SCHED_FIFO");
     }

@@ -25,7 +25,7 @@ cc_binary {
 }
 
 cc_binary {
-    name: "servicemanager_orig",
+    name: "servicemanager",
     defaults: ["servicemanager_flags"],
     srcs: [
         "service_manager.c",
@@ -36,7 +36,7 @@ cc_binary {
 }
 
 cc_binary {
-    name: "vndservicemanager_orig",
+    name: "vndservicemanager",
     defaults: ["servicemanager_flags"],
     vendor: true,
     srcs: [

@@ -99,8 +99,14 @@ public:
     // set power mode
     status_t setPowerMode(int32_t displayId, int mode);
 
+    // set eventControl
+    status_t eventControl(int32_t displayId, int32_t event, int32_t enabled);
+
     // set active config
     status_t setActiveConfig(int32_t displayId, size_t configId);
+
+    // update active config's size
+    status_t updateActiveConfigSize(int32_t displayId, uint32_t width, uint32_t height);
 
     // Sets a color transform to be applied to the result of composition
     status_t setColorTransform(int32_t displayId, const mat4& transform);

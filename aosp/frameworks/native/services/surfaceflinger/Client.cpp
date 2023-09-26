@@ -137,7 +137,7 @@ status_t Client::onTransact(
          {
              ALOGE("Permission Denial: "
                      "can't openGlobalTransaction pid=%d, uid<=%d", pid, uid);
-             return PERMISSION_DENIED;
+             // only warning not return (CPH)
          }
      }
      return BnSurfaceComposerClient::onTransact(code, data, reply, flags);
