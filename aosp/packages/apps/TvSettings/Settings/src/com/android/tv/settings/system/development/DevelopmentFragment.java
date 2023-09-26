@@ -298,11 +298,10 @@ public class DevelopmentFragment extends SettingsPreferenceFragment
                 findPreference(DEBUG_DEBUGGING_CATEGORY_KEY);
         mEnableAdb = findAndInitSwitchPref(ENABLE_ADB);
         mClearAdbKeys = findPreference(CLEAR_ADB_KEYS);
-        if (!SystemProperties.getBoolean("ro.adb.secure", false)) {
-            if (debugDebuggingCategory != null) {
-                debugDebuggingCategory.removePreference(mClearAdbKeys);
-            }
+        if (debugDebuggingCategory != null) {
+            debugDebuggingCategory.removePreference(mClearAdbKeys);
         }
+
         mAllPrefs.add(mClearAdbKeys);
         mEnableTerminal = findAndInitSwitchPref(ENABLE_TERMINAL);
         if (!isPackageInstalled(getActivity(), TERMINAL_APP_PACKAGE)) {

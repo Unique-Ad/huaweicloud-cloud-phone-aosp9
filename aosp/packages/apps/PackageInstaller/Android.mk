@@ -27,7 +27,8 @@ LOCAL_STATIC_ANDROID_LIBRARIES += \
 
 LOCAL_STATIC_JAVA_LIBRARIES := \
     xz-java \
-    android-support-annotations
+    android-support-annotations \
+    packageinstaller.src-vendor
 
 LOCAL_PACKAGE_NAME := PackageInstaller
 LOCAL_CERTIFICATE := platform

@@ -936,6 +936,7 @@ public class WifiSettings extends RestrictedSettingsFragment
                 isWifiWakeupEnabled()
                         ? R.string.wifi_configure_settings_preference_summary_wakeup_on
                         : R.string.wifi_configure_settings_preference_summary_wakeup_off));
+        mConfigureWifiSettingsPreference.setEnabled(false);
         int numSavedNetworks = mWifiTracker.getNumSavedNetworks();
         if (numSavedNetworks > 0) {
             mAdditionalSettingsPreferenceCategory.addPreference(mSavedNetworksPreference);

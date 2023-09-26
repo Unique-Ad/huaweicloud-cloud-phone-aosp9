@@ -194,9 +194,6 @@
         <service android:name=".ota.OtaService" />
 
         <receiver android:name="com.android.managedprovisioning.preprovisioning.BootReminder">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
         </receiver>
 
         <receiver android:name="com.android.managedprovisioning.ota.PreBootListener">

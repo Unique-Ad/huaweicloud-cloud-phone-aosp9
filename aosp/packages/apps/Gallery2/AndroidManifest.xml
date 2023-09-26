@@ -21,7 +21,6 @@
     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
     <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.SET_WALLPAPER" />
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
@@ -316,14 +315,6 @@
             <meta-data android:name="android.appwidget.provider"
                     android:resource="@xml/widget_info" />
         </receiver>
-        <receiver android:name="com.android.gallery3d.app.PackagesMonitor">
-            <intent-filter>
-                <action android:name="android.intent.action.PACKAGE_ADDED"/>
-                <action android:name="android.intent.action.PACKAGE_REMOVED"/>
-                <action android:name="android.intent.action.PACKAGE_CHANGED"/>
-                <data android:scheme="package"/>
-            </intent-filter>
-        </receiver>
         <service android:name="com.android.gallery3d.app.PackagesMonitor$AsyncService"/>
         <service android:name="com.android.gallery3d.gadget.WidgetService"
                 android:permission="android.permission.BIND_REMOTEVIEWS"/>
@@ -337,9 +328,6 @@
         <service android:name="com.android.gallery3d.app.BatchService" />
 
         <receiver android:name="com.android.camera.DisableCameraReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
         </receiver>
 
         <service android:name="com.android.camera.MediaSaveService" />

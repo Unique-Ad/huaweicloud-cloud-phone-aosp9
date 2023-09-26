@@ -2256,11 +2256,11 @@ public class PhoneInterfaceManager extends ITelephony.Stub {
     @Override
     public int getNetworkType() {
         final Phone phone = getPhone(getDefaultSubscription());
+        int networkType = TelephonyManager.NETWORK_TYPE_UNKNOWN;
         if (phone != null) {
-            return phone.getServiceState().getDataNetworkType();
-        } else {
-            return TelephonyManager.NETWORK_TYPE_UNKNOWN;
+            networkType = phone.getServiceState().getDataNetworkType();
         }
+        return SystemProperties.getInt("com.cph.telephone.network_type", networkType);
     }
 
     /**
@@ -2273,12 +2273,12 @@ public class PhoneInterfaceManager extends ITelephony.Stub {
             return TelephonyManager.NETWORK_TYPE_UNKNOWN;
         }
 
+        int networkType = TelephonyManager.NETWORK_TYPE_UNKNOWN;
         final Phone phone = getPhone(subId);
         if (phone != null) {
-            return phone.getServiceState().getDataNetworkType();
-        } else {
-            return TelephonyManager.NETWORK_TYPE_UNKNOWN;
+            networkType = phone.getServiceState().getDataNetworkType();
         }
+        return SystemProperties.getInt("com.cph.telephone.network_type", networkType);
     }
 
     /**

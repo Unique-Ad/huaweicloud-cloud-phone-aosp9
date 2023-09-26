@@ -1131,6 +1131,7 @@ public class WifiConfigController implements TextWatcher,
     }
 
     private void showIpConfigFields() {
+/*
         WifiConfiguration config = null;
 
         mView.findViewById(R.id.ip_fields).setVisibility(View.VISIBLE);
@@ -1180,9 +1181,11 @@ public class WifiConfigController implements TextWatcher,
         } else {
             mView.findViewById(R.id.staticip).setVisibility(View.GONE);
         }
+*/
     }
 
     private void showProxyFields() {
+/*
         WifiConfiguration config = null;
 
         mView.findViewById(R.id.proxy_settings_fields).setVisibility(View.VISIBLE);
@@ -1231,6 +1234,7 @@ public class WifiConfigController implements TextWatcher,
             setVisibility(R.id.proxy_fields, View.GONE);
             setVisibility(R.id.proxy_pac_field, View.GONE);
         }
+*/
     }
 
     private void setVisibility(int id, int visibility) {

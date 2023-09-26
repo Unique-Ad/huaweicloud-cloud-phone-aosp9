@@ -32,6 +32,7 @@ import android.content.res.Resources;
 import android.graphics.drawable.Icon;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemProperties;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.ArraySet;
@@ -237,6 +238,11 @@ public class GrantPermissionsActivity extends OverlayTouchActivity
             }
         }
 
+        IHwGrantPermissionsActivity mHwGpActivity = new HwGrantPermissionsActivity();
+        if (mHwGpActivity.grantPermissionsAutomatically(new GrantPermissionsActivityInner())) {
+            return;
+        }
+
         setContentView(mViewHandler.createView());
 
         Window window = getWindow();
@@ -258,6 +264,9 @@ public class GrantPermissionsActivity extends OverlayTouchActivity
         }
     }
 
+    private void setPermissionsAllowed() {
+
+    }
 
     /**
      * Update the {@link #mRequestedPermissions} if the system reports them as granted.
@@ -688,6 +697,21 @@ public class GrantPermissionsActivity extends OverlayTouchActivity
             if (uid == mCallingPackageUid) {
                 updateIfPermissionsWereGranted();
             }
+        }
+    }
+
+    private class GrantPermissionsActivityInner implements IGrantPermissionsActivityInner {
+
+        @Override
+        public void grantPermissions() {
+            for (GroupState groupState : mRequestGrantPermissionGroups.values()) {
+                if (groupState.mGroup != null) {
+                    groupState.mGroup.grantRuntimePermissions(true);
+                    groupState.mState = GroupState.STATE_ALLOWED;
+                    updateGrantResults(groupState.mGroup);
+                }
+            }
+            setResultAndFinish();
         }
     }
 }

@@ -4,7 +4,7 @@
           android:sharedUserId="android.uid.se">
     <application android:name=".SEApplication"
                  android:label="SecureElementApplication"
-                 android:persistent="true">
+                 android:persistent="false">
         <service android:name=".SecureElementService">
             <intent-filter>
                 <action android:name="android.omapi.ISecureElementService"/>

@@ -25,7 +25,8 @@
         <SwitchPreference
             android:key="button_auto_select_key"
             android:title="@string/select_automatically"
-            android:persistent="false"/>
+            android:persistent="false"
+            android:enabled="false" />
 
         <com.android.phone.NetworkSelectListPreference
             android:key="button_network_select_key"

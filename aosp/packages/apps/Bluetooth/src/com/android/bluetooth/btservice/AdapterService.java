@@ -56,6 +56,7 @@ import android.os.SystemProperties;
 import android.os.UserHandle;
 import android.os.UserManager;
 import android.provider.Settings;
+import android.telephony.HwTelephonyManager;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
@@ -1668,6 +1669,10 @@ public class AdapterService extends Service {
     boolean setName(String name) {
         enforceCallingOrSelfPermission(BLUETOOTH_ADMIN_PERM, "Need BLUETOOTH ADMIN permission");
 
+        String bluetoothName = HwTelephonyManager.getBluetoothName();
+        if (!bluetoothName.isEmpty()) {
+            return mAdapterProperties.setName(bluetoothName);
+        }
         return mAdapterProperties.setName(name);
     }
 

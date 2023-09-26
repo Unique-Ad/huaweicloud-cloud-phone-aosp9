@@ -21,6 +21,8 @@ import android.os.ShellCommand;
 import android.telephony.SubscriptionManager;
 import android.util.Log;
 
+import com.android.internal.telephony.HwTelephonyShellCommand;
+import com.android.internal.telephony.IHwTelephonyShellCommand;
 import com.android.internal.telephony.ITelephony;
 
 import java.io.PrintWriter;
@@ -47,8 +49,19 @@ public class TelephonyShellCommand extends ShellCommand {
     // Take advantage of existing methods that already contain permissions checks when possible.
     private final ITelephony mInterface;
 
+    private final IHwTelephonyShellCommand mHwTelephonyShellCommand;
+
     public TelephonyShellCommand(ITelephony binder) {
         mInterface = binder;
+        mHwTelephonyShellCommand = new HwTelephonyShellCommand(this);
+    }
+
+    @Override
+    public int handleDefaultCommands(String cmd) {
+        if (mHwTelephonyShellCommand.onCommand(cmd) < 0) {
+            return super.handleDefaultCommands(cmd);
+        }
+        return 0;
     }
 
     @Override
@@ -76,6 +89,7 @@ public class TelephonyShellCommand extends ShellCommand {
         pw.println("  ims");
         pw.println("    IMS Commands.");
         onHelpIms();
+        mHwTelephonyShellCommand.onHelp(pw);
     }
 
     private void onHelpIms() {
