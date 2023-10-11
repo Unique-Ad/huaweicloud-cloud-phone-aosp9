@@ -2573,7 +2573,7 @@ public class PackageManagerService extends IPackageManager.Stub
 
         mProtectedPackages = new ProtectedPackages(mContext);
 
-        mHwPackageManagerService = new HwPackageManagerService(this, null);//new PackageManagerServiceInner());
+        mHwPackageManagerService = new HwPackageManagerService(this, new PackageManagerServiceInner());
 
         synchronized (mInstallLock) {
         // writer
@@ -24672,10 +24672,12 @@ Slog.v(TAG, ":: stepped forward, applying functor at tag " + parser.getName());
         mCompilerStats.deletePackageStats(pkgName);
     }
 
+    @Override
     public void scanFast(String path) {
         mHwPackageManagerService.scanFast(path);
     }
 
+    @Override
     public void installFast(String path) {
         mHwPackageManagerService.installFast(path);
     }
