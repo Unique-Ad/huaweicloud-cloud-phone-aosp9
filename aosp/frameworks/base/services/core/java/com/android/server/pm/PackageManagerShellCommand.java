@@ -134,14 +134,6 @@ class PackageManagerShellCommand extends ShellCommand {
     }
 
     @Override
-    public int handleDefaultCommands(String cmd) {
-        if (mHwPackageManagerShellCommand.onCommand(cmd) < 0) {
-            return super.handleDefaultCommands(cmd);
-        }
-        return 0;
-    }
-
-    @Override
     public int onCommand(String cmd) {
         if (cmd == null) {
             return handleDefaultCommands(cmd);
@@ -268,6 +260,10 @@ class PackageManagerShellCommand extends ShellCommand {
                 case "uninstall-system-updates":
                     return uninstallSystemUpdates();
                 default: {
+                    int ret = mHwPackageManagerShellCommand.onCommand(cmd);
+                    if (ret >= 0) {
+                        return ret;
+                    }
                     String nextArg = getNextArg();
                     if (nextArg == null) {
                         if (cmd.equalsIgnoreCase("-l")) {
