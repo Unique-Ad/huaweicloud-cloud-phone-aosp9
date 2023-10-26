@@ -3,110 +3,119 @@
 PRE_INSTALL_APP_LIST_FILE="/data/appbase/preInstallAppList"
 PRE_INSTALL_CONFIG_PKG_NAME="com.cph.config"
 OVERLAY_LOCAL_FOLDER="/data/local/appbase"
-PRE_INSTALL_CONFIG_FOLDER="${OVERLAY_LOCAL_FOLDER}/com.cph.config/"
-
-#Length of the version folder
-TIMESTAMP_LEN=10
+PRE_INSTALL_CONFIG_FOLDER="${OVERLAY_LOCAL_FOLDER}/${PRE_INSTALL_CONFIG_PKG_NAME}"
+SHARE_CONFIG_FOLDER="/data/appbase/${PRE_INSTALL_CONFIG_PKG_NAME}"
 
 ######################################################################
-#   FUNCTION   : checkTheOldVersion
-#   DESCRIPTION: check the phone has oldversion
-#   INPUT      : no
+#   FUNCTION   : presetFile
+#   DESCRIPTION: exec mount overlay and copy to phone
+#   INPUT      : newVersionName
 #   OUTPUT     : no
 ######################################################################
-checkTheOldVersion()
+presetFile()
 {
-    if [[ ! -d "$PRE_INSTALL_CONFIG_FOLDER" ]]; then
-        echo "The old pre_install_config_folder is not found"
-        return 0
+    local newVersionName=$1
+    mkdir -p ${PRE_INSTALL_CONFIG_FOLDER}/${newVersionName}/upper
+    mkdir -p ${PRE_INSTALL_CONFIG_FOLDER}/${newVersionName}/work
+    mkdir -p ${PRE_INSTALL_CONFIG_FOLDER}/${newVersionName}/merged
+    chmod 776 -R ${PRE_INSTALL_CONFIG_FOLDER}/
+    mount -t overlay appbase -o metacopy=on,lowerdir=${SHARE_CONFIG_FOLDER}/${newVersionName},upperdir=${PRE_INSTALL_CONFIG_FOLDER}/${newVersionName}/upper,workdir=${PRE_INSTALL_CONFIG_FOLDER}/${newVersionName}/work ${PRE_INSTALL_CONFIG_FOLDER}/${newVersionName}/merged
+    # exec copy
+    if [[ -d "${PRE_INSTALL_CONFIG_FOLDER}/${newVersionName}/merged/data/" ]]; then
+        cp -a -f ${PRE_INSTALL_CONFIG_FOLDER}/${newVersionName}/merged/data/* /data/
     fi
-    return 1
 }
+
 ######################################################################
-#   FUNCTION   : initPreInstallConfigData
-#   DESCRIPTION: process preinstalled files
+#   FUNCTION   : initPreConfigData
+#   DESCRIPTION: process preinstall files
 #   INPUT      : no
 #   OUTPUT     : no
 ######################################################################
-initPreInstallConfigData()
+initPreConfigData()
 {
-    checkTheOldVersion
-    local check_result=$?
-    local oldVersionName=0
-    if [[ ${check_result} -eq 1 ]]; then
-        #find phone exists version
-        for file in $PRE_INSTALL_CONFIG_FOLDER/*
-        do
-            local temp_num=$(basename ${file})
-            if [[ ${#temp_num} -eq ${TIMESTAMP_LEN} ]]; then
-                oldVersionName=${temp_num}
-                echo "oldVersionName = ${oldVersionName}"
-                break
-            fi
-        done
-    fi
-    #find the new version
-    local newVersionName=0
-    if [[ -d "/data/appbase/$PRE_INSTALL_CONFIG_PKG_NAME/" ]]; then
-        for file in /data/appbase/$PRE_INSTALL_CONFIG_PKG_NAME/*
-        do
-            local temp_num=$(basename ${file})
-            if [[ ${#temp_num} -ne ${TIMESTAMP_LEN} ]]; then
-                continue
-            fi
-            if [[ ${temp_num} -gt ${newVersionName} ]]; then
-                newVersionName=${temp_num}
-            fi
-        done
-    fi
-
-    if [[ -d "${OVERLAY_LOCAL_FOLDER}/$PRE_INSTALL_CONFIG_PKG_NAME/${oldVersionName}/" ]]; then
-        if [[ ${oldVersionName} -ne ${newVersionName} ]]; then
-            echo "delete the ${oldVersionName} version data"
-            umount ${OVERLAY_LOCAL_FOLDER}/${PRE_INSTALL_CONFIG_PKG_NAME}/${oldVersionName}/merged
-            rm -rf ${OVERLAY_LOCAL_FOLDER}/$PRE_INSTALL_CONFIG_PKG_NAME/
-        fi
-    fi
-    if [[ ${newVersionName} -eq 0 ]]; then
-        echo "The version number is not found"
+    if [[ ! -d ${SHARE_CONFIG_FOLDER} ]]; then
         return
     fi
+    local newVersionName=$(ls -1 ${SHARE_CONFIG_FOLDER} | sort -n | tail -n 1)
+    if [[ -z "${newVersionName}" ]]; then
+        return
+    fi
+    local localVersionName
+    if [[ -d "${PRE_INSTALL_CONFIG_FOLDER}" ]]; then
+        localVersionName=$(ls -1 ${PRE_INSTALL_CONFIG_FOLDER} | sort -n | tail -n 1)
+    fi
+    if [[ -z "${localVersionName}" ]]; then
+        presetFile ${newVersionName}
+    else
+        # have no newVersion to update
+        if [[ ${localVersionName} -ge ${newVersionName} ]]; then
+            echo "have no newVersion to update ${localVersionName}->${newVersionName}"
+            return
+        fi
+        # delete the local old version
+        if [[ -d "${PRE_INSTALL_CONFIG_FOLDER}/${localVersionName}/" ]]; then
+            echo "delete the ${localVersionName} version data"
+            umount ${PRE_INSTALL_CONFIG_FOLDER}/${localVersionName}/merged
+            rm -rf ${PRE_INSTALL_CONFIG_FOLDER}/${localVersionName}/
+        fi
+        presetFile ${newVersionName}
+    fi
+}
 
+######################################################################
+#   FUNCTION   : initPreInstallAppAndData
+#   DESCRIPTION: process preinstall app and files
+#   INPUT      : no
+#   OUTPUT     : no
+######################################################################
+initPreInstallAppAndData()
+{
+    if [[ ! -f "${PRE_INSTALL_APP_LIST_FILE}" ]]; then
+        return
+    fi
+    local localAppbaseExist
     if [[ ! -d ${OVERLAY_LOCAL_FOLDER} ]]; then
         mkdir -p ${OVERLAY_LOCAL_FOLDER}
         chmod 776 ${OVERLAY_LOCAL_FOLDER}
+        localAppbaseExist=1
+    fi
+    if grep -q "^${PRE_INSTALL_CONFIG_PKG_NAME}$" ${PRE_INSTALL_APP_LIST_FILE}; then
+        initPreConfigData
     fi
 
-    mkdir -p ${OVERLAY_LOCAL_FOLDER}/$PRE_INSTALL_CONFIG_PKG_NAME/${newVersionName}/upper
-    mkdir -p ${OVERLAY_LOCAL_FOLDER}/$PRE_INSTALL_CONFIG_PKG_NAME/${newVersionName}/work
-    mkdir -p ${OVERLAY_LOCAL_FOLDER}/$PRE_INSTALL_CONFIG_PKG_NAME/${newVersionName}/merged
-    chmod 777 -R ${OVERLAY_LOCAL_FOLDER}/$PRE_INSTALL_CONFIG_PKG_NAME
-    echo "oldVersionName is ${oldVersionName} - newVersionName is ${newVersionName}"
-    mount -t overlay appbase -o metacopy=on,lowerdir=/data/appbase/$PRE_INSTALL_CONFIG_PKG_NAME/${newVersionName},upperdir=${OVERLAY_LOCAL_FOLDER}/$PRE_INSTALL_CONFIG_PKG_NAME/${newVersionName}/upper,workdir=${OVERLAY_LOCAL_FOLDER}/$PRE_INSTALL_CONFIG_PKG_NAME/${newVersionName}/work ${OVERLAY_LOCAL_FOLDER}/$PRE_INSTALL_CONFIG_PKG_NAME/${newVersionName}/merged
-    #exec copy
-    if [[ -d "${OVERLAY_LOCAL_FOLDER}/${PRE_INSTALL_CONFIG_PKG_NAME}/${newVersionName}/merged/data/" ]]; then
-        cd "${OVERLAY_LOCAL_FOLDER}/${PRE_INSTALL_CONFIG_PKG_NAME}/${newVersionName}/merged/data/"
-        cp -a -f ./* /data/
-        cd /
+    if [[ -z "${localAppbaseExist}" || -f "/data/system/packages.xml" ]]; then
+        echo "the phone is not first boot"
+        return
     fi
-}
 
-local packages=$(ls ${OVERLAY_LOCAL_FOLDER} | grep -E "^([a-zA-Z][a-zA-Z0-9_]*)+([.][a-zA-Z][a-zA-Z0-9_]*)+$" | grep -v "${PRE_INSTALL_CONFIG_PKG_NAME}")
-for packageName in ${packages};do
-    echo "packageName = " ${packageName}
-    appctrl preinstall ${packageName}
-done
-
-if [[ -f "${PRE_INSTALL_APP_LIST_FILE}" ]]; then
-    for line in $(cat ${PRE_INSTALL_APP_LIST_FILE})
-    do
+    for line in $(cat ${PRE_INSTALL_APP_LIST_FILE}); do
         if [[ "${PRE_INSTALL_CONFIG_PKG_NAME}" == "${line}" ]]; then
-            initPreInstallConfigData
-        else
-            if [[ ! -d "${OVERLAY_LOCAL_FOLDER}/${line}" ]]; then
-                appctrl preinstall ${line}
-            fi
+            continue
+        fi
+        if [[ ! -d "${OVERLAY_LOCAL_FOLDER}/${line}" ]]; then
+            appctrl preinstall ${line}
         fi
     done
-fi
+}
 
+######################################################################
+#   FUNCTION   : initPhoneShareApp
+#   DESCRIPTION: mount overlay for the phone already install shareApp
+#   INPUT      : no
+#   OUTPUT     : no
+######################################################################
+initPhoneShareApp()
+{
+    if [[ ! -d ${OVERLAY_LOCAL_FOLDER} ]]; then
+        return
+    fi
+    local packages=$(ls ${OVERLAY_LOCAL_FOLDER} | grep -E "^([a-zA-Z][a-zA-Z0-9_]*)+([.][a-zA-Z][a-zA-Z0-9_]*)+$" | grep -v "${PRE_INSTALL_CONFIG_PKG_NAME}")
+    for packageName in ${packages}; do
+        echo "packageName = " ${packageName}
+        appctrl preinstall ${packageName}
+    done
+}
+
+initPhoneShareApp
+initPreInstallAppAndData
