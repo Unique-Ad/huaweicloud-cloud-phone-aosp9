@@ -1,5 +1,9 @@
 #! /system/bin/sh
 
+if [[ "`getprop com.cph.config_phone_done`" == "1" ]];then
+    exit 0
+fi
+
 settings put secure adb_install_need_confirm 0
 
 [[ -e /vendor/config ]] && chmod -R 777 /vendor/config
