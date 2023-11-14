@@ -7405,6 +7405,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     if (preferredRotation >= 0) {
                         return preferredRotation;
                     }
+                    if (HwPhoneWindowManager.isHorizontalScreen()) {
+                       return mLandscapeRotation;
+                    }
                     return Surface.ROTATION_0;
             }
         }

@@ -93,11 +93,6 @@ public class WificondScannerImpl extends WifiScannerImpl implements Handler.Call
         }
 
         @Override
-        public WifiScanner.ScanData getLatestSingleScanResult() {
-            return WificondScannerImpl.this.mLatestSingleScanResult;
-        }
-
-        @Override
         public Object getLock() {
             return WificondScannerImpl.this.mSettingsLock;
         }
@@ -105,6 +100,11 @@ public class WificondScannerImpl extends WifiScannerImpl implements Handler.Call
         @Override
         public void setLastScanSettings() {
             WificondScannerImpl.this.mLastScanSettings = null;
+        }
+
+        @Override
+        public void setLatestSingleScanResult(WifiScanner.ScanData result) {
+            WificondScannerImpl.this.mLatestSingleScanResult = result;
         }
     }
 

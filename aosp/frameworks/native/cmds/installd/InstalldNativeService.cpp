@@ -477,6 +477,7 @@ binder::Status InstalldNativeService::createAppData(const std::unique_ptr<std::s
                 prepare_app_cache_dir(path, "cache", 02771, uid, cacheGid) ||
                 prepare_app_cache_dir(path, "code_cache", 02771, uid, cacheGid)) {
             fix_app_path(path.c_str(), uid, uid);
+            LOG(WARNING) << "Attemp to fix app data " << path.c_str();
         }
 
         // Consider restorecon over contents if label changed
@@ -507,7 +508,8 @@ binder::Status InstalldNativeService::createAppData(const std::unique_ptr<std::s
         if (prepare_app_dir(path, targetMode, uid) ||
                 prepare_app_cache_dir(path, "cache", 02771, uid, cacheGid) ||
                 prepare_app_cache_dir(path, "code_cache", 02771, uid, cacheGid)) {
-            return error("Failed to prepare " + path);
+            fix_app_path(path.c_str(), uid, uid);
+            LOG(WARNING) << "Attemp to fix app data " << path.c_str();
         }
 
         // Consider restorecon over contents if label changed
