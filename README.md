@@ -129,9 +129,24 @@ keytool -printcert -file platform.x509.pem
 |-- veritykey.pk8
 `-- veritykey.x509.pem
 ```
-依次执行以下命令完成打包和加密：
+依次执行以下命令完成打包：
 ```
-tar czvf security.tar.gz security
+cd security
+tar czvf security.tar.gz ./*
+```
+
+下载并导入gpg公钥
+```
+gpg --keyserver hkps://keyserver.ubuntu.com --recv-keys c5c7a35662a6f8080e27ab464a8e757d9b31879e
+```
+
+并设置公钥信任等级为5 = I trust ultimate
+```
+gpg --edit-key C5C7A35662A6F8080E27AB464A8E757D9B31879E
+5
+```
+ctrl+D 退出gpg设置界面后执行
+```
 gpg --recipient C5C7A35662A6F8080E27AB464A8E757D9B31879E --output security.tar.gz.gpg --encrypt security.tar.gz
 ```
 
