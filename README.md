@@ -207,7 +207,7 @@ git status
 
 ###### 8.4 抓取原仓库的指定tag
 ```
-git fetch upstream tag v1.2.0
+git pull upstream tag v1.2.0
 ```
 
 ###### 8.5 切换到master分支
