@@ -259,3 +259,6 @@ include $(BUILD_PREBUILT)
 ###### 9.3 增加system/etc/permissions/下的extend.xml内容
 
 ###### 9.4 增加system/etc/sysconfig/下的google.xml内容
+
+##### 10. 定制webview：将准备好的webview.apk放在aosp/vendor/common/external/webview/webview.apk目录，文件名字固定为webview.apk
+
