@@ -230,35 +230,6 @@ git tag -a v1.2.1 -m "update tag v1.2.1"
 ```
 git push --tags
 ```
-##### 9. 定制GMS镜像
 
-###### 9.1 修改aosp/vendor/common/products/product_extra.mk文件，文件开头增加如下内容：
-
-```
-IS_GMS_LUNCH := true
-```
-
-并且增加PRODUCT_PACKAGES包名，此处添加的包名可以根据自身项目需要添加，google安装包获取地址为：
-[获取谷歌安装包地址](https://www.apkmirror.com/)
-
-###### 9.2 将下载好的google安装包放在aosp/vendor/common/android/gms/目录下，并且编写相应的mk文件：
-
-```
-include $(CLEAR_VARS)
-
-LOCAL_MODULE := ${包名}
-LOCAL_SRC_FILES := $(LOCAL_MODULE).apk
-LOCAL_MODULE_TAGS := optional
-LOCAL_MODULE_CLASS := APPS
-LOCAL_CERTIFICATE := PRESIGNED
-LOCAL_PRIVILEGED_MODULE := true
-LOCAL_DEX_PREOPT := false
-
-include $(BUILD_PREBUILT)
-```
-###### 9.3 增加system/etc/permissions/下的extend.xml内容
-
-###### 9.4 增加system/etc/sysconfig/下的google.xml内容
-
-##### 10. 定制webview：将准备好的webview.apk放在aosp/vendor/common/external/webview/webview.apk目录，文件名字固定为webview.apk
+##### 9. 定制webview：将准备好的webview.apk放在aosp/vendor/common/external/webview/webview.apk目录，文件名字固定为webview.apk
 
