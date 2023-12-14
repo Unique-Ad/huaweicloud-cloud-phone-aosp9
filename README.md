@@ -93,9 +93,11 @@ SERVER_ADDR   专属构建服务器
 
 ###### 6.2 获取定位SDK的Key
 
+系统网络定位和地理编码接口通过一个系统App，集成定位SDK开发实现，且和当前系统签名绑定
+
 根据系统签名申请Key，请参考 https://lbs.amap.com/api/android-location-sdk/guide/create-project/get-key/
 
-包名
+系统App包名
 
 ```
 com.cph.networklocation
@@ -107,7 +109,8 @@ com.cph.networklocation
 keytool -printcert -file platform.x509.pem
 ```
 
-获取到Key后，将其保存至文件`amap_key`中
+获取到Key后，将其保存至文件`amap_key`中构建镜像即可。如果更新了系统签名，更换镜像时需要重置手机才生效。
+
 
 ###### 6.3 打包加密私有系统签名文件
 完成以上步骤后，将生成的所有文件放入`security`文件夹，`security`文件夹应包含以下文件
