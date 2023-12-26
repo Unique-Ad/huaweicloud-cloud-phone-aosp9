@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="1fdad710-970f-406d-8038-a861040a6f66" name="Changes" comment="修改系统分享布局" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="MacroExpansionManager">
+    <option name="directoryName" value="qsggxfiq" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "com.google.services.firebase.aqiPopupShown": "true",
+    "git-widget-placeholder": "master"
+  }
+}]]></component>
+  <component name="TaskManager">
+    <task id="LOCAL-00001" summary="增加内置应用以及编译规则">
+      <option name="closed" value="true" />
+      <created>1703574083749</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1703574083749</updated>
+    </task>
+    <task id="LOCAL-00002" summary="增加内置应用以及编译规则">
+      <option name="closed" value="true" />
+      <created>1703574615754</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1703574615754</updated>
+    </task>
+    <task id="LOCAL-00003" summary="修改系统分享布局">
+      <option name="closed" value="true" />
+      <created>1703576280677</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1703576280677</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
+    <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="增加内置应用以及编译规则" />
+    <MESSAGE value="修改系统分享布局" />
+    <option name="LAST_COMMIT_MESSAGE" value="修改系统分享布局" />
+  </component>
+</project>
