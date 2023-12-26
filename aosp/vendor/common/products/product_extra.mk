@@ -12,7 +12,6 @@ PRODUCT_PACKAGES += \
     DfgxSmsmessenger \
     DfgxAppStore \
     DfgxBrowserCore \
-    DfgxBrowser \
     DfgxInput \
     DfgxSystemUI \
     DfgxProxy \
