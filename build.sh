@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
 # 验证
-KEY=""
+KEY="SQuFDTfLzna0vZSgnCx4QMKNMEXEGMJMMtRIP4H0qZ3xybPjaXcHLGDxr4IcPkYKv8wElkJ2GK1n75xVf0uhLZRPPMTVEU3TQrONHD2lttI1Z4Xl9tMSbUV2ukT80wy6"
 # 指定克隆分支
-BRANCH_TAG=""
+BRANCH_TAG="v1.2.1"
 # 镜像别名
-IMG_NAME=""
+IMG_NAME="bonc_v1.2.1"
 # 编译服务器地址
-SERVER_ADDR=""
+SERVER_ADDR="124.71.62.21"
 
 # 默认不执行增量编译
 INCREMENTAL=0
@@ -24,7 +24,7 @@ while getopts ":il" opt; do
 done
 
 echo '{
-  "region":"cn-east-3",
+  "region":"cn-south-1",
   "tag":"'${BRANCH_TAG}'",
   "type":"aosp9",
   "name":"'${IMG_NAME}'",
