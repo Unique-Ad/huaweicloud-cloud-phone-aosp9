@@ -110,7 +110,8 @@ public class ResolverListController {
             int totalSize = infos.size();
             for (int j = totalSize - 1; j >= 0 ; j--) {
                 ResolveInfo info = infos.get(j);
-                if (info.activityInfo != null && !info.activityInfo.exported) {
+                boolean isBluetooth = info.activityInfo != null && info.activityInfo.packageName != null && info.activityInfo.packageName.contains("android.bluetooth");
+                if (info.activityInfo != null && !info.activityInfo.exported || isBluetooth) {
                     infos.remove(j);
                 }
             }

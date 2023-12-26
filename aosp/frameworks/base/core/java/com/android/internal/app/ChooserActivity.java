@@ -73,6 +73,7 @@ import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Space;
+import android.widget.TextView;
 
 import com.android.internal.R;
 import com.android.internal.annotations.VisibleForTesting;
@@ -1259,7 +1260,20 @@ public class ChooserActivity extends ResolverActivity {
                 holder = (RowViewHolder) convertView.getTag();
             }
             bindViewHolder(position, holder);
-
+            if(parent instanceof AbsListView) {
+                int count = getCount();
+                LayoutParams layoutParams = parent.getLayoutParams();
+                if (count == 1) {
+                    layoutParams.height = holder.measuredRowHeight;
+                }else if(count == 2){
+                    layoutParams.height = holder.measuredRowHeight * 2;
+                }else if(count == 3){
+                    layoutParams.height = holder.measuredRowHeight * 3;
+                }else {
+                    layoutParams.height = (int) (holder.measuredRowHeight * 3.5);
+                }
+                parent.setLayoutParams(layoutParams);
+            }
             return holder.row;
         }
 
@@ -1271,6 +1285,12 @@ public class ChooserActivity extends ResolverActivity {
 
             for (int i = 0; i < mColumnCount; i++) {
                 final View v = mChooserListAdapter.createView(row);
+                View view = v.findViewById(R.id.text1);
+                if(view != null){
+                    TextView textView = (TextView)view;
+                    String text = getResources().getString(com.android.internal.R.string.chooseActivity);
+                    textView.setText(text+"\n"+text);
+                }
                 final int column = i;
                 v.setOnClickListener(new OnClickListener() {
                     @Override
@@ -1302,6 +1322,10 @@ public class ChooserActivity extends ResolverActivity {
                 if (i != (mColumnCount - 1)) {
                     row.addView(new Space(ChooserActivity.this),
                             new LinearLayout.LayoutParams(0, 0, 1));
+                }
+                if(view != null){
+                    TextView textView = (TextView)view;
+                    textView.setText("");
                 }
             }
 
