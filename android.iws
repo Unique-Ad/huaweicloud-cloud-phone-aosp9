@@ -4,7 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1fdad710-970f-406d-8038-a861040a6f66" name="Changes" comment="修改系统分享布局" />
+    <list default="true" id="1fdad710-970f-406d-8038-a861040a6f66" name="Changes" comment="应用商店安装跳过签名验证">
+      <change afterPath="$PROJECT_DIR$/aosp/frameworks/base/应用商店的下载恢复dex优化，关闭签名校验.patch" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android.iml" beforeDir="false" afterPath="$PROJECT_DIR$/android.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android.iws" beforeDir="false" afterPath="$PROJECT_DIR$/android.iws" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/aosp/frameworks/base/services/core/java/com/android/server/pm/permission/PermissionManagerService.java" beforeDir="false" afterPath="$PROJECT_DIR$/aosp/frameworks/base/services/core/java/com/android/server/pm/permission/PermissionManagerService.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -19,9 +24,16 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "com.google.services.firebase.aqiPopupShown": "true",
-    "git-widget-placeholder": "master"
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "/home/mz/aosp/cph-aosp9/huaweicloud-cloud-phone-aosp9/aosp/frameworks/base"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/aosp/frameworks/base" />
+      <recent name="$PROJECT_DIR$/aosp/frameworks/base/core/res/res/mipmap-xxhdpi" />
+    </key>
+  </component>
   <component name="TaskManager">
     <task id="LOCAL-00001" summary="增加内置应用以及编译规则">
       <option name="closed" value="true" />
@@ -47,12 +59,48 @@
       <option name="project" value="LOCAL" />
       <updated>1703576280677</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="修改系统盘为非只读">
+      <option name="closed" value="true" />
+      <created>1703649020313</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1703649020313</updated>
+    </task>
+    <task id="LOCAL-00005" summary="云机异常上报">
+      <option name="closed" value="true" />
+      <created>1703649638485</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1703649638485</updated>
+    </task>
+    <task id="LOCAL-00006" summary="修改默认状态栏高度">
+      <option name="closed" value="true" />
+      <created>1703649827213</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1703649827213</updated>
+    </task>
+    <task id="LOCAL-00007" summary="应用商店安装跳过签名验证">
+      <option name="closed" value="true" />
+      <created>1703657588259</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1703657588259</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="增加内置应用以及编译规则" />
     <MESSAGE value="修改系统分享布局" />
-    <option name="LAST_COMMIT_MESSAGE" value="修改系统分享布局" />
+    <MESSAGE value="修改系统盘为非只读" />
+    <MESSAGE value="云机异常上报" />
+    <MESSAGE value="修改默认状态栏高度" />
+    <MESSAGE value="应用商店安装跳过签名验证" />
+    <option name="LAST_COMMIT_MESSAGE" value="应用商店安装跳过签名验证" />
   </component>
 </project>
