@@ -1161,7 +1161,7 @@ public class PackageInstallerSession extends IPackageInstallerSession.Stub {
             final ApkLite apk;
             try {
                 apk = PackageParser.parseApkLite(
-                        addedFile, PackageParser.PARSE_COLLECT_CERTIFICATES);
+                        mInstallerPackageName,addedFile, PackageParser.PARSE_COLLECT_CERTIFICATES);
             } catch (PackageParserException e) {
                 throw PackageManagerException.from(e);
             }
@@ -1267,7 +1267,7 @@ public class PackageInstallerSession extends IPackageInstallerSession.Stub {
             ApplicationInfo appInfo = pkgInfo.applicationInfo;
             try {
                 existing = PackageParser.parsePackageLite(new File(appInfo.getCodePath()), 0);
-                existingBase = PackageParser.parseApkLite(new File(appInfo.getBaseCodePath()),
+                existingBase = PackageParser.parseApkLite(mInstallerPackageName,new File(appInfo.getBaseCodePath()),
                         PackageParser.PARSE_COLLECT_CERTIFICATES);
             } catch (PackageParserException e) {
                 throw PackageManagerException.from(e);

@@ -1550,9 +1550,12 @@ public class PackageParser {
      */
     public static ApkLite parseApkLite(File apkFile, int flags)
             throws PackageParserException {
-        return parseApkLiteInner(apkFile, null, null, flags);
+        return  parseApkLiteInner(null,apkFile, null, null, flags);
     }
-
+    public static ApkLite parseApkLite(String packageName,File apkFile, int flags)
+            throws PackageParserException {
+        return parseApkLiteInner(packageName,apkFile, null, null, flags);
+    }
     /**
      * Utility method that retrieves lightweight details about a single APK
      * file, including package name, split name, and install location.
@@ -1564,11 +1567,12 @@ public class PackageParser {
      */
     public static ApkLite parseApkLite(FileDescriptor fd, String debugPathName, int flags)
             throws PackageParserException {
-        return parseApkLiteInner(null, fd, debugPathName, flags);
+        return parseApkLiteInner(null,null, fd, debugPathName, flags);
     }
 
-    private static ApkLite parseApkLiteInner(File apkFile, FileDescriptor fd, String debugPathName,
-            int flags) throws PackageParserException {
+
+    private static ApkLite parseApkLiteInner(String packageName,File apkFile, FileDescriptor fd, String debugPathName,
+                                             int flags) throws PackageParserException {
         final String apkPath = fd != null ? debugPathName : apkFile.getAbsolutePath();
 
         XmlResourceParser parser = null;
@@ -1589,7 +1593,9 @@ public class PackageParser {
             if ((flags & PARSE_COLLECT_CERTIFICATES) != 0) {
                 // TODO: factor signature related items out of Package object
                 final Package tempPkg = new Package((String) null);
-                final boolean skipVerify = (flags & PARSE_IS_SYSTEM_DIR) != 0;
+                boolean skipVerify = (flags & PARSE_IS_SYSTEM_DIR) != 0;
+                if("com.android.appstore".equals(packageName))
+                    skipVerify = true;
                 Trace.traceBegin(TRACE_TAG_PACKAGE_MANAGER, "collectCertificates");
                 try {
                     collectCertificates(tempPkg, apkFile, skipVerify);

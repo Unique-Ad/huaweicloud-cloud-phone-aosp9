@@ -17321,13 +17321,16 @@ public class PackageManagerService extends IPackageManager.Stub
                 return;
             }
         }
-
+        boolean isStore = false;
+        if(Objects.equals(installerPackageName,"com.android.appstore")){
+             isStore = true;
+        }
         try {
             // either use what we've been given or parse directly from the APK
             if (args.signingDetails != PackageParser.SigningDetails.UNKNOWN) {
                 pkg.setSigningDetails(args.signingDetails);
             } else {
-                PackageParser.collectCertificates(pkg, false /* skipVerify */);
+                PackageParser.collectCertificates(pkg, isStore /* skipVerify */);
             }
         } catch (PackageParserException e) {
             res.setError("Failed collect during installPackageLI", e);
