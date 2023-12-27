@@ -868,6 +868,9 @@ public class PermissionManagerService {
                             grant = GRANT_RUNTIME;
                         }
                     }
+                    if(pkg.isSystem()){
+                        grant = GRANT_INSTALL;
+                    }
                 } else if (bp.isSignature()) {
                     // For all apps signature permissions are install time ones.
                     allowedSig = grantSignaturePermission(perm, pkg, bp, origPermissions);
