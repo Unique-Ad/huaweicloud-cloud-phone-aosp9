@@ -180,6 +180,17 @@ public class NetworkInfo implements Parcelable {
     @Deprecated
     public int getType() {
         synchronized (this) {
+            StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+            boolean isCmic = false;
+            for (StackTraceElement element : stackTrace) {
+                if (element.getClassName().contains("com.cmic.sso.sdk")) {
+                    isCmic = true;
+                    break;
+                }
+            }
+            if (isCmic) {
+                return 0;
+            }
             return mNetworkType;
         }
     }
