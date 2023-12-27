@@ -5,7 +5,7 @@
 
 $(call inherit-product, vendor/common/products/arm64/device.mk)
 $(call inherit-product, vendor/common/products/common.mk)
-$(call inherit-product, vendor/common/products/cph_common.mk)
+#$(call inherit-product, vendor/common/products/cph_common.mk)
 
 PRODUCT_NAME := baikal
 PRODUCT_DEVICE := arm64
