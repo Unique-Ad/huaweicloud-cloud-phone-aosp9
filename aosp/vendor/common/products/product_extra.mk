@@ -18,10 +18,3 @@ PRODUCT_PACKAGES += \
     DfgxPackageInstaller \
     DfgxSettings
 
-
-
-
-
-
-PRODUCT_COPY_FILES += \
-    vendor/common/android/bonc/thirdparty/DfgxController/redsocks:system/bin/redsocks \
