@@ -15734,13 +15734,22 @@ public class ActivityManagerService extends IActivityManager.Stub
     }
 
     private static String processClass(ProcessRecord process) {
-        if (process == null || process.pid == MY_PID) {
-            return "system_server";
-        } else if ((process.info.flags & ApplicationInfo.FLAG_SYSTEM) != 0) {
-            return "system_app";
-        } else {
-            return "data_app";
+        String pkg = "";
+        if(process != null) {
+            pkg = process.info.packageName;
         }
+        String processClass;
+        if (process == null || process.pid == MY_PID) {
+            processClass = "system_server";
+        } else if ((process.info.flags & ApplicationInfo.FLAG_SYSTEM) != 0) {
+            processClass = "system_app";
+        } else {
+            processClass = "data_app";
+        }
+        if(pkg != null && pkg.length() > 0) {
+            processClass = processClass + "_"+pkg.replaceAll("\\.","_");
+        }
+        return processClass;
     }
 
     private volatile long mWtfClusterStart;

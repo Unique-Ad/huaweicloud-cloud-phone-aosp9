@@ -45,7 +45,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/aerr_close_app"
-        android:drawableStart="@drawable/ic_close"
+        android:drawableStart="@mipmap/ic_anr_close_and_report"
         style="@style/aerr_list_item" />
 
     <Button

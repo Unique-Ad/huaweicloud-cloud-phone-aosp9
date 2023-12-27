@@ -27,6 +27,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.Settings;
 import android.text.BidiFormatter;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
@@ -91,6 +92,7 @@ final class AppErrorDialog extends BaseErrorDialog implements View.OnClickListen
         attrs.setTitle("Application Error: " + mProc.info.processName);
         attrs.privateFlags |= WindowManager.LayoutParams.PRIVATE_FLAG_SYSTEM_ERROR
                 | WindowManager.LayoutParams.PRIVATE_FLAG_SHOW_FOR_ALL_USERS;
+        attrs.gravity = Gravity.BOTTOM;
         getWindow().setAttributes(attrs);
         if (mProc.persistent) {
             getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ERROR);
@@ -120,6 +122,7 @@ final class AppErrorDialog extends BaseErrorDialog implements View.OnClickListen
         report.setVisibility(hasReceiver ? View.VISIBLE : View.GONE);
         final TextView close = findViewById(com.android.internal.R.id.aerr_close);
         close.setOnClickListener(this);
+        close.setText("上传日志并关闭应用");
         final TextView appInfo = findViewById(com.android.internal.R.id.aerr_app_info);
         appInfo.setOnClickListener(this);
 

@@ -27,7 +27,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.BidiFormatter;
+import android.util.Log;
 import android.util.Slog;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
@@ -94,6 +96,7 @@ final class AppNotRespondingDialog extends BaseErrorDialog implements View.OnCli
         attrs.setTitle("Application Not Responding: " + mProc.info.processName);
         attrs.privateFlags = WindowManager.LayoutParams.PRIVATE_FLAG_SYSTEM_ERROR |
                 WindowManager.LayoutParams.PRIVATE_FLAG_SHOW_FOR_ALL_USERS;
+        attrs.gravity = Gravity.BOTTOM;
         getWindow().setAttributes(attrs);
     }
 
@@ -108,11 +111,13 @@ final class AppNotRespondingDialog extends BaseErrorDialog implements View.OnCli
         final TextView report = findViewById(com.android.internal.R.id.aerr_report);
         report.setOnClickListener(this);
         final boolean hasReceiver = mProc.errorReportReceiver != null;
-        report.setVisibility(hasReceiver ? View.VISIBLE : View.GONE);
+        report.setVisibility(View.GONE);
         final TextView close = findViewById(com.android.internal.R.id.aerr_close);
         close.setOnClickListener(this);
+        close.setText("上传日志并关闭应用");
         final TextView wait = findViewById(com.android.internal.R.id.aerr_wait);
         wait.setOnClickListener(this);
+        wait.setText("重新打开应用");
 
         findViewById(com.android.internal.R.id.customPanel).setVisibility(View.VISIBLE);
     }
@@ -143,27 +148,41 @@ final class AppNotRespondingDialog extends BaseErrorDialog implements View.OnCli
 
             switch (msg.what) {
                 case FORCE_CLOSE:
+                    try {
+                        AppErrors.uploadError(getContext(),"anr",mProc.info.packageName);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
                     // Kill the application.
                     mService.killAppAtUsersRequest(mProc, AppNotRespondingDialog.this);
                     break;
                 case WAIT_AND_REPORT:
                 case WAIT:
-                    // Continue waiting for the application.
-                    synchronized (mService) {
-                        ProcessRecord app = mProc;
-
-                        if (msg.what == WAIT_AND_REPORT) {
-                            appErrorIntent = mService.mAppErrors.createAppErrorIntentLocked(app,
-                                    System.currentTimeMillis(), null);
-                        }
-
-                        app.notResponding = false;
-                        app.notRespondingReport = null;
-                        if (app.anrDialog == AppNotRespondingDialog.this) {
-                            app.anrDialog = null;
-                        }
-                        mService.mServices.scheduleServiceTimeoutLocked(app);
+                    mService.killAppAtUsersRequest(mProc, AppNotRespondingDialog.this);
+                    try {
+                        String packageName = mProc.info.packageName;
+                        Intent launchIntentForPackage = getContext().getPackageManager().getLaunchIntentForPackage(packageName);
+                        getContext().startActivity(launchIntentForPackage);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                        Log.d("miaozi","error sending : " + e.getMessage());
                     }
+                    // Continue waiting for the application.
+//                    synchronized (mService) {
+//                        ProcessRecord app = mProc;
+//
+//                        if (msg.what == WAIT_AND_REPORT) {
+//                            appErrorIntent = mService.mAppErrors.createAppErrorIntentLocked(app,
+//                                    System.currentTimeMillis(), null);
+//                        }
+//
+//                        app.notResponding = false;
+//                        app.notRespondingReport = null;
+//                        if (app.anrDialog == AppNotRespondingDialog.this) {
+//                            app.anrDialog = null;
+//                        }
+//                        mService.mServices.scheduleServiceTimeoutLocked(app);
+//                    }
                     break;
             }
 

@@ -35,6 +35,7 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.net.Uri;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Message;
 import android.os.Process;
 import android.os.RemoteException;
@@ -516,6 +517,11 @@ class AppErrors {
                     }
                 } finally {
                     Binder.restoreCallingIdentity(orig);
+                }
+                try {
+                    uploadError(mContext, "crash", r.info.packageName);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
             if (res == AppErrorDialog.APP_INFO) {
@@ -1183,5 +1189,15 @@ class AppErrors {
         final String longMsg;
         final String stack;
     }
-
+    static void uploadError(Context context, String errorType, String packageName) {
+        //查找对应的文件进行上报 这个后续得修改 在日志文件很多的情况下 扫描肯定会很慢
+        Intent intent = new Intent("com.android.cbcc.server.UPLOAD_ERROR");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.DONUT) {
+            intent.setPackage("com.android.cbcc.server");
+        }
+        intent.putExtra("packageName",packageName);
+        intent.putExtra("errorType", errorType);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
+    }
 }
