@@ -382,6 +382,15 @@ static int UnmountTree(const char* path) {
 static bool MountEmulatedStorage(uid_t uid, jint mount_mode,
         bool force_mount_namespace, std::string* error_msg, jint runtime_flags) {
     // See storage config details at http://source.android.com/tech/storage/
+    if (HwCanUnshare()) {
+        // Create a second private mount namespace for our process
+        if (unshare(CLONE_NEWNS) == -1) {
+            *error_msg = CREATE_ERROR("Failed to unshare(): %s", strerror(errno));
+            return false;
+        }
+ 
+        HwMountEmulatedStorage(runtime_flags);
+    }
 
     String8 storageSource;
     if (mount_mode == MOUNT_EXTERNAL_DEFAULT) {
@@ -394,14 +403,6 @@ static bool MountEmulatedStorage(uid_t uid, jint mount_mode,
         // Sane default of no storage visible
         return true;
     }
-
-    // Create a second private mount namespace for our process
-    if (unshare(CLONE_NEWNS) == -1) {
-        *error_msg = CREATE_ERROR("Failed to unshare(): %s", strerror(errno));
-        return false;
-    }
-
-    HwMountEmulatedStorage(runtime_flags);
 
     // Handle force_mount_namespace with MOUNT_EXTERNAL_NONE.
     if (mount_mode == MOUNT_EXTERNAL_NONE) {
