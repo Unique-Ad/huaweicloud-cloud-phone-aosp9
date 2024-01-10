@@ -1449,6 +1449,9 @@ class PackageManagerShellCommand extends ShellCommand {
                 case "--versionCode":
                     versionCode = Long.parseLong(getNextArgRequired());
                     break;
+                case "--update":
+                    flags |= HwPackageManagerService.DELETE_UPDATE_SHARE_APP;
+                    break;
                 default:
                     pw.println("Error: Unknown option: " + opt);
                     return 1;

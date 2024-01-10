@@ -18365,6 +18365,8 @@ public class PackageManagerService extends IPackageManager.Stub
 
         final int removeUser = (deleteFlags & PackageManager.DELETE_ALL_USERS) != 0
                 ? UserHandle.USER_ALL : userId;
+        
+        mHwPackageManagerService.deletePackageX(packageName, deleteFlags);
 
         if (isPackageDeviceAdmin(packageName, removeUser)) {
             Slog.w(TAG, "Not removing package " + packageName + ": has active device admin");
