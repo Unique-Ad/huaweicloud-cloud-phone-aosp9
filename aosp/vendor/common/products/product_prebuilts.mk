@@ -43,7 +43,8 @@ PRODUCT_PACKAGES += \
     libva-android \
     libjni_keys \
     wget \
-    cell.db
+    cell.db \
+    sensor.db
 
 PRODUCT_COPY_FILES += \
     vendor/common/android/prebuilts/system/etc/mediaEngine/config.json:system/etc/mediaEngine/config.json \

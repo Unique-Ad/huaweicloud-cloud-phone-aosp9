@@ -3,5 +3,6 @@
  * Description: binder helper function
  */
 
+void checkBinderFeature(int fd);
 size_t hwGetMaxThreads(size_t maxThreads);
 size_t hwGetDefaultMaxThreads();

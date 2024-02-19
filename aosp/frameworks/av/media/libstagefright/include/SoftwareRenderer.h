@@ -37,6 +37,7 @@ public:
 
     ~SoftwareRenderer();
 
+    void setSurface(const sp<ANativeWindow> &nativeWindow);
     std::list<FrameRenderTracker::Info> render(
             const void *data, size_t size, int64_t mediaTimeUs, nsecs_t renderTimeNs,
             size_t numOutputBuffers, const sp<AMessage> &format);

@@ -104,7 +104,6 @@ public class FallbackHome extends Activity {
         @Override
         public void onReceive(Context context, Intent intent) {
             maybeFinish();
-            System.exit(0);
         }
     };
 
@@ -127,6 +126,7 @@ public class FallbackHome extends Activity {
                 getSystemService(PowerManager.class).userActivity(
                         SystemClock.uptimeMillis(), false);
                 finish();
+                System.exit(0);
             }
         }
     }

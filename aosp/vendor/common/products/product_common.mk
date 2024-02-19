@@ -54,9 +54,9 @@ PRODUCT_PROPERTY_OVERRIDES += \
     ro.hardware.hwcomposer=huawei \
     ro.hardware.gpurenderer=Mali_G76 \
     ro.hardware.vulkan.level = 1 \
-    ro.hardware.vulkan.version = 4194307 \
+    ro.hardware.vulkan.version = 4198400 \
     ro.hardware.vulkan = radv \
-    ro.build.version.release=9.0.0 \
+    ro.build.version.release=9 \
     ro.build.user=test \
     ro.build.product=SIP \
     ro.product.board=SIP \
@@ -82,6 +82,8 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.bluetooth_le.xml:system/etc/permissions/android.hardware.bluetooth_le.xml \
     frameworks/native/data/etc/android.hardware.usb.accessory.xml:system/etc/permissions/android.hardware.usb.accessory.xml \
     frameworks/native/data/etc/android.hardware.wifi.xml:system/etc/permissions/android.hardware.wifi.xml \
+    frameworks/native/data/etc/android.hardware.vulkan.level-1.xml:system/etc/permissions/android.hardware.vulkan.level.xml \
+    frameworks/native/data/etc/android.hardware.vulkan.version-1_1.xml:system/etc/permissions/android.hardware.vulkan.version.xml \
     vendor/common/android/etc/cph_perf_name_list.xml:system/etc/cph_perf_name_list.xml \
     vendor/common/android/etc/init.wifi.rc:root/init.wifi.rc \
     vendor/common/android/etc/InstallBlacklist:system/etc/InstallBlacklist \

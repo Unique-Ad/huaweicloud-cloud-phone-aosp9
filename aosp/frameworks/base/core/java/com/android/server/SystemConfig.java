@@ -497,7 +497,7 @@ public class SystemConfig {
                     if (fname == null) {
                         Slog.w(TAG, "<feature> without name in " + permFile + " at "
                                 + parser.getPositionDescription());
-                    } else if (allowed) {
+                    } else if (allowed && HwSystemConfig.allowFeatures(fname)) {
                         addFeature(fname, fversion);
                     }
                     XmlUtils.skipCurrentTag(parser);

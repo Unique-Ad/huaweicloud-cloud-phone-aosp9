@@ -183,6 +183,8 @@ function create_hook_thermal_link() {
 }
 
 function hook_thermal() {
+  [[ -d "/sys/devices/virtual/thermal/thermal_zone0" ]] && return 0
+
   for j in $(seq 0 16);do
     create_hook_thermal $j
     create_hook_thermal_link $j
@@ -216,6 +218,8 @@ function create_power_supply() {
 }
 
 function hook_power_supply() {
+  [[ -d "/sys/class/power_supply/hw00001_battery/" ]] && return 0
+
   create_power_supply
   umount /sys/class/power_supply
   mount --bind /power_supply /sys/class/power_supply

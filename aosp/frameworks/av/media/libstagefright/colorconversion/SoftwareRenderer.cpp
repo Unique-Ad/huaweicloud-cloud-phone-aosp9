@@ -60,6 +60,11 @@ SoftwareRenderer::~SoftwareRenderer() {
     mConverter = NULL;
 }
 
+void SoftwareRenderer::setSurface(const sp<ANativeWindow> &nativeWindow) {
+    mNativeWindow = nativeWindow;
+    mColorFormat = OMX_COLOR_FormatUnused;
+}
+
 void SoftwareRenderer::resetFormatIfChanged(
         const sp<AMessage> &format, size_t numOutputBuffers) {
     CHECK(format != NULL);

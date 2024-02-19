@@ -24,9 +24,11 @@ LOCAL_SRC_FILES := \
 	Overlay.cpp \
 	Program.cpp
 
+LOCAL_STATIC_LIBRARIES := libscreenrecord_vendor
+
 LOCAL_SHARED_LIBRARIES := \
 	libstagefright libmedia libmedia_omx libutils libbinder libstagefright_foundation \
-	libjpeg libui libgui libcutils liblog libEGL libGLESv2
+	libjpeg libui libgui libcutils liblog libEGL libGLESv2 libCPHMediaEngine libmediandk
 
 LOCAL_C_INCLUDES := \
 	frameworks/av/media/libstagefright \

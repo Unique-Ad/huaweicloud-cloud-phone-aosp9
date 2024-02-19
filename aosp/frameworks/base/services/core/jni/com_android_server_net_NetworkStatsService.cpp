@@ -33,6 +33,8 @@
 #include "bpf/BpfNetworkStats.h"
 #include "bpf/BpfUtils.h"
 
+#include "hw_com_android_server_net_NetworkStatsService.h"
+
 using android::bpf::Stats;
 using android::bpf::hasBpfSupport;
 using android::bpf::bpfGetUidStats;
@@ -75,6 +77,10 @@ static uint64_t getStatsType(struct Stats* stats, StatsType type) {
 }
 
 static int parseIfaceStats(const char* iface, struct Stats* stats) {
+    if (hwNetworkStats()) {
+        return 0;
+    }
+
     FILE *fp = fopen(QTAGUID_IFACE_STATS, "r");
     if (fp == NULL) {
         return -1;
@@ -163,7 +169,7 @@ static jlong getTotalStat(JNIEnv* env, jclass clazz, jint type, jboolean useBpfS
     }
 
     if (parseIfaceStats(NULL, &stats) == 0) {
-        return getStatsType(&stats, (StatsType) type);
+        return hwGetIfaceStats(NULL, static_cast<hwStatsType>(type));
     } else {
         return UNKNOWN;
     }
@@ -188,7 +194,7 @@ static jlong getIfaceStat(JNIEnv* env, jclass clazz, jstring iface, jint type,
     }
 
     if (parseIfaceStats(iface8.c_str(), &stats) == 0) {
-        return getStatsType(&stats, (StatsType) type);
+        return hwGetIfaceStats(iface8.c_str(), static_cast<hwStatsType>(type));
     } else {
         return UNKNOWN;
     }

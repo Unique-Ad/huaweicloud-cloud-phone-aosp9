@@ -4440,6 +4440,7 @@ public final class PowerManagerService extends SystemService
                     || PowerManager.REBOOT_RECOVERY_UPDATE.equals(reason)) {
                 mContext.enforceCallingOrSelfPermission(android.Manifest.permission.RECOVERY, null);
             }
+            mHwPowerManagerService.reboot(confirm, reason, wait);
 
             final long ident = Binder.clearCallingIdentity();
             try {
@@ -4458,6 +4459,7 @@ public final class PowerManagerService extends SystemService
         @Override // Binder call
         public void rebootSafeMode(boolean confirm, boolean wait) {
             mContext.enforceCallingOrSelfPermission(android.Manifest.permission.REBOOT, null);
+            mHwPowerManagerService.reboot(confirm, PowerManager.REBOOT_SAFE_MODE, wait);
 
             final long ident = Binder.clearCallingIdentity();
             try {
@@ -4476,8 +4478,10 @@ public final class PowerManagerService extends SystemService
          */
         @Override // Binder call
         public void shutdown(boolean confirm, String reason, boolean wait) {
-            mHwPowerManagerService.shutdown(confirm, reason, wait);
             mContext.enforceCallingOrSelfPermission(android.Manifest.permission.REBOOT, null);
+            if (!mHwPowerManagerService.canShutdown(confirm, reason, wait)) {
+                return;
+            }
 
             final long ident = Binder.clearCallingIdentity();
             try {

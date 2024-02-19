@@ -107,6 +107,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @SystemService(Context.STORAGE_SERVICE)
 public class StorageManager {
     private static final String TAG = "StorageManager";
+    private static IHwStorageManager mHwStorageManager;
 
     /** {@hide} */
     public static final String PROP_PRIMARY_PHYSICAL = "ro.vold.primary_physical";
@@ -463,6 +464,7 @@ public class StorageManager {
         mResolver = context.getContentResolver();
         mLooper = looper;
         mStorageManager = IStorageManager.Stub.asInterface(ServiceManager.getServiceOrThrow("mount"));
+        mHwStorageManager = new HwStorageManager();
     }
 
     /**
@@ -1118,12 +1120,12 @@ public class StorageManager {
 
     /** {@hide} */
     public static Pair<String, Long> getPrimaryStoragePathAndSize() {
-        return Pair.create(null, Environment.getDataDirectory().getTotalSpace());
+        return IHwStorageManager.getPrimaryStoragePathAndSize();
     }
 
     /** {@hide} */
     public long getPrimaryStorageSize() {
-        return Environment.getDataDirectory().getTotalSpace();
+        return mHwStorageManager.getPrimaryStorageSize();
     }
 
     /** {@hide} */

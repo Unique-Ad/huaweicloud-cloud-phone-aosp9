@@ -2475,7 +2475,11 @@ void MediaCodec::onMessageReceived(const sp<AMessage> &msg) {
                                             && (mFlags & kFlagPushBlankBuffersOnShutdown)) {
                                         pushBlankBuffersToNativeWindow(mSurface.get());
                                     }
-                                    mSoftRenderer = new SoftwareRenderer(surface);
+                                    if (mSoftRenderer != NULL) {
+                                        mSoftRenderer->setSurface(surface);
+                                    } else {
+                                        mSoftRenderer = new SoftwareRenderer(surface);
+                                    }
                                     // TODO: check if this was successful
                                 } else {
                                     err = mCodec->setSurface(surface);

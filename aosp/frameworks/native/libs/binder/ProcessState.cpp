@@ -399,6 +399,9 @@ static int open_driver(const char *driver)
     } else {
         ALOGW("Opening '%s' failed: %s\n", driver, strerror(errno));
     }
+    if (fd >= 0) {
+        checkBinderFeature(fd);
+    }
     return fd;
 }
 

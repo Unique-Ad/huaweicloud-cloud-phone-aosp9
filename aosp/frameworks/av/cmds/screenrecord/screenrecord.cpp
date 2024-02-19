@@ -57,6 +57,7 @@
 #include "screenrecord.h"
 #include "Overlay.h"
 #include "FrameOutput.h"
+#include "hw_screenrecord.h"
 
 using namespace android;
 
@@ -72,6 +73,7 @@ static bool gVerbose = false;           // chatty on stdout
 static bool gRotate = false;            // rotate 90 degrees
 static bool gMonotonicTime = false;     // use system monotonic time for timestamps
 static bool gPersistentSurface = false; // use persistent surface
+static bool gEnableAudio = false;       // add audio track
 static enum {
     FORMAT_MP4, FORMAT_H264, FORMAT_FRAMES, FORMAT_RAW_FRAMES
 } gOutputFormat = FORMAT_MP4;           // data format for output
@@ -83,6 +85,7 @@ static uint32_t gVideoWidth = 0;        // default width+height
 static uint32_t gVideoHeight = 0;
 static uint32_t gBitRate = 20000000;     // 20Mbps
 static uint32_t gTimeLimitSec = kMaxTimeLimitSec;
+static uint32_t gTimeDuration = 5;      // Default recording time 5min
 
 // Set by signal handler to stop recording.
 static volatile bool gStopRequested = false;
@@ -91,7 +94,6 @@ static volatile bool gStopRequested = false;
 static struct sigaction gOrigSigactionINT;
 static struct sigaction gOrigSigactionHUP;
 
-
 /*
  * Catch keyboard interrupt signals.  On receipt, the "stop requested"
  * flag is raised, and the original handler is restored (so that, if
@@ -99,6 +101,7 @@ static struct sigaction gOrigSigactionHUP;
  */
 static void signalCatcher(int signum)
 {
+    hwSetStopRequestedFlag(true);
     gStopRequested = true;
     switch (signum) {
     case SIGINT:
@@ -904,8 +907,17 @@ static void usage() {
         "    Set the maximum recording time, in seconds.  Default / maximum is %d.\n"
         "--verbose\n"
         "    Display interesting information on stdout.\n"
+        "--with-audio\n"
+        "    Add audio track.\n"
+        "--prefix (work only for --with-audio open) \n"
+        "    Set the file prefix.\n"
+        "--time-duration (work only for --with-audio open) \n"
+        "    Customize the recording time for each video segment.\n"
         "--help\n"
         "    Show this message.\n"
+        "\n"
+        " --size WIDTHxHEIGHT, --bugreport, --bit-rate RATE, --time-limit, --verbose work for Android screenrecord(--with-audio close)\n"
+        " --prefix, --time-duration, --bit-rate RATE work for CPHscreenrecord(--with-audio open)\n"
         "\n"
         "Recording continues until Ctrl-C is hit or the time limit is reached.\n"
         "\n",
@@ -923,7 +935,11 @@ int main(int argc, char* const argv[]) {
         { "size",               required_argument,  NULL, 's' },
         { "bit-rate",           required_argument,  NULL, 'b' },
         { "time-limit",         required_argument,  NULL, 't' },
+        { "time-duration",      required_argument,  NULL, 'd' },
+        { "prefix",             required_argument,  NULL, 'q' },
+        { "encode-type",        required_argument,  NULL, 'e' },
         { "bugreport",          no_argument,        NULL, 'u' },
+        { "with-audio",         no_argument,        NULL, 'a' },
         // "unofficial" options
         { "show-device-info",   no_argument,        NULL, 'i' },
         { "show-frame-time",    no_argument,        NULL, 'f' },
@@ -962,6 +978,8 @@ int main(int argc, char* const argv[]) {
                 return 2;
             }
             gSizeSpecified = true;
+            hwSetVideoResolution(gVideoWidth, gVideoHeight);
+            ALOGI("Size of video is w %d, h %d", gVideoWidth, gVideoHeight);
             break;
         case 'b':
             if (parseValueWithUnit(optarg, &gBitRate) != NO_ERROR) {
@@ -973,6 +991,8 @@ int main(int argc, char* const argv[]) {
                         gBitRate, kMinBitRate, kMaxBitRate);
                 return 2;
             }
+            hwSetVideoBitRate(gBitRate);
+            ALOGI("Bit rate of video is %d", gBitRate);
             break;
         case 't':
             gTimeLimitSec = atoi(optarg);
@@ -980,6 +1000,15 @@ int main(int argc, char* const argv[]) {
                 fprintf(stderr,
                         "Time limit %ds outside acceptable range [1,%d]\n",
                         gTimeLimitSec, kMaxTimeLimitSec);
+                return 2;
+            }
+            break;
+        case 'd':
+            gTimeDuration = atoi(optarg);
+            if (gTimeDuration <= 0) {
+                fprintf(stderr,
+                        "Time duration %d must be positive\n",
+                        gTimeDuration);
                 return 2;
             }
             break;
@@ -1020,6 +1049,16 @@ int main(int argc, char* const argv[]) {
         case 'p':
             gPersistentSurface = true;
             break;
+        case 'a':
+            gEnableAudio = true;
+            break;
+        case 'e':
+            hwSetEncodeType(atoi(optarg));
+            break;
+        case 'q':
+            hwSetFilePrefix(optarg);
+            ALOGI("prefix of mp4 file is %s", optarg);
+            break;
         default:
             if (ic != '?') {
                 fprintf(stderr, "getopt_long returned unexpected value 0x%x\n", ic);
@@ -1034,20 +1073,30 @@ int main(int argc, char* const argv[]) {
     }
 
     const char* fileName = argv[optind];
-    if (gOutputFormat == FORMAT_MP4) {
-        // MediaMuxer tries to create the file in the constructor, but we don't
-        // learn about the failure until muxer.start(), which returns a generic
-        // error code without logging anything.  We attempt to create the file
-        // now for better diagnostics.
-        int fd = open(fileName, O_CREAT | O_RDWR, 0644);
-        if (fd < 0) {
-            fprintf(stderr, "Unable to open '%s': %s\n", fileName, strerror(errno));
-            return 1;
+    status_t err;
+
+    if (gEnableAudio) {
+        hwSetTimeDuration(gTimeDuration);
+        hwSetFilePath(fileName);
+        configureSignals();
+        err = hwRecordScreenWithAudio();
+    } else {
+        if (gOutputFormat == FORMAT_MP4) {
+            // MediaMuxer tries to create the file in the constructor, but we don't
+            // learn about the failure until muxer.start(), which returns a generic
+            // error code without logging anything.  We attempt to create the file
+            // now for better diagnostics.
+            int fd = open(fileName, O_CREAT | O_RDWR, 0644);
+            if (fd < 0) {
+                fprintf(stderr, "Unable to open '%s': %s\n", fileName, strerror(errno));
+                return 1;
+            }
+            close(fd);
         }
-        close(fd);
+
+        err = recordScreen(fileName);
     }
 
-    status_t err = recordScreen(fileName);
     if (err == NO_ERROR) {
         // Try to notify the media scanner.  Not fatal if this fails.
         notifyMediaScanner(fileName);
