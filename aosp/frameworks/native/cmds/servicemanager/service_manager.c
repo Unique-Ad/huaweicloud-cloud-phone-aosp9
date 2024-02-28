@@ -23,6 +23,8 @@
 #endif
 #include <log/log.h>
 
+#include <hw_service_manager.h>
+
 struct audit_data {
     pid_t pid;
     uid_t uid;
@@ -404,7 +406,12 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    if (binder_become_context_manager(bs)) {
+    while (binder_become_context_manager(bs)) {
+        if (wait_for_binder()) {
+            ALOGW("wait for binder driver(%s)\n", strerror(errno));
+            continue;
+        }
+
         ALOGE("cannot become context manager (%s)\n", strerror(errno));
         return -1;
     }

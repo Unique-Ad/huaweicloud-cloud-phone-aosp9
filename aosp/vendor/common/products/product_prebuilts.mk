@@ -28,7 +28,6 @@ PRODUCT_PACKAGES += \
     libd310encode \
     libRemoteEncoder \
     libVmiShareMem \
-    libxcoder \
     libevent \
     libLLVM13 \
     libGLES_mesa \

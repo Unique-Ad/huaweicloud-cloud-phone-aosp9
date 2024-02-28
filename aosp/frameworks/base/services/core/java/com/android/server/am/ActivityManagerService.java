@@ -4560,7 +4560,7 @@ public class ActivityManagerService extends IActivityManager.Stub
                     + ", " + reason);
             app.pendingStart = false;
             Process.killProcessQuiet(pid);
-            Process.killProcessGroup(app.uid, app.pid);
+            Process.killProcessGroup(app.uid, pid);
             return false;
         }
         mBatteryStatsService.noteProcessStart(app.processName, app.info.uid);
