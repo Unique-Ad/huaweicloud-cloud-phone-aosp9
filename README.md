@@ -236,3 +236,7 @@ git push --tags
 
 ##### 9. 定制webview：将准备好的webview.apk放在aosp/vendor/common/external/webview/webview.apk目录，文件名字固定为webview.apk
 
+##### 10. 线下自定义镜像方案文档
+
+链接如下
+https://gitee.com/HuaweiCloudDeveloper/huaweicloud-cloud-phone-aosp9/wikis/%E7%BA%BF%E4%B8%8B%E6%94%AF%E6%8C%81%E5%AE%A2%E6%88%B7%E6%9E%84%E5%BB%BA%E9%95%9C%E5%83%8F?sort_id=9617807
