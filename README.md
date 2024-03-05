@@ -1,3 +1,5 @@
+### [华为云手机开源项目仓主入口](https://gitee.com/HuaweiCloudDeveloper/huaweicloud-cloud-phone)
+
 # huaweicloud-cloudPhone-aosp9
 
 #### 介绍
