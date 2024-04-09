@@ -9,29 +9,28 @@ PRODUCT_PACKAGES += \
     gralloc.$(BUILD_HARDWARE) \
     sensors.$(BUILD_HARDWARE) \
     camera.$(BUILD_HARDWARE) \
-    android.hardware.audio@2.0-service \
     android.hardware.audio@2.0-impl \
     android.hardware.audio.effect@2.0-impl \
     android.hardware.bluetooth@1.0-impl \
-    android.hardware.bluetooth@1.0-service \
-    android.hardware.camera.provider@2.4-service \
-    android.hardware.camera.provider@2.4-service_64 \
     android.hardware.camera.provider@2.4-impl \
     android.hardware.configstore@1.1 \
     android.hardware.configstore@1.1-service \
-    android.hardware.gnss@1.1 \
-    android.hardware.gnss@1.1-service \
+    android.hardware.gnss@1.0-impl \
     android.hardware.graphics.composer@2.1-impl \
     android.hardware.graphics.composer@2.1-service \
     android.hardware.graphics.mapper@2.0-impl-2.1 \
     android.hardware.graphics.allocator@2.0-impl \
     android.hardware.graphics.allocator@2.0-service \
     android.hardware.sensors@1.0-impl \
-    android.hardware.sensors@1.0-service \
+    android.hardware.vibrator@1.0-impl \
     android.hardware.wifi@1.0-service \
+    android.hardware.nidec@1.0-impl \
     audio.primary.hi3660 \
     libGLES_mesa \
     vulkan.radv \
+    libGLESv1_CM_slow_binding \
+    libGLESv2_slow_binding \
+    libGLESv3_slow_binding \
     uinput \
     curl \
     Dialer \
@@ -41,13 +40,14 @@ PRODUCT_PACKAGES += \
     libbt-vendor \
     libwifi-hal-cph \
     wpa_supplicant \
-    CphNetworkLocation
+    CphNetworkLocation \
+    ni_rsrc_mon \
+    ni_rsrc_list
 
 PRODUCT_PROPERTY_OVERRIDES += \
     persist.sys.language=zh \
     persist.sys.country=CN \
     persist.sys.timezone=Asia/Shanghai \
-    persist.sys.usb.config=adb \
     ro.board.platform=$(BUILD_HARDWARE) \
     ro.hardware=$(BUILD_HARDWARE) \
     ro.hardware.gralloc=$(BUILD_HARDWARE) \
@@ -72,7 +72,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
     gsm.version.baseband=21C20B526S000C000 \
     wifi.interface=wlan0 \
     debug.sf.nobootanimation=1 \
-    debug.mesa.gallium_thread=0
+    mesa.gallium.thread=false
 
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.software.app_widgets.xml:system/etc/permissions/android.software.app_widgets.xml \

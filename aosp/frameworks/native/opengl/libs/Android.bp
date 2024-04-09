@@ -151,6 +151,7 @@ cc_library_shared {
         "libhidlbase",
         "libhidltransport",
         "libutils",
+        "libattr",
     ],
     static_libs: [
         "libEGL_getProcAddress",
@@ -181,7 +182,7 @@ cc_defaults {
             ldflags: ["-Wl,--hash-style,both"],
         },
     },
-    shared_libs: ["libEGL"],
+    shared_libs: ["libEGL", "libattr"],
 }
 
 //##############################################################################
@@ -215,4 +216,28 @@ cc_library_shared {
     srcs: ["GLES2/gl2.cpp"],
     static_libs: ["libEGL_vendor"],
     cflags: ["-DLOG_TAG=\"libGLESv3\""],
+}
+
+cc_library_shared {
+    name: "libGLESv1_CM_slow_binding",
+    defaults: ["gles_libs_defaults"],
+    srcs: ["GLES_CM/gl.cpp"],
+    static_libs: ["libEGL_vendor"],
+    cflags: ["-DLOG_TAG=\"libGLESv1\"", "-DUSE_SLOW_BINDING=1"],
+}
+
+cc_library_shared {
+    name: "libGLESv2_slow_binding",
+    defaults: ["gles_libs_defaults"],
+    srcs: ["GLES2/gl2.cpp"],
+    static_libs: ["libEGL_vendor"],
+    cflags: ["-DLOG_TAG=\"libGLESv2\"", "-DUSE_SLOW_BINDING=1"],
+}
+
+cc_library_shared {
+    name: "libGLESv3_slow_binding",
+    defaults: ["gles_libs_defaults"],
+    srcs: ["GLES2/gl2.cpp"],
+    static_libs: ["libEGL_vendor"],
+    cflags: ["-DLOG_TAG=\"libGLESv3\"", "-DUSE_SLOW_BINDING=1"],
 }

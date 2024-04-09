@@ -159,7 +159,7 @@ public class PhoneFactory {
 
                 int[] networkModes = new int[numPhones];
                 sPhones = new Phone[numPhones];
-                sCommandsInterfaces = new RIL[numPhones];
+                sCommandsInterfaces = new HwRIL[numPhones];
                 sTelephonyNetworkFactories = new TelephonyNetworkFactory[numPhones];
 
                 for (int i = 0; i < numPhones; i++) {
@@ -168,7 +168,7 @@ public class PhoneFactory {
                     networkModes[i] = RILConstants.PREFERRED_NETWORK_MODE;
 
                     Rlog.i(LOG_TAG, "Network Mode set to " + Integer.toString(networkModes[i]));
-                    sCommandsInterfaces[i] = new RIL(context, networkModes[i],
+                    sCommandsInterfaces[i] = new HwRIL(context, networkModes[i],
                             cdmaSubscription, i);
                 }
                 Rlog.i(LOG_TAG, "Creating SubscriptionController");

@@ -2387,10 +2387,7 @@ void KeyboardInputMapper::process(const RawEvent* rawEvent) {
 }
 
 bool KeyboardInputMapper::isKeyboardOrGamepadKey(int32_t scanCode) {
-    return scanCode < BTN_MOUSE
-        || scanCode >= KEY_OK
-        || (scanCode >= BTN_MISC && scanCode < BTN_MOUSE)
-        || (scanCode >= BTN_JOYSTICK && scanCode < BTN_DIGI);
+    return true;
 }
 
 bool KeyboardInputMapper::isMediaKey(int32_t keyCode) {

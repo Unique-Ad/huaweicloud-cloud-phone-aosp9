@@ -34,7 +34,9 @@
 #include <GLES3/gl32.h>
 
 // set to 1 for debugging
+#ifndef USE_SLOW_BINDING
 #define USE_SLOW_BINDING    0
+#endif
 
 #undef NELEM
 #define NELEM(x)            (sizeof(x)/sizeof(*(x)))

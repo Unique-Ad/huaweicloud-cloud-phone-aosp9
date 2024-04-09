@@ -273,6 +273,12 @@ hook_ro_hardware() {
       ln -s "${system_64_lib_path}/sensors.${build_hardware}.so" "${system_64_lib_path}/sensors.${ro_hardware}.so"
       ln -s "${system_32_lib_path}/sensors.${build_hardware}.so" "${system_32_lib_path}/sensors.${ro_hardware}.so"
 
+      ln -s "${system_64_lib_path}/gps.${build_hardware}.so" "${system_64_lib_path}/gps.${ro_hardware}.so"
+      ln -s "${system_32_lib_path}/gps.${build_hardware}.so" "${system_32_lib_path}/gps.${ro_hardware}.so"
+
+      ln -s "${system_64_lib_path}/vibrator.${build_hardware}.so" "${system_64_lib_path}/vibrator.${ro_hardware}.so"
+      ln -s "${system_32_lib_path}/vibrator.${build_hardware}.so" "${system_32_lib_path}/vibrator.${ro_hardware}.so"
+      
       ln -s "${system_64_lib_path}/audio.primary.${build_hardware}.so" "${system_64_lib_path}/audio.primary.${ro_hardware}.so"
       ln -s "${system_32_lib_path}/audio.primary.${build_hardware}.so" "${system_32_lib_path}/audio.primary.${ro_hardware}.so"
       

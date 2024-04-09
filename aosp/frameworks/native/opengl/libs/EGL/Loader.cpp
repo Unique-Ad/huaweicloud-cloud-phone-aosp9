@@ -35,6 +35,7 @@
 
 #include "egl_trace.h"
 #include "egldefs.h"
+#include "hw_egl.h"
 
 extern "C" {
   android_namespace_t* android_get_exported_namespace(const char*);
@@ -223,8 +224,8 @@ void* Loader::open(egl_connection_t* cnx)
     LOG_ALWAYS_FATAL_IF(!hnd, "couldn't find an OpenGL ES implementation");
 
     cnx->libEgl   = load_wrapper(EGL_WRAPPER_DIR "/libEGL.so");
-    cnx->libGles2 = load_wrapper(EGL_WRAPPER_DIR "/libGLESv2.so");
-    cnx->libGles1 = load_wrapper(EGL_WRAPPER_DIR "/libGLESv1_CM.so");
+    cnx->libGles2 = load_wrapper(hw_get_lib_gles(false).c_str());
+    cnx->libGles1 = load_wrapper(hw_get_lib_gles(true).c_str());
 
     LOG_ALWAYS_FATAL_IF(!cnx->libEgl,
             "couldn't load system EGL wrapper libraries");

@@ -41,6 +41,7 @@ PRODUCT_PACKAGES += \
     libva \
     libva-android \
     libjni_keys \
+    libxcoder \
     wget \
     cell.db \
     sensor.db

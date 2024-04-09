@@ -6,8 +6,6 @@ fi
 
 settings put secure adb_install_need_confirm 0
 
-[[ -e /vendor/config ]] && chmod -R 777 /vendor/config
-
 if [ 1 == "`getprop disable.status.bar`" ];then
 	settings put global policy_control immersive.status=*
 else

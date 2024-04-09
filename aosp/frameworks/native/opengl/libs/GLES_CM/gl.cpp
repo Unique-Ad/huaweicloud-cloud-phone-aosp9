@@ -101,6 +101,7 @@ GL_API void GL_APIENTRY glWeightPointerOESBounds(GLint size, GLenum type,
 
     #define CALL_GL_API_INTERNAL_CALL(_api, ...)                         \
         gl_hooks_t::gl_t const * const _c = &getGlThreadSpecific()->gl;  \
+        GlApiPrinter printer(__FUNCTION__);                              \
         if (_c) return _c->_api(__VA_ARGS__);
 
     #define CALL_GL_API_INTERNAL_SET_RETURN_VALUE return 0;
