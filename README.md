@@ -240,7 +240,7 @@ git push --tags
 
 ##### 10. 线下自定义镜像
 支持线下自定义镜像部署；大致分以下三个步骤：
-###### 10.1 准变编译环境
+###### 10.1 准备编译环境
 ###### 10.2 编译环境配置：此处包含代码部署
 ###### 10.3 执行构建脚本
 详细内容见：https://gitee.com/HuaweiCloudDeveloper/huaweicloud-cloud-phone-aosp9.wiki.git
