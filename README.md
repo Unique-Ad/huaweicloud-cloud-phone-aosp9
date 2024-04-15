@@ -243,4 +243,4 @@ git push --tags
 ###### 10.1 准备编译环境
 ###### 10.2 编译环境配置：此处包含代码部署
 ###### 10.3 执行构建脚本
-详细内容见：https://gitee.com/HuaweiCloudDeveloper/huaweicloud-cloud-phone-aosp9.wiki.git
+详细内容见：https://gitee.com/HuaweiCloudDeveloper/huaweicloud-cloud-phone-aosp9/wikis/%E7%BA%BF%E4%B8%8B%E6%94%AF%E6%8C%81%E5%AE%A2%E6%88%B7%E6%9E%84%E5%BB%BA%E9%95%9C%E5%83%8F
