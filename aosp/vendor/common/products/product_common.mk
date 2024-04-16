@@ -9,6 +9,7 @@ PRODUCT_PACKAGES += \
     gralloc.$(BUILD_HARDWARE) \
     sensors.$(BUILD_HARDWARE) \
     camera.$(BUILD_HARDWARE) \
+    gps.$(BUILD_HARDWARE) \
     android.hardware.audio@2.0-impl \
     android.hardware.audio.effect@2.0-impl \
     android.hardware.bluetooth@1.0-impl \
