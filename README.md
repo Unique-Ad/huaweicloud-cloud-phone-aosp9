@@ -140,7 +140,7 @@ cd build/target/product/security
 openssl pkcs8 -in platform.pk8 -inform DER -outform PEM -out shared.priv.pem -nocrypt
 openssl pkcs12 -export -in platform.x509.pem -inkey shared.priv.pem -out shared.pk12 -name ${customer_name}-system-key
 
-# 此时要求输入密码，可以设置为 ${customer_name}@123
+# 此时要求输入密码
 
 keytool -importkeystore -deststorepass "${password}" -destkeypass "${password}" -destkeystore ${customer_name}-AOSP.keystore -srckeystore shared.pk12 -srcstoretype PKCS12 -srcstorepass "${password}" -alias ${customer_name}-system-key
 
