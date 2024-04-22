@@ -107,12 +107,13 @@ Step 1：生成 releasekey platform shared media testkey
 ```
 cd /path/to/aosp/rootdir/
 
-subject='/C=CN/ST=Guangdong/L=Shengzhen/O=Huawei/OU=Compony/CN=AndroidTeam/emailAddress=mobile@huawei.com'
+subject='/C=CN/ST=Guangdong/L=Shengzhen/O=${company}/OU=Compony/CN=AndroidTeam/emailAddress=mobile@${company}.com'
 for x in releasekey platform shared media testkey; do
     rm build/target/product/security/${x}*
     ./development/tools/make_key build/target/product/security/$x "$subject"
 done
 ```
+
 Step 2：生成verity key
 
 ```
