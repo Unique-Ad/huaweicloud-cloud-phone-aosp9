@@ -91,7 +91,56 @@ SERVER_ADDR   专属构建服务器
 使用公共的系统签名有安全风险，可通过以下步骤制作私有系统签名，加密后上传，构建系统可保证私有的系统签名不会泄露。
 ###### 6.1 制作私有系统签名
 
-请参考 https://android.googlesource.com/platform/build/+/refs/tags/android-security-9.0.0_r76/target/product/security/README
+请参考 
+
+https://android.googlesource.com/platform/build/+/refs/tags/android-security-9.0.0_r76/target/product/security/README
+
+https://blog.csdn.net/langlitaojin/article/details/108045709
+
+Step 1：生成 releasekey platform shared media testkey
+
+```
+cd /path/to/aosp/rootdir/
+
+subject='/C=CN/ST=Guangdong/L=Shengzhen/O=Huawei/OU=Compony/CN=AndroidTeam/emailAddress=mobile@huawei.com'
+for x in releasekey platform shared media testkey; do
+    rm build/target/product/security/${x}*
+    ./development/tools/make_key build/target/product/security/$x "$subject"
+done
+```
+Step 2：生成verity key
+
+```
+cd /path/to/aosp/rootdir/
+
+make generate_verity_key
+
+development/tools/make_key veritykey   '/C=CN/ST=Guangdong/L=Shengzhen/O=Huawei/OU=Compony/CN=AndroidTeam/emailAddress=mobile@huawei.com'
+
+out/host/linux-x86/bin/generate_verity_key -convert veritykey.x509.pem verity_key
+
+mv veritykey.pk8 ./build/target/product/security/veritykey.pk8
+mv veritykey.x509.pem ./build/target/product/security/veritykey.x509.pem
+mv verity_key.pub ./build/target/product/security/verity_key
+```
+生成keystore
+
+```
+cd /path/to/aosp/rootdir/
+
+cd build/target/product/security
+
+# 注意替换客户名
+openssl pkcs8 -in platform.pk8 -inform DER -outform PEM -out shared.priv.pem -nocrypt
+openssl pkcs12 -export -in platform.x509.pem -inkey shared.priv.pem -out shared.pk12 -name ${customer_name}-system-key
+
+# 此时要求输入密码，可以设置为 ${customer_name}@123
+
+keytool -importkeystore -deststorepass "${password}" -destkeypass "${password}" -destkeystore ${customer_name}-AOSP.keystore -srckeystore shared.pk12 -srcstoretype PKCS12 -srcstorepass "${password}" -alias ${customer_name}-system-key
+
+tar cf ${customer_name}-keystore.tar shared.pk12 shared.priv.pem ${customer_name}-AOSP.keystore
+```
+
 
 ###### 6.2 获取定位SDK的Key
 
