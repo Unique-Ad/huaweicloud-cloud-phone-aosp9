@@ -92,10 +92,14 @@ SERVER_ADDR   专属构建服务器
 ###### 6.1 制作私有系统签名
 
 制作环境：
+
+```
 Distributor ID: Ubuntu
 Description:    Ubuntu 18.04.6 LTS
 Release:        18.04
 Codename:       bionic
+```
+
 请参考 
 
 https://android.googlesource.com/platform/build/+/refs/tags/android-security-9.0.0_r76/target/product/security/README
