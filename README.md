@@ -91,6 +91,11 @@ SERVER_ADDR   专属构建服务器
 使用公共的系统签名有安全风险，可通过以下步骤制作私有系统签名，加密后上传，构建系统可保证私有的系统签名不会泄露。
 ###### 6.1 制作私有系统签名
 
+制作环境：
+Distributor ID: Ubuntu
+Description:    Ubuntu 18.04.6 LTS
+Release:        18.04
+Codename:       bionic
 请参考 
 
 https://android.googlesource.com/platform/build/+/refs/tags/android-security-9.0.0_r76/target/product/security/README
