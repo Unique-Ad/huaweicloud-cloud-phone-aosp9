@@ -10,6 +10,7 @@ PRODUCT_PACKAGES += \
     sensors.$(BUILD_HARDWARE) \
     camera.$(BUILD_HARDWARE) \
     gps.$(BUILD_HARDWARE) \
+    vibrator.$(BUILD_HARDWARE) \
     android.hardware.audio@2.0-impl \
     android.hardware.audio.effect@2.0-impl \
     android.hardware.bluetooth@1.0-impl \
