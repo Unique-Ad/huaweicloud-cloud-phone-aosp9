@@ -14,13 +14,13 @@ aosp/vendor
 ```
 
 #### 内容摘要
-一 客户对接阶段
+客户对接阶段
 
     使用说明 
         1 申请权限
         2 准备开发环境
 
-二 客户日常修改代码编译构建阶段
+客户日常修改代码编译构建阶段
 
     使用说明 
         3. 修改代码
@@ -29,14 +29,14 @@ aosp/vendor
         7. 版本管理
         8. 与原仓库保持同步更新
 
-三 客户定制化需求：
+客户定制化需求：
 
     使用说明 
         6. 自定义系统签名
         9. 定制webview
     定制GMS：https://gitee.com/HuaweiCloudDeveloper/huaweicloud-cloudPhone-aosp11/wikis/%E5%AE%9A%E5%88%B6GMS%E9%95%9C%E5%83%8F
 
-四 客户镜像管理：
+客户镜像管理：
 
     支持镜像查询以及同region不同账号镜像共享
 
