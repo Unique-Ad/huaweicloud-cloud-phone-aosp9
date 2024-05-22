@@ -123,6 +123,11 @@ public class PackageUpdatedTask extends BaseModelUpdateTask {
                 for (int i = 0; i < N; i++) {
                     iconCache.removeIconsForPkg(packages[i], mUser);
                 }
+                // Force gc and finalization here.
+                for (int i = 0; i < 2; i++) {
+                    Runtime.getRuntime().gc();
+                    Runtime.getRuntime().runFinalization();
+                }
                 // Fall through
             }
             case OP_UNAVAILABLE:

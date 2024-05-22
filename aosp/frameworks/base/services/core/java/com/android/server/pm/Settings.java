@@ -1129,6 +1129,14 @@ public final class Settings {
             return false;
         }
 
+        if (mHwSettings.isAssignAppUid(uid)) {
+            if (!mHwSettings.addAssignAppUid(uid, obj)) {
+                PackageManagerService.reportSettingsProblem(Log.ERROR,
+                        "Adding duplicate user id: " + uid
+                        + " name=" + name);
+                return false;
+            }
+        }
         if (uid >= Process.FIRST_APPLICATION_UID) {
             int N = mUserIds.size();
             final int index = uid - Process.FIRST_APPLICATION_UID;
@@ -1156,6 +1164,9 @@ public final class Settings {
     }
 
     public Object getUserIdLPr(int uid) {
+        if (mHwSettings.isAssignAppUid(uid)) {
+            return mHwSettings.getAssignUidObject(uid);
+        }
         if (uid >= Process.FIRST_APPLICATION_UID) {
             final int N = mUserIds.size();
             final int index = uid - Process.FIRST_APPLICATION_UID;
@@ -1166,6 +1177,10 @@ public final class Settings {
     }
 
     private void removeUserIdLPw(int uid) {
+        if (mHwSettings.isAssignAppUid(uid)) {
+            mHwSettings.removeAssignAppUid(uid);
+            return;
+        }
         if (uid >= Process.FIRST_APPLICATION_UID) {
             final int N = mUserIds.size();
             final int index = uid - Process.FIRST_APPLICATION_UID;
@@ -1177,6 +1192,10 @@ public final class Settings {
     }
 
     private void replaceUserIdLPw(int uid, Object obj) {
+        if (mHwSettings.isAssignAppUid(uid)) {
+            mHwSettings.replaceAssignAppUid(uid, obj);
+            return;
+        }
         if (uid >= Process.FIRST_APPLICATION_UID) {
             final int N = mUserIds.size();
             final int index = uid - Process.FIRST_APPLICATION_UID;
@@ -4217,6 +4236,10 @@ public final class Settings {
 
     // Returns -1 if we could not find an available UserId to assign
     private int newUserIdLPw(Object obj) {
+        int uid = mHwSettings.newAssignAppUid(obj);
+        if (uid > 0) {
+            return uid;
+        }
         // Let's be stupidly inefficient for now...
         final int N = mUserIds.size();
         if (mHwSettings.isLastApplicationUid(mFirstAvailableUid, mUserIds, N)) {
@@ -4230,7 +4253,7 @@ public final class Settings {
         }
 
         // None left?
-        if (N > (Process.LAST_APPLICATION_UID-Process.FIRST_APPLICATION_UID)) {
+        if (N > (mHwSettings.getLastApplicationUid() - Process.FIRST_APPLICATION_UID)) {
             return -1;
         }
 

@@ -9154,6 +9154,11 @@ public class PackageManagerService extends IPackageManager.Stub
 
             boolean useProfileForDexopt = false;
 
+            if (mHwPackageManagerService.skipUpdatePackage(pkg.packageName)) {
+                numberOfPackagesSkipped++;
+                continue;
+            }
+
             if ((isFirstBoot() || isUpgrade()) && isSystemApp(pkg)) {
                 // Copy over initial preopt profiles since we won't get any JIT samples for methods
                 // that are already compiled.
@@ -18458,7 +18463,10 @@ public class PackageManagerService extends IPackageManager.Stub
             info.sendSystemPackageAppearedBroadcasts();
         }
         // Force a gc here.
-        Runtime.getRuntime().gc();
+        for (int i = 0; i < 2; i++) {
+            Runtime.getRuntime().gc();
+            Runtime.getRuntime().runFinalization();
+        }
         // Delete the resources here after sending the broadcast to let
         // other processes clean up before deleting resources.
         if (info.args != null) {
