@@ -1,0 +1,63 @@
+#!/system/bin/sh
+
+version=1.0
+listen_port=12345
+
+if [ $# = 1 ] && [ "$1" == "-v" ] ; then
+    echo "proxy version ${version}"
+    exit 0
+fi
+
+if [ $# = 1 ] && [ "$1" == "shutdown" ] ; then
+    killall -9 gost > /dev/null 2>&1
+    iptables -t nat -F > /dev/null 2>&1
+    echo "proxy shutdown!"
+    exit 0
+fi
+
+if [ $# != 5 ] ; then
+    echo "usage:
+    proxy open      -  proxy [protocol] [ip] [port] [user] [passwd]
+    proxy shutdown  -  proxy shutdown
+    proxy version   -  proxy -v"
+    exit 0
+fi
+
+protocol=$1
+ip=$2
+port=$3
+user=$4
+passwd=$5
+
+if [ "${protocol}" != "socks5" ] ; then
+    echo "error: protocol only support socks5 currently"
+    exit -1
+fi
+
+# shutdown last proxy
+killall -9 gost > /dev/null 2>&1
+iptables -t nat -F > /dev/null 2>&1
+
+# bypass local network and management ip
+iptables -t nat -N GOST_LOCAL > /dev/null 2>&1
+iptables -t nat -A GOST_LOCAL -d 0/8 -j RETURN > /dev/null 2>&1
+iptables -t nat -A GOST_LOCAL -d 127/8 -j RETURN > /dev/null 2>&1
+iptables -t nat -A GOST_LOCAL -d 10/8 -j RETURN > /dev/null 2>&1
+iptables -t nat -A GOST_LOCAL -d 100.64/16 -j RETURN > /dev/null 2>&1
+iptables -t nat -A GOST_LOCAL -d 100.125/16 -j RETURN > /dev/null 2>&1
+iptables -t nat -A GOST_LOCAL -d 169.254/16 -j RETURN > /dev/null 2>&1
+iptables -t nat -A GOST_LOCAL -d 172.16/12 -j RETURN > /dev/null 2>&1
+iptables -t nat -A GOST_LOCAL -d 192.168/16 -j RETURN > /dev/null 2>&1
+iptables -t nat -A GOST_LOCAL -d 214/8 -j RETURN > /dev/null 2>&1
+iptables -t nat -A GOST_LOCAL -d 224/4 -j RETURN > /dev/null 2>&1
+iptables -t nat -A GOST_LOCAL -d 240/4 -j RETURN > /dev/null 2>&1
+
+# redirect tcp stream to listen_port
+iptables -t nat -A GOST_LOCAL -d ${ip} -j RETURN > /dev/null 2>&1
+iptables -t nat -A GOST_LOCAL -p tcp -j REDIRECT --to-ports ${listen_port} > /dev/null 2>&1
+iptables -t nat -A OUTPUT -p tcp -j GOST_LOCAL > /dev/null 2>&1
+
+# start service
+nohup /data/local/tmp/gost -L "red://:${listen_port}" -F socks5://${user}:${passwd}@${ip}:${port} > /dev/null 2>&1 &
+echo "proxy open!"
+
