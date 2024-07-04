@@ -243,6 +243,8 @@ public class UserManagerService extends IUserManager.Stub {
     private final File mUsersDir;
     private final File mUserListFile;
 
+    private final IHwUserManagerService mHwUserManagerService;
+
     private static final IBinder mUserRestriconToken = new Binder();
 
     /**
@@ -521,6 +523,7 @@ public class UserManagerService extends IUserManager.Stub {
         mPackagesLock = packagesLock;
         mHandler = new MainHandler();
         mUserDataPreparer = userDataPreparer;
+        mHwUserManagerService = new HwUserManagerService(this);
         synchronized (mPackagesLock) {
             mUsersDir = new File(dataDir, USER_INFO_DIR);
             mUsersDir.mkdirs();
@@ -2150,7 +2153,7 @@ public class UserManagerService extends IUserManager.Stub {
         }
     }
 
-    private void fallbackToSingleUserLP() {
+    void fallbackToSingleUserLP() {
         int flags = UserInfo.FLAG_INITIALIZED;
         // In split system user mode, the admin and primary flags are assigned to the first human
         // user.
@@ -2379,10 +2382,9 @@ public class UserManagerService extends IUserManager.Stub {
                     new AtomicFile(new File(mUsersDir, Integer.toString(id) + XML_SUFFIX));
             fis = userFile.openRead();
             return readUserLP(id, fis);
-        } catch (IOException ioe) {
+        } catch (IOException | XmlPullParserException ex) {
             Slog.e(LOG_TAG, "Error reading user list");
-        } catch (XmlPullParserException pe) {
-            Slog.e(LOG_TAG, "Error reading user list");
+            mHwUserManagerService.reportUserDataProblem(new File(mUsersDir, id + XML_SUFFIX), ex);
         } finally {
             IoUtils.closeQuietly(fis);
         }
@@ -2423,7 +2425,7 @@ public class UserManagerService extends IUserManager.Stub {
 
         if (type != XmlPullParser.START_TAG) {
             Slog.e(LOG_TAG, "Unable to read user " + id);
-            return null;
+            throw new XmlPullParserException("Unable to read user " + id);
         }
 
         if (type == XmlPullParser.START_TAG && parser.getName().equals(TAG_USER)) {

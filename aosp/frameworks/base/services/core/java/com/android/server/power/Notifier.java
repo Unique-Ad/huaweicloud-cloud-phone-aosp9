@@ -90,6 +90,8 @@ final class Notifier {
     private static final int MSG_PROFILE_TIMED_OUT = 5;
     private static final int MSG_WIRED_CHARGING_STARTED = 6;
 
+    private static final int MSG_INTERACTIVE = 7;
+
     private static final long[] WIRELESS_VIBRATION_TIME = {
             40, 40, 40, 40, 40, 40, 40, 40, 40, // ramp-up sampling rate = 40ms
             40, 40, 40, 40, 40, 40, 40 // ramp-down sampling rate = 40ms
@@ -123,6 +125,8 @@ final class Notifier {
     private final Intent mScreenOnIntent;
     private final Intent mScreenOffIntent;
     private final Intent mScreenBrightnessBoostIntent;
+
+    private final IHwNotifier mHwNotifier;
 
     // True if the device should suspend when the screen is off due to proximity.
     private final boolean mSuspendWhenScreenOffDueToProximityConfig;
@@ -175,6 +179,7 @@ final class Notifier {
         mScreenOffIntent.addFlags(
                 Intent.FLAG_RECEIVER_REGISTERED_ONLY | Intent.FLAG_RECEIVER_FOREGROUND
                 | Intent.FLAG_RECEIVER_VISIBLE_TO_INSTANT_APPS);
+        mHwNotifier = new HwNotifier(mContext, mHandler);
         mScreenBrightnessBoostIntent =
                 new Intent(PowerManager.ACTION_SCREEN_BRIGHTNESS_BOOST_CHANGED);
         mScreenBrightnessBoostIntent.addFlags(
@@ -408,6 +413,18 @@ final class Notifier {
         if (mInteractiveChanging) {
             mInteractiveChanging = false;
             handleLateInteractiveChange();
+        }
+    }
+
+    public void onInteraciveChange(boolean isInteractive) {
+        mHwNotifier.onInteraciveChange(isInteractive);
+    }
+ 
+    private void sendNoInteractiveIntent(boolean isInteractive) {
+        synchronized (mLock) {
+            if (mActivityManagerInternal.isSystemReady()) {
+                mHwNotifier.sendNoInteractiveIntent(isInteractive);
+            }
         }
     }
 
@@ -813,6 +830,8 @@ final class Notifier {
                 case MSG_WIRED_CHARGING_STARTED:
                     showWiredChargingStarted();
                     break;
+                case MSG_INTERACTIVE:
+                    sendNoInteractiveIntent(msg.arg1 == 1);
             }
         }
     }

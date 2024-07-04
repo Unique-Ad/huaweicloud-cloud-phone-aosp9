@@ -524,7 +524,8 @@ binder::Status InstalldNativeService::createAppData(const std::unique_ptr<std::s
         }
 
         if (!prepare_app_profile_dir(packageName, appId, userId)) {
-            return error("Failed to prepare profiles for " + packageName);
+            fix_app_profile_path(packageName, userId, uid, appId);
+            LOG(WARNING) << "Attemp to fix app profile, " << packageName.c_str();
         }
     }
     return ok();

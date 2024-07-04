@@ -9154,7 +9154,7 @@ public class PackageManagerService extends IPackageManager.Stub
 
             boolean useProfileForDexopt = false;
 
-            if (mHwPackageManagerService.skipUpdatePackage(pkg.packageName)) {
+            if (HwPackageManagerService.skipUpdatePackage(pkg.packageName)) {
                 numberOfPackagesSkipped++;
                 continue;
             }
@@ -9474,6 +9474,12 @@ public class PackageManagerService extends IPackageManager.Stub
         // others will see that the compiled code for the library is up to date.
         Collection<PackageParser.Package> deps = findSharedNonSystemLibraries(p);
         final String[] instructionSets = getAppDexInstructionSets(p.applicationInfo);
+
+        boolean contain64bit = Arrays.asList(instructionSets).stream().anyMatch(VMRuntime::is64BitInstructionSet);
+        if (!contain64bit) {
+            return PackageDexOptimizer.DEX_OPT_SKIPPED;
+        }
+     
         if (!deps.isEmpty()) {
             DexoptOptions libraryOptions = new DexoptOptions(options.getPackageName(),
                     options.getCompilationReason(), options.getCompilerFilter(),
@@ -18462,7 +18468,7 @@ public class PackageManagerService extends IPackageManager.Stub
             info.sendSystemPackageUpdatedBroadcasts();
             info.sendSystemPackageAppearedBroadcasts();
         }
-        // Force a gc here.
+        // Force gc and finalization here.
         for (int i = 0; i < 2; i++) {
             Runtime.getRuntime().gc();
             Runtime.getRuntime().runFinalization();

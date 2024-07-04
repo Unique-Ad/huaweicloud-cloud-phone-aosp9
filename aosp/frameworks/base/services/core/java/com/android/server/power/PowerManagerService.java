@@ -2043,6 +2043,8 @@ public final class PowerManagerService extends SystemService
                 mUserActivitySummary = 0;
             }
 
+            checkStatusAndSendWakefulnessChange(now);
+
             if (DEBUG_SPEW) {
                 Slog.d(TAG, "updateUserActivitySummaryLocked: mWakefulness="
                         + PowerManagerInternal.wakefulnessToString(mWakefulness)
@@ -2050,6 +2052,18 @@ public final class PowerManagerService extends SystemService
                         + ", nextTimeout=" + TimeUtils.formatUptime(nextTimeout));
             }
         }
+    }
+
+    private void checkStatusAndSendWakefulnessChange(long eventTime) {
+        if (eventTime < mLastWakeTime || !mBootCompleted || !mSystemReady) {
+            return;
+        }
+ 
+        boolean nowKeepInteractive = (mProximityPositive || (mWakeLockSummary & WAKE_LOCK_STAY_AWAKE) != 0
+                || (mUserActivitySummary & (USER_ACTIVITY_SCREEN_BRIGHT | USER_ACTIVITY_SCREEN_DIM)) != 0
+                || mScreenBrightnessBoostInProgress);
+ 
+        mHwPowerManagerService.checkInteractiveStatusAndNotify(nowKeepInteractive, mNotifier);
     }
 
     private void scheduleUserInactivityTimeout(long timeMs) {

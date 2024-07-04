@@ -282,6 +282,11 @@ public class JobInfo implements Parcelable {
      */
     public static final int CONSTRAINT_FLAG_STORAGE_NOT_LOW = 1 << 3;
 
+    /**
+     * @hide
+     */
+    public static final int CONSTRAINT_FLAG_NO_INTERACTIVE = 1 << 4;
+
     private final int jobId;
     private final PersistableBundle extras;
     private final Bundle transientExtras;
@@ -392,6 +397,13 @@ public class JobInfo implements Parcelable {
      */
     public boolean isRequireStorageNotLow() {
         return (constraintFlags & CONSTRAINT_FLAG_STORAGE_NOT_LOW) != 0;
+    }
+
+    /**
+     * @hide
+     */
+    public boolean isRequireNoInteractive() {
+        return (constraintFlags & CONSTRAINT_FLAG_NO_INTERACTIVE) != 0;
     }
 
     /**
@@ -1283,6 +1295,17 @@ public class JobInfo implements Parcelable {
         public Builder setRequiresStorageNotLow(boolean storageNotLow) {
             mConstraintFlags = (mConstraintFlags&~CONSTRAINT_FLAG_STORAGE_NOT_LOW)
                     | (storageNotLow ? CONSTRAINT_FLAG_STORAGE_NOT_LOW : 0);
+            return this;
+        }
+
+        /**
+         * The device is no interactive, which means not been in use for some time, it is a good time
+         * to perform resource heavy jobs.
+         * {@hide}
+         */
+        public Builder setRequiresNoInteractive(boolean requiresNoInteractive) {
+            mConstraintFlags = (mConstraintFlags & ~CONSTRAINT_FLAG_NO_INTERACTIVE)
+                    | (requiresNoInteractive ? CONSTRAINT_FLAG_NO_INTERACTIVE : 0);
             return this;
         }
 

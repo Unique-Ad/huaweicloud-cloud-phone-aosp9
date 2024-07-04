@@ -604,6 +604,9 @@
     <protected-broadcast android:name="android.intent.action.DOCK_IDLE" />
     <protected-broadcast android:name="android.intent.action.DOCK_ACTIVE" />
 
+    <protected-broadcast android:name="android.intent.action.KEEP_INTERACTIVE" />
+    <protected-broadcast android:name="android.intent.action.NO_INTERACTIVE" />
+
     <!-- ====================================================================== -->
     <!--                          RUNTIME PERMISSIONS                           -->
     <!-- ====================================================================== -->

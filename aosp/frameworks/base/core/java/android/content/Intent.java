@@ -1929,6 +1929,18 @@ public class Intent implements Parcelable, Cloneable {
     public static final String ACTION_SCREEN_OFF = "android.intent.action.SCREEN_OFF";
 
     /**
+     * @hide
+     */
+    @SdkConstant(SdkConstantType.BROADCAST_INTENT_ACTION)
+    public static final String ACTION_NO_INTERACTIVE = "android.intent.action.NO_INTERACTIVE";
+ 
+    /**
+     * @hide
+     */
+    @SdkConstant(SdkConstantType.BROADCAST_INTENT_ACTION)
+    public static final String ACTION_KEEP_INTERACTIVE = "android.intent.action.KEEP_INTERACTIVE";
+
+    /**
      * Broadcast Action: Sent when the device wakes up and becomes interactive.
      * <p>
      * For historical reasons, the name of this broadcast action refers to the power

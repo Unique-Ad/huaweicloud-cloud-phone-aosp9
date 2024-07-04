@@ -8,6 +8,9 @@ PRE_INSTALL_CONFIG_PKG_LEVEL2="com.cph.config.level2"
 OVERLAY_LOCAL_FOLDER="/data/local/appbase"
 HIGH_LEVEL_CONFIG_PRESET=0
 
+STORAGE_DE="storage_de"
+STORAGE_CE="storage_ce"
+
 ######################################################################
 #   FUNCTION   : processOverlayDir
 #   DESCRIPTION: exec mount overlay
@@ -46,20 +49,21 @@ presetFile()
     processOverlayDir ${configPackageName} ${versionName}
     # exec copy
     if [[ -d "${OVERLAY_LOCAL_FOLDER}/${configPackageName}/${versionName}/merged/data/" ]]; then
-        cp -a -f ${OVERLAY_LOCAL_FOLDER}/${configPackageName}/${versionName}/merged/data/* /data/
+        cp -a -f ${OVERLAY_LOCAL_FOLDER}/${configPackageName}/${versionName}/merged/data/!(system_ce|misc_ce|vendor_ce|media|data|app) /data/
     fi
 }
 
 ######################################################################
-#   FUNCTION   : initPreConfigData
-#   DESCRIPTION: process preinstall files
+#   FUNCTION   : configWithoutCeData
+#   DESCRIPTION: process preinstall without user CE storage files
 #   INPUT      : no
 #   OUTPUT     : no
 ######################################################################
-initPreConfigData()
+configWithoutCeData()
 {
     if [[ $# -ne 1 ]]; then
         echo "$FUNCNAME param num is wrong, need 1, actual is $#."
+        return
     fi
     local configPackageName=$1
     if [[ ! -d "${APPBASE_PATH}/${configPackageName}" ]]; then
@@ -88,16 +92,45 @@ initPreConfigData()
             return
         fi
         HIGH_LEVEL_CONFIG_PRESET=1
-        # delete the local old version
-        if [[ -d "${OVERLAY_LOCAL_FOLDER}/${configPackageName}/${localVersionName}/" ]]; then
-            echo "delete the ${configPackageName} ${localVersionName} version data"
-            umount ${OVERLAY_LOCAL_FOLDER}/${configPackageName}/${localVersionName}/merged
-            if [[ $? -ne 0 ]]; then
-                umount -l ${OVERLAY_LOCAL_FOLDER}/${configPackageName}/${localVersionName}/merged
-            fi
-            rm -rf ${OVERLAY_LOCAL_FOLDER}/${configPackageName}/${localVersionName}/
-        fi
+
         presetFile ${configPackageName} ${newVersionName}
+    fi
+}
+
+######################################################################
+#   FUNCTION   : configUserCeData
+#   DESCRIPTION: config User Ce Data(system_ce|misc_ce|vendor_ce|media|data|app) and remove old data
+#   INPUT      : no
+#   OUTPUT     : no
+######################################################################
+configUserCeData() {
+    if [[ $# -ne 1 ]]; then
+        echo "$FUNCNAME param num is wrong, need 1, actual is $#."
+        return
+    fi
+    local configPackageName=$1
+ 
+    local version_num="$(ls ${OVERLAY_LOCAL_FOLDER}/${configPackageName} | wc -l)"
+ 
+    if [[ ${version_num} -gt 1 ]]; then
+        # delete the local old version
+        local oldVersionName="$(ls -1 ${OVERLAY_LOCAL_FOLDER}/${configPackageName} | sort -n | head -n 1)"
+        echo "delete the ${configPackageName} ${oldVersionName} version data"
+        umount ${OVERLAY_LOCAL_FOLDER}/${configPackageName}/${oldVersionName}/merged
+        if [[ $? -ne 0 ]]; then
+            umount -l ${OVERLAY_LOCAL_FOLDER}/${configPackageName}/${oldVersionName}/merged
+        fi
+        rm -rf ${OVERLAY_LOCAL_FOLDER}/${configPackageName}/${oldVersionName}/
+    fi
+ 
+    if [[ ${version_num} -gt 1 || $(getprop ro.first_boot) == 1 ]]; then
+        # config user ce data and /app data
+        local newVersionName="$(ls -1 ${OVERLAY_LOCAL_FOLDER}/${configPackageName} | sort -n | tail -n 1)"
+        if [[ -d "${OVERLAY_LOCAL_FOLDER}/${configPackageName}/${newVersionName}/merged/data/" ]]; then
+            for ce_dir in system_ce misc_ce vendor_ce media data app; do
+                cp -a -f ${OVERLAY_LOCAL_FOLDER}/${configPackageName}/${newVersionName}/merged/data/${ce_dir} /data/
+            done
+        fi
     fi
 }
 
@@ -109,12 +142,17 @@ initPreConfigData()
 ######################################################################
 processConfigPackage()
 {
-    if [[ $# -ne 1 ]]; then
-        echo "$FUNCNAME param num is wrong, need 1, actual is $#."
+    if [[ $# -ne 2 ]]; then
+        echo "$FUNCNAME param num is wrong, need 2, actual is $#."
     fi
     local configPackageName=$1
+    local configSpace=$2
     if [[ -d "${OVERLAY_LOCAL_FOLDER}/${configPackageName}" ]] || ([[ -f "${PRE_INSTALL_APP_LIST_FILE}" ]] && grep -q "^${configPackageName}$" ${PRE_INSTALL_APP_LIST_FILE}); then
-        initPreConfigData ${configPackageName}
+        if [[ ${STORAGE_DE} == ${configSpace} ]]; then
+            configWithoutCeData ${configPackageName}
+        else
+            configUserCeData ${configPackageName}
+        fi
     fi
 }
 
@@ -126,10 +164,16 @@ processConfigPackage()
 ######################################################################
 initPreConfig()
 {
+    local configSpace=$1
+    if [[ ! -d ${OVERLAY_LOCAL_FOLDER} ]]; then
+        mkdir -p ${OVERLAY_LOCAL_FOLDER}
+        chmod 776 ${OVERLAY_LOCAL_FOLDER}
+    fi
+
     # 配置包按照顺序去执行
-    processConfigPackage ${PRE_INSTALL_CONFIG_PKG}
-    processConfigPackage ${PRE_INSTALL_CONFIG_PKG_LEVEL1}
-    processConfigPackage ${PRE_INSTALL_CONFIG_PKG_LEVEL2}
+    processConfigPackage ${PRE_INSTALL_CONFIG_PKG} ${configSpace}
+    processConfigPackage ${PRE_INSTALL_CONFIG_PKG_LEVEL1} ${configSpace}
+    processConfigPackage ${PRE_INSTALL_CONFIG_PKG_LEVEL2} ${configSpace}
 }
 
 ######################################################################
@@ -150,7 +194,13 @@ initPreInstallApp()
         localAppbaseExist=1
     fi
 
-    if [[ -z "${localAppbaseExist}" || -f "/data/system/packages.xml" ]]; then
+    if [[ ${IS_SUPPORT_FSCRYPT} != true && (-z "${localAppbaseExist}" || -f "/data/system/packages.xml") ]]; then
+        echo "the phone is not first boot"
+        return
+    fi
+ 
+    # the encrypt type should check by prop.
+    if [[ ${IS_SUPPORT_FSCRYPT} == true && ! $(getprop ro.first_boot) == 1 ]]; then
         echo "the phone is not first boot"
         return
     fi
@@ -194,9 +244,22 @@ initPhoneExistSharePackage()
 ######################################################################
 initShareApp()
 {
-    initPhoneExistSharePackage
-    initPreInstallApp
-    initPreConfig
+    if [[ ${IS_SUPPORT_FSCRYPT} != true && $(getprop sys.boot_completed) != 1 ]]; then
+        initPhoneExistSharePackage
+        initPreInstallApp
+        initPreConfig ${STORAGE_DE}
+        initPreConfig ${STORAGE_CE}
+    elif [[ ${IS_SUPPORT_FSCRYPT} == true ]]; then
+        if [[ $(getprop sys.boot_completed) != 1 ]]; then
+            initPreConfig ${STORAGE_DE}
+            [[ ! -f "/data/system/packages.xml" ]] && setprop ro.first_boot 1
+        else
+            initPhoneExistSharePackage
+            initPreInstallApp
+            initPreConfig ${STORAGE_CE}
+            pm scan-fast /data/app
+        fi
+    fi
     return 0
 }
 

@@ -1829,6 +1829,7 @@ public final class Settings {
 
         } catch (XmlPullParserException e) {
             mReadMessages.append("Error reading: " + e.toString());
+            mHwSettings.reportSettingsProblem(userPackagesStateFile, e);
             PackageManagerService.reportSettingsProblem(Log.ERROR,
                     "Error reading stopped packages: " + e);
             Slog.wtf(PackageManagerService.TAG, "Error reading package manager stopped packages",
@@ -1836,6 +1837,7 @@ public final class Settings {
 
         } catch (java.io.IOException e) {
             mReadMessages.append("Error reading: " + e.toString());
+            mHwSettings.reportSettingsProblem(userPackagesStateFile, e);
             PackageManagerService.reportSettingsProblem(Log.ERROR, "Error reading settings: " + e);
             Slog.wtf(PackageManagerService.TAG, "Error reading package manager stopped packages",
                     e);
@@ -3051,6 +3053,8 @@ public final class Settings {
 
             if (type != XmlPullParser.START_TAG) {
                 mReadMessages.append("No start tag found in settings file\n");
+                mHwSettings.reportSettingsProblem(mSettingsFilename,
+                        new XmlPullParserException("No start tag found in settings file"));
                 PackageManagerService.reportSettingsProblem(Log.WARN,
                         "No start tag found in package manager settings");
                 Slog.wtf(PackageManagerService.TAG,
@@ -3172,11 +3176,13 @@ public final class Settings {
 
         } catch (XmlPullParserException e) {
             mReadMessages.append("Error reading: " + e.toString());
+            mHwSettings.reportSettingsProblem(mSettingsFilename, e);
             PackageManagerService.reportSettingsProblem(Log.ERROR, "Error reading settings: " + e);
             Slog.wtf(PackageManagerService.TAG, "Error reading package manager settings", e);
 
         } catch (java.io.IOException e) {
             mReadMessages.append("Error reading: " + e.toString());
+            mHwSettings.reportSettingsProblem(mSettingsFilename, e);
             PackageManagerService.reportSettingsProblem(Log.ERROR, "Error reading settings: " + e);
             Slog.wtf(PackageManagerService.TAG, "Error reading package manager settings", e);
         }
@@ -5409,6 +5415,7 @@ public final class Settings {
                 parseRuntimePermissionsLPr(parser, userId);
 
             } catch (XmlPullParserException | IOException e) {
+                mHwSettings.reportSettingsProblem(permissionsFile, e); 
                 throw new IllegalStateException("Failed parsing permissions file: "
                         + permissionsFile , e);
             } finally {

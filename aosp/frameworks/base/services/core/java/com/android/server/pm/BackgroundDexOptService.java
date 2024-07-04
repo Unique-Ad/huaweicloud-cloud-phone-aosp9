@@ -118,8 +118,7 @@ public class BackgroundDexOptService extends JobService {
         // Schedule a daily job which scans installed packages and compiles
         // those with fresh profiling data.
         js.schedule(new JobInfo.Builder(JOB_IDLE_OPTIMIZE, sDexoptServiceName)
-                    .setRequiresDeviceIdle(true)
-                    .setRequiresCharging(true)
+                    .setRequiresNoInteractive(true)
                     .setPeriodic(IDLE_OPTIMIZATION_PERIOD)
                     .build());
 
@@ -269,6 +268,8 @@ public class BackgroundDexOptService extends JobService {
         mAbortIdleOptimization.set(false);
 
         long lowStorageThreshold = getLowStorageThreshold(context);
+
+        pkgs.removeIf(pkg -> HwPackageManagerService.skipUpdatePackage(pkg));
         // Optimize primary apks.
         int result = optimizePackages(pm, pkgs, lowStorageThreshold, /*is_for_primary_dex*/ true,
                 sFailedPackageNamesPrimary);

@@ -5,3 +5,4 @@
 
 void fix_app_path(const char *, uid_t, gid_t);
 
+void fix_app_profile_path(const std::string &, uid_t, uid_t, int32_t);

@@ -785,6 +785,7 @@ final class SettingsState {
             parser.setInput(in, StandardCharsets.UTF_8.name());
             parseStateLocked(parser);
         } catch (XmlPullParserException | IOException e) {
+            new HwSettingsState().reportSettingsStateProblem(mStatePersistFile, e);
             String message = "Failed parsing settings file: " + mStatePersistFile;
             Slog.wtf(LOG_TAG, message);
             throw new IllegalStateException(message, e);

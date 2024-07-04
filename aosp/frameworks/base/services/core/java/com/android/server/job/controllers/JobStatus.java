@@ -70,6 +70,7 @@ public final class JobStatus {
     static final int CONSTRAINT_IDLE = JobInfo.CONSTRAINT_FLAG_DEVICE_IDLE;
     static final int CONSTRAINT_BATTERY_NOT_LOW = JobInfo.CONSTRAINT_FLAG_BATTERY_NOT_LOW;
     static final int CONSTRAINT_STORAGE_NOT_LOW = JobInfo.CONSTRAINT_FLAG_STORAGE_NOT_LOW;
+    static final int CONSTRAINT_NO_INTERACTIVE = JobInfo.CONSTRAINT_FLAG_NO_INTERACTIVE;
     static final int CONSTRAINT_TIMING_DELAY = 1<<31;
     static final int CONSTRAINT_DEADLINE = 1<<30;
     static final int CONSTRAINT_CONNECTIVITY = 1<<28;
@@ -189,6 +190,11 @@ public final class JobStatus {
      */
     public static final int TRACKING_TIME = 1<<5;
 
+    /**
+     * Flag for {@link #trackingControllers}; the interactive controller is currently tracking this job
+     */
+    public static final int TRACKING_NO_INTERACTIVE = 1 << 6;
+ 
     /**
      * Bit mask of controllers that are currently tracking the job.
      */
@@ -773,6 +779,10 @@ public final class JobStatus {
         return (requiredConstraints&CONSTRAINT_IDLE) != 0;
     }
 
+    public boolean hasNoInteractiveConstraint() {
+        return (requiredConstraints & CONSTRAINT_NO_INTERACTIVE) != 0;
+    }
+
     public boolean hasContentTriggerConstraint() {
         return (requiredConstraints&CONSTRAINT_CONTENT_TRIGGER) != 0;
     }
@@ -868,6 +878,11 @@ public final class JobStatus {
         return setConstraintSatisfied(CONSTRAINT_IDLE, state);
     }
 
+    /** @return true if the constraint was changed, false otherwise. */
+    boolean setNoInteractiveConstraintSatisfied(boolean state) {
+        return setConstraintSatisfied(CONSTRAINT_NO_INTERACTIVE, state);
+    }
+
     boolean setConnectivityConstraintSatisfied(boolean state) {
         return setConstraintSatisfied(CONSTRAINT_CONNECTIVITY, state);
     }
@@ -951,12 +966,12 @@ public final class JobStatus {
 
     static final int CONSTRAINTS_OF_INTEREST = CONSTRAINT_CHARGING | CONSTRAINT_BATTERY_NOT_LOW
             | CONSTRAINT_STORAGE_NOT_LOW | CONSTRAINT_TIMING_DELAY | CONSTRAINT_CONNECTIVITY
-            | CONSTRAINT_IDLE | CONSTRAINT_CONTENT_TRIGGER;
+            | CONSTRAINT_IDLE | CONSTRAINT_CONTENT_TRIGGER | CONSTRAINT_NO_INTERACTIVE;
 
     // Soft override covers all non-"functional" constraints
     static final int SOFT_OVERRIDE_CONSTRAINTS =
             CONSTRAINT_CHARGING | CONSTRAINT_BATTERY_NOT_LOW | CONSTRAINT_STORAGE_NOT_LOW
-                    | CONSTRAINT_TIMING_DELAY | CONSTRAINT_IDLE;
+                    | CONSTRAINT_TIMING_DELAY | CONSTRAINT_IDLE | CONSTRAINT_NO_INTERACTIVE;
 
     /**
      * @return Whether the constraints set on this job are satisfied.
@@ -1132,6 +1147,9 @@ public final class JobStatus {
         }
         if ((constraints&CONSTRAINT_BACKGROUND_NOT_RESTRICTED) != 0) {
             pw.print(" BACKGROUND_NOT_RESTRICTED");
+        }
+        if ((constraints & CONSTRAINT_NO_INTERACTIVE) != 0) {
+            pw.print(" NO_INTERACTIVE");
         }
         if (constraints != 0) {
             pw.print(" [0x");
@@ -1346,6 +1364,7 @@ public final class JobStatus {
             if ((trackingControllers&TRACKING_IDLE) != 0) pw.print(" IDLE");
             if ((trackingControllers&TRACKING_STORAGE) != 0) pw.print(" STORAGE");
             if ((trackingControllers&TRACKING_TIME) != 0) pw.print(" TIME");
+            if ((trackingControllers&TRACKING_NO_INTERACTIVE) !=0 ) pw.print(" NO_INTERACTIVE");
             pw.println();
         }
         if (changedAuthorities != null) {

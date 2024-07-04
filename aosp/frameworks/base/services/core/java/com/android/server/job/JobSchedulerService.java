@@ -99,6 +99,7 @@ import com.android.server.job.controllers.JobStatus;
 import com.android.server.job.controllers.StateController;
 import com.android.server.job.controllers.StorageController;
 import com.android.server.job.controllers.TimeController;
+import com.android.server.job.controllers.HwInteractiveController;
 
 import libcore.util.EmptyArray;
 
@@ -1147,6 +1148,7 @@ public class JobSchedulerService extends com.android.server.SystemService
         mControllers.add(new ContentObserverController(this));
         mDeviceIdleJobsController = new DeviceIdleJobsController(this);
         mControllers.add(mDeviceIdleJobsController);
+        mControllers.add(new HwInteractiveController(this));
 
         // If the job store determined that it can't yet reschedule persisted jobs,
         // we need to start watching the clock.
