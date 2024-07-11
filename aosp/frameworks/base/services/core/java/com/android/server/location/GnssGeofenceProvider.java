@@ -81,7 +81,7 @@ class GnssGeofenceProvider extends IGpsGeofenceHardware.Stub {
 
     @Override
     public boolean isHardwareGeofenceSupported() {
-        return runOnHandlerThread(mNative::isGeofenceSupported);
+        return mNative.isGeofenceSupported();
     }
 
     @Override
