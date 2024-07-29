@@ -139,7 +139,7 @@ https://blog.csdn.net/langlitaojin/article/details/108045709
 Step 1：生成 releasekey platform shared media testkey
 
 ```
-cd /path/to/aosp/rootdir/
+cd /path/to/aosp/rootdir/（aosp源码根目录，根据客户自己的目录结构取不同的值）
 
 subject='/C=CN/ST=Guangdong/L=Shengzhen/O=${company}/OU=Compony/CN=AndroidTeam/emailAddress=mobile@${company}.com'
 for x in releasekey platform shared media testkey; do
