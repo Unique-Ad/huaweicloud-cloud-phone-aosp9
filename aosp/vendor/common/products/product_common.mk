@@ -75,7 +75,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
     gsm.version.baseband=21C20B526S000C000 \
     wifi.interface=wlan0 \
     debug.sf.nobootanimation=1 \
-    mesa.gallium.thread=false
+    mesa.gallium.thread=true
 
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.software.app_widgets.xml:system/etc/permissions/android.software.app_widgets.xml \
