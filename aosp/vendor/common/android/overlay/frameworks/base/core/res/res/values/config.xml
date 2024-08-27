@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <bool translatable="false" name="config_wifi_enable_wifi_firmware_debugging">false</bool>
+    <bool name="config_enableNetworkLocationOverlay" translatable="false">false</bool>
+    <bool name="config_enableGeocoderOverlay" translatable="false">false</bool>
+    <bool name="config_enableFusedLocationOverlay" translatable="false">false</bool>
     <string name="config_networkLocationProviderPackageName" translatable="false">com.cph.networklocation</string>
     <string name="config_geocoderProviderPackageName" translatable="false">com.cph.networklocation</string>
+    <string name="config_fusedLocationProviderPackageName" translatable="false">com.cph.networklocation</string>
     <string-array name="config_locationProviderPackageNames" translatable="false">
         <item>com.cph.networklocation</item>
         <item>com.android.location.fused</item>
