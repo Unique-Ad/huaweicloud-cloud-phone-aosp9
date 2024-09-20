@@ -15,3 +15,20 @@ cc_prebuilt_library_static {
         none: true,
     },
 }
+
+cc_prebuilt_library_static {
+    name: "libgui_vendor",
+    compile_multilib: "both",
+    export_include_dirs: ["./include"],
+    multilib: {
+        lib64: {
+            srcs: ["lib64/libgui_vendor_impl.a"],
+        },
+        lib32: {
+            srcs: ["lib/libgui_vendor_impl.a"],
+        },
+    },
+    strip : {
+        none: true,
+    },
+}

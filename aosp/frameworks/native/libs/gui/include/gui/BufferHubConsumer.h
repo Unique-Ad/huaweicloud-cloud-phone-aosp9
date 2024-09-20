@@ -33,6 +33,8 @@ public:
     // object and is guaranteed to succeed if parcelable object is valid.
     static sp<BufferHubConsumer> Create(dvr::ConsumerQueueParcelable parcelable);
 
+    status_t setBufferSyncPeriod(nsecs_t bufferSyncPeriod);
+
     // See |IGraphicBufferConsumer::acquireBuffer|
     status_t acquireBuffer(BufferItem* buffer, nsecs_t presentWhen,
                            uint64_t maxFrameNumber = 0) override;

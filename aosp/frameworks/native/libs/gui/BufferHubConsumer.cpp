@@ -38,6 +38,11 @@ sp<BufferHubConsumer> BufferHubConsumer::Create(const std::shared_ptr<ConsumerQu
     return consumer;
 }
 
+status_t BufferHubConsumer::setBufferSyncPeriod(nsecs_t /*bufferSyncPeriod*/) {
+    ALOGE("BufferHubConsumer::setBufferSyncPeriod: not implemented.");
+    return INVALID_OPERATION;
+}
+
 status_t BufferHubConsumer::acquireBuffer(BufferItem* /*buffer*/, nsecs_t /*presentWhen*/,
                                           uint64_t /*maxFrameNumber*/) {
     ALOGE("BufferHubConsumer::acquireBuffer: not implemented.");

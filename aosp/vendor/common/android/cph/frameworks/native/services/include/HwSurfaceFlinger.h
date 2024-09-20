@@ -7,4 +7,5 @@ bool hwCheckFps();
 int64_t hwGetAppVsync(int64_t);
 int64_t hwGetSfVsync(int64_t);
 int hwGetTransactionTimeout(int);
-
+nsecs_t hwGetSyncPeriod(nsecs_t);
+uint64_t hwGetBufferSyncFlag(uint64_t);

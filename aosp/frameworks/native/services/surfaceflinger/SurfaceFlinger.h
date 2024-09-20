@@ -235,6 +235,10 @@ public:
     SurfaceFlingerBE& getBE() { return mBE; }
     const SurfaceFlingerBE& getBE() const { return mBE; }
 
+    static uint64_t layerNumber;
+ 
+    static nsecs_t bufferSyncPeriodTime;
+
     // This is the phase offset in nanoseconds of the software vsync event
     // relative to the vsync event reported by HWComposer.  The software vsync
     // event is when SurfaceFlinger and Choreographer-based applications run each

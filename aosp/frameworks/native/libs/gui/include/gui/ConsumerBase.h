@@ -190,6 +190,7 @@ protected:
     virtual status_t acquireBufferLocked(BufferItem *item, nsecs_t presentWhen,
             uint64_t maxFrameNumber = 0);
 
+    virtual status_t setBufferSyncPeriod(nsecs_t bufferSyncPeriod);
     // releaseBufferLocked relinquishes control over a buffer, returning that
     // control to the BufferQueue.
     //

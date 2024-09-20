@@ -46,6 +46,8 @@
 #include <utils/String8.h>
 #include <utils/Trace.h>
 
+#include <HwBufferLayerConsumer.h>
+
 namespace android {
 
 // Macros for including the BufferLayerConsumer name in log messages
@@ -76,7 +78,8 @@ BufferLayerConsumer::BufferLayerConsumer(const sp<IGraphicBufferConsumer>& bq,
         mRE(engine),
         mTexName(tex),
         mLayer(layer),
-        mCurrentTexture(BufferQueue::INVALID_BUFFER_SLOT) {
+        mCurrentTexture(BufferQueue::INVALID_BUFFER_SLOT),
+        mEnableBufferSync(false) {
     BLC_LOGV("BufferLayerConsumer");
 
     memcpy(mCurrentTransformMatrix, mtxIdentity.asArray(), sizeof(mCurrentTransformMatrix));
@@ -167,6 +170,8 @@ status_t BufferLayerConsumer::updateTexImage(BufferRejecter* rejecter, const Dis
     }
 
     BufferItem item;
+
+    item.mEnableBufferSync = hwGetEnableBufferSyncState(mEnableBufferSync);
 
     // Acquire the next buffer.
     // In asynchronous mode the list is guaranteed to be one buffer
@@ -278,6 +283,10 @@ status_t BufferLayerConsumer::acquireBufferLocked(BufferItem* item, nsecs_t pres
     }
 
     return NO_ERROR;
+}
+
+status_t BufferLayerConsumer::setBufferSyncPeriod(nsecs_t bufferSyncPeriod) {
+    return ConsumerBase::setBufferSyncPeriod(bufferSyncPeriod);
 }
 
 bool BufferLayerConsumer::canUseImageCrop(const Rect& crop) const {
@@ -425,6 +434,10 @@ void BufferLayerConsumer::setFilteringEnabled(bool enabled) {
     if (needsRecompute && mCurrentTextureImage != nullptr) {
         computeCurrentTransformMatrixLocked();
     }
+}
+
+void BufferLayerConsumer::setBufferSyncEnabled(bool enabled) {
+    mEnableBufferSync = hwGetEnableBufferSyncState(enabled);
 }
 
 void BufferLayerConsumer::computeCurrentTransformMatrixLocked() {

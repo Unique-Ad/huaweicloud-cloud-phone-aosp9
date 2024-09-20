@@ -130,6 +130,8 @@ class BufferItem : public Flattenable<BufferItem> {
 
     // Indicates the API (NATIVE_WINDOW_API_xxx) that queues the buffer.
     int mApi;
+
+    bool mEnableBufferSync;
 };
 
 } // namespace android
