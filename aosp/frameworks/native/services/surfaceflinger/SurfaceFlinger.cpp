@@ -147,7 +147,8 @@ bool SurfaceFlinger::useVrFlinger;
 int64_t SurfaceFlinger::maxFrameBufferAcquiredBuffers;
 // TODO(courtneygo): Rename hasWideColorDisplay to clarify its actual meaning.
 bool SurfaceFlinger::hasWideColorDisplay;
-
+uint64_t SurfaceFlinger::layerNumber = 0;
+nsecs_t SurfaceFlinger::bufferSyncPeriodTime = 0;
 
 std::string getHwcServiceName() {
     char value[PROPERTY_VALUE_MAX] = {};
@@ -1290,6 +1291,7 @@ void SurfaceFlinger::resyncToHardwareVsync(bool makeAvailable) {
     const auto& activeConfig = getBE().mHwc->getActiveConfig(HWC_DISPLAY_PRIMARY);
     const nsecs_t period = activeConfig->getVsyncPeriod();
 
+    SurfaceFlinger::bufferSyncPeriodTime = hwGetSyncPeriod(period);
     mPrimaryDispSync.reset();
     mPrimaryDispSync.setPeriod(period);
 
@@ -1878,6 +1880,8 @@ void SurfaceFlinger::rebuildLayerStacks() {
                 });
             }
             displayDevice->setVisibleLayersSortedByZ(layersSortedByZ);
+            displayDevice->updateBufferSyncFlag(SurfaceFlinger::layerNumber);
+
             displayDevice->setLayersNeedingFences(layersNeedingFences);
             displayDevice->undefinedRegion.set(bounds);
             displayDevice->undefinedRegion.subtractSelf(
@@ -3647,6 +3651,7 @@ status_t SurfaceFlinger::createBufferLayer(const sp<Client>& client,
     }
 
     sp<BufferLayer> layer = new BufferLayer(this, client, name, w, h, flags);
+    layer->setBufferSyncPeriod(hwGetSyncPeriod(SurfaceFlinger::bufferSyncPeriodTime));
     status_t err = layer->setBuffers(w, h, format, flags);
     if (err == NO_ERROR) {
         *handle = layer->getHandle();

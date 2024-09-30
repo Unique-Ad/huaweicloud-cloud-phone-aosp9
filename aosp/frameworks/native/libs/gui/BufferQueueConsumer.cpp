@@ -40,6 +40,7 @@
 #endif
 
 #include <system/window.h>
+#include <HwBufferQueueConsumer.h>
 
 namespace android {
 
@@ -50,10 +51,16 @@ BufferQueueConsumer::BufferQueueConsumer(const sp<BufferQueueCore>& core) :
 
 BufferQueueConsumer::~BufferQueueConsumer() {}
 
+status_t BufferQueueConsumer::setBufferSyncPeriod(nsecs_t bufferSyncPeriod) {
+    Mutex::Autolock lock(mCore->mMutex);
+    mCore->mBufferSyncPeriod = hwUpdateBufferSyncPeriod(bufferSyncPeriod);
+    return NO_ERROR;
+}
+
 status_t BufferQueueConsumer::acquireBuffer(BufferItem* outBuffer,
         nsecs_t expectedPresent, uint64_t maxFrameNumber) {
     ATRACE_CALL();
-
+    mCore->mEnableBufferSync = hwUpdateBufferSyncState(outBuffer->mEnableBufferSync);
     int numDroppedBuffers = 0;
     sp<IProducerListener> listener;
     {

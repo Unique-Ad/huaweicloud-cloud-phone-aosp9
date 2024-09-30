@@ -119,6 +119,7 @@ public:
     // If a buffer was replaced this frame, release the former buffer
     void releasePendingBuffer(nsecs_t dequeueReadyTime);
 
+    void setBufferSyncPeriod(nsecs_t bufferSyncPeriod);
     /*
      * latchBuffer - called each time the screen is redrawn and returns whether
      * the visible regions need to be recomputed (this is a fairly heavy

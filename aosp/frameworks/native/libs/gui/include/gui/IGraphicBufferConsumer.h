@@ -271,6 +271,7 @@ public:
     // call to free up any of its locally cached buffers.
     virtual status_t discardFreeBuffers() = 0;
 
+    virtual status_t setBufferSyncPeriod(nsecs_t bufferSyncPeriod) = 0;
     // dump state into a string
     virtual status_t dumpState(const String8& prefix, String8* outResult) const = 0;
 

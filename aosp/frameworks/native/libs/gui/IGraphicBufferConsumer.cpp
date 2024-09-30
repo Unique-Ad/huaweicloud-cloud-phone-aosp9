@@ -51,6 +51,7 @@ enum class Tag : uint32_t {
     GET_SIDEBAND_STREAM,
     GET_OCCUPANCY_HISTORY,
     DISCARD_FREE_BUFFERS,
+    SET_BUFFER_SYNC_PERIOD,
     DUMP_STATE,
     LAST = DUMP_STATE,
 };
@@ -163,6 +164,11 @@ public:
                 Tag::DISCARD_FREE_BUFFERS);
     }
 
+    status_t setBufferSyncPeriod(nsecs_t bufferSyncPeriod) {
+        using Signature = decltype(&IGraphicBufferConsumer::setBufferSyncPeriod);
+        return callRemote<Signature>(Tag::SET_BUFFER_SYNC_PERIOD, bufferSyncPeriod);
+    }
+
     status_t dumpState(const String8& prefix, String8* outResult) const override {
         using Signature = status_t (IGraphicBufferConsumer::*)(const String8&, String8*) const;
         return callRemote<Signature>(Tag::DUMP_STATE, prefix, outResult);
@@ -220,6 +226,8 @@ status_t BnGraphicBufferConsumer::onTransact(uint32_t code, const Parcel& data, 
             return callLocal(data, reply, &IGraphicBufferConsumer::getOccupancyHistory);
         case Tag::DISCARD_FREE_BUFFERS:
             return callLocal(data, reply, &IGraphicBufferConsumer::discardFreeBuffers);
+        case Tag::SET_BUFFER_SYNC_PERIOD:
+            return callLocal(data, reply, &IGraphicBufferConsumer::setBufferSyncPeriod);
         case Tag::DUMP_STATE: {
             using Signature = status_t (IGraphicBufferConsumer::*)(const String8&, String8*) const;
             return callLocal<Signature>(data, reply, &IGraphicBufferConsumer::dumpState);

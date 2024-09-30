@@ -177,6 +177,10 @@ public:
     // DEFAULT_USAGE_FLAGS to usage.
     status_t setConsumerUsageBits(uint64_t usage);
 
+    void setBufferSyncEnabled(bool enabled);
+ 
+    status_t setBufferSyncPeriod(nsecs_t bufferSyncPeriod);
+
 protected:
     // abandonLocked overrides the ConsumerBase method to clear
     // mCurrentTextureImage in addition to the ConsumerBase behavior.
@@ -384,6 +388,8 @@ private:
     // A release that is pending on the receipt of a new release fence from
     // presentDisplay
     PendingRelease mPendingRelease;
+
+    bool mEnableBufferSync;
 };
 
 // ----------------------------------------------------------------------------

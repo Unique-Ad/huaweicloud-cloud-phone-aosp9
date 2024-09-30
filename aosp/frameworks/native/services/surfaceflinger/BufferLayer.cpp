@@ -48,6 +48,8 @@
 #include <stdlib.h>
 #include <mutex>
 
+#include <HwBufferLayer.h>
+
 namespace android {
 
 BufferLayer::BufferLayer(SurfaceFlinger* flinger, const sp<Client>& client, const String8& name,
@@ -376,6 +378,10 @@ void BufferLayer::releasePendingBuffer(nsecs_t dequeueReadyTime) {
     }
 }
 
+void BufferLayer::setBufferSyncPeriod(nsecs_t bufferSyncPeriod) {
+    mConsumer->setBufferSyncPeriod(hwGetBufferSyncPeriod(bufferSyncPeriod));
+}
+
 Region BufferLayer::latchBuffer(bool& recomputeVisibleRegions, nsecs_t latchTime) {
     ATRACE_CALL();
 
@@ -394,6 +400,7 @@ Region BufferLayer::latchBuffer(bool& recomputeVisibleRegions, nsecs_t latchTime
         return getTransform().transform(Region(Rect(s.active.w, s.active.h)));
     }
 
+    mConsumer->setBufferSyncEnabled(hwUpdateBufferSyncState(SurfaceFlinger::layerNumber));
     Region outDirtyRegion;
     if (mQueuedFrames <= 0 && !mAutoRefresh) {
         return outDirtyRegion;

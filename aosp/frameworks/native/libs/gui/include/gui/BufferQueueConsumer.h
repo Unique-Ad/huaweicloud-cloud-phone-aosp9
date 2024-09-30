@@ -34,6 +34,7 @@ public:
     BufferQueueConsumer(const sp<BufferQueueCore>& core);
     ~BufferQueueConsumer() override;
 
+    virtual status_t setBufferSyncPeriod(nsecs_t bufferSyncPeriod);
     // acquireBuffer attempts to acquire ownership of the next pending buffer in
     // the BufferQueue. If no buffer is pending then it returns
     // NO_BUFFER_AVAILABLE. If a buffer is successfully acquired, the

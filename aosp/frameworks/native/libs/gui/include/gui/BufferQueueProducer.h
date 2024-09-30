@@ -251,6 +251,8 @@ private:
     // slot is not yet available.
     nsecs_t mDequeueTimeout;
 
+    uint64_t mDequeueTime;
+
 }; // class BufferQueueProducer
 
 } // namespace android
