@@ -187,6 +187,8 @@ public:
 
     const sp<Fence>& getClientTargetAcquireFence() const;
 
+    void updateBufferSyncFlag(uint64_t &layerNum);
+
     /* ------------------------------------------------------------------------
      * Display power mode management.
      */

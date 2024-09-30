@@ -368,6 +368,10 @@ status_t ConsumerBase::acquireBufferLocked(BufferItem *item,
     return OK;
 }
 
+status_t ConsumerBase::setBufferSyncPeriod(nsecs_t bufferSyncPeriod) {
+    return mConsumer->setBufferSyncPeriod(bufferSyncPeriod);
+}
+
 status_t ConsumerBase::addReleaseFence(int slot,
         const sp<GraphicBuffer> graphicBuffer, const sp<Fence>& fence) {
     Mutex::Autolock lock(mMutex);

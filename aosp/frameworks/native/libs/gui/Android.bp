@@ -142,6 +142,10 @@ cc_library_shared {
         "android.hardware.configstore-utils",
     ],
 
+    static_libs: [
+        "libgui_vendor",
+    ],
+
     // bufferhub is not used when building libgui for vendors
     target: {
         vendor: {

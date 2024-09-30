@@ -31,6 +31,8 @@
 #include "MessageQueue.h"
 #include "SurfaceFlinger.h"
 
+#include <HwMessageQueue.h>
+
 namespace android {
 
 // ---------------------------------------------------------------------------
@@ -134,7 +136,11 @@ status_t MessageQueue::postMessage(const sp<MessageBase>& messageHandler, nsecs_
 }
 
 void MessageQueue::invalidate() {
-    mEvents->requestNextVsync();
+    if (hwGetEnableBufferSyncState(SurfaceFlinger::layerNumber)) {
+        mHandler->dispatchInvalidate();
+    } else {
+        mEvents->requestNextVsync();
+    }
 }
 
 void MessageQueue::refresh() {

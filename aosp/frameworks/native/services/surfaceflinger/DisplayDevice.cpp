@@ -796,6 +796,10 @@ void DisplayDevice::getBestColorMode(Dataspace dataspace, RenderIntent intent,
     }
 }
 
+void DisplayDevice::updateBufferSyncFlag(uint64_t &layerNum) {
+    layerNum = hwUpdateBufferSyncFlag(mType, DisplayType::DISPLAY_PRIMARY, layerNum, mVisibleLayersSortedByZ.size());
+}
+
 std::atomic<int32_t> DisplayDeviceState::nextDisplayId(1);
 
 DisplayDeviceState::DisplayDeviceState(DisplayDevice::DisplayType type, bool isSecure)

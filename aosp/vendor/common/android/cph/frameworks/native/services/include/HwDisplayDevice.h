@@ -3,4 +3,8 @@
  * Description: surfaceflinger helper function
  */
 
+#include <stdint.h>
+
 void hwSetProjection(int, int);
+
+uint64_t hwUpdateBufferSyncFlag(int, int, uint64_t, int);

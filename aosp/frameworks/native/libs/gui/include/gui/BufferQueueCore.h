@@ -336,6 +336,8 @@ private:
 
     const uint64_t mUniqueId;
 
+    bool mEnableBufferSync;
+    nsecs_t mBufferSyncPeriod;
 }; // class BufferQueueCore
 
 } // namespace android

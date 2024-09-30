@@ -44,7 +44,10 @@ PRODUCT_PACKAGES += \
     libxcoder \
     wget \
     cell.db \
-    sensor.db
+    sensor.db \
+    libmCODEC \
+    libmCODECNetINT \
+    android.hardware.nidec@1.0-impl
 
 PRODUCT_COPY_FILES += \
     vendor/common/android/prebuilts/system/etc/mediaEngine/config.json:system/etc/mediaEngine/config.json \

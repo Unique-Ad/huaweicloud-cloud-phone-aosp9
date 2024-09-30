@@ -40,6 +40,7 @@
 #include <utils/Trace.h>
 
 #include <system/window.h>
+#include <HwBufferQueueProducer.h>
 
 namespace android {
 
@@ -58,7 +59,8 @@ BufferQueueProducer::BufferQueueProducer(const sp<BufferQueueCore>& core,
     mNextCallbackTicket(0),
     mCurrentCallbackTicket(0),
     mCallbackCondition(),
-    mDequeueTimeout(-1) {}
+    mDequeueTimeout(-1),
+    mDequeueTime(0) {}
 
 BufferQueueProducer::~BufferQueueProducer() {}
 
@@ -352,6 +354,7 @@ status_t BufferQueueProducer::dequeueBuffer(int* outSlot, sp<android::Fence>* ou
                                             uint64_t usage, uint64_t* outBufferAge,
                                             FrameEventHistoryDelta* outTimestamps) {
     ATRACE_CALL();
+    mDequeueTime = hwUpdateDequeueTime(mCore->mEnableBufferSync, mDequeueTime, static_cast<uint64_t>(mCore->mBufferSyncPeriod));
     { // Autolock scope
         Mutex::Autolock lock(mCore->mMutex);
         mConsumerName = mCore->mConsumerName;
