@@ -45,7 +45,8 @@ PRODUCT_PACKAGES += \
     wpa_supplicant \
     CphNetworkLocation \
     ni_rsrc_mon \
-    ni_rsrc_list
+    ni_rsrc_list \
+    audio.r_submix.default
 
 PRODUCT_PROPERTY_OVERRIDES += \
     persist.sys.language=zh \

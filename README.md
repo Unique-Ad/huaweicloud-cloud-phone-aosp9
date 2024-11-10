@@ -351,3 +351,5 @@ git push --tags
 
 
 https://support.huaweicloud.com/api-cph/cph_api_0559.html
+
+注意:同一个账号在同一个region下最多支持创建200个镜像文件
