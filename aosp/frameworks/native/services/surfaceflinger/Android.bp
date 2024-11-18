@@ -142,6 +142,7 @@ cc_library_shared {
     srcs: [
         ":libsurfaceflinger_sources",
     ],
+    shared_libs: ["libattr"],
     static_libs: ["libsurfaceflinger_vendor"],
     logtags: ["EventLog/EventLogTags.logtags"],
     include_dirs: [
