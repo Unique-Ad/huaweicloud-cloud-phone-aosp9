@@ -27,7 +27,6 @@ PRODUCT_PACKAGES += \
     android.hardware.vibrator@1.0-impl \
     android.hardware.wifi@1.0-service \
     android.hardware.nidec@1.0-impl \
-    android.hardware.keymaster@4.0-service \
     audio.primary.hi3660 \
     libGLES_mesa \
     vulkan.radv \
@@ -45,7 +44,6 @@ PRODUCT_PACKAGES += \
     wpa_supplicant \
     CphNetworkLocation \
     ni_rsrc_mon \
-    ni_rsrc_list \
     audio.r_submix.default
 
 PRODUCT_PROPERTY_OVERRIDES += \
@@ -94,7 +92,6 @@ PRODUCT_COPY_FILES += \
     vendor/common/android/etc/handheld_core_hardware.xml:system/etc/permissions/handheld_core_hardware.xml \
     vendor/common/android/etc/packages_priv.xml:system/etc/packages_priv.xml \
     vendor/common/android/etc/wpa_supplicant.conf:system/etc/wifi/wpa_supplicant.conf \
-    vendor/common/android/etc/fstab.default:system/vendor/etc/fstab.default \
     vendor/common/android/scripts/buildOverlayfs.sh:system/bin/buildOverlayfs.sh \
     vendor/common/android/scripts/config_phone.sh:system/bin/config_phone.sh \
     vendor/common/android/scripts/configBuildDate.sh:system/bin/configBuildDate.sh \
