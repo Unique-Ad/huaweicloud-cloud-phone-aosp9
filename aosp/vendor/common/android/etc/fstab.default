@@ -1,2 +1,0 @@
-#<src>     <mnt_point>      <type>     <mnt_flags and options>       <fs_mgr_flags>
-none       /data            ext4       defaults                      fileencryption=aes-256-xts:aes-256-cts
