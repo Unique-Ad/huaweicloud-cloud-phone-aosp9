@@ -33,4 +33,7 @@
     <bool name="def_stay_on_while_plugged_in">true</bool>
     <!-- Encrypted AMap key for network location, default is null -->
     <string name="def_amap_key"></string>
+    <fraction name="def_window_animation_scale">50%</fraction>
+    <fraction name="def_window_transition_scale">50%</fraction>
+    <fraction name="def_animator_duration_scale">50%</fraction>
 </resources>
