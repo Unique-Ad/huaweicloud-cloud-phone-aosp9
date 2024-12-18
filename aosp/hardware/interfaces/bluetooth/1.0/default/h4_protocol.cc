@@ -30,6 +30,8 @@ namespace bluetooth {
 namespace hci {
 
 size_t H4Protocol::Send(uint8_t type, const uint8_t* data, size_t length) {
+  return 0;
+
   struct iovec iov[] = {{&type, sizeof(type)},
                         {const_cast<uint8_t*>(data), length}};
   ssize_t ret = 0;

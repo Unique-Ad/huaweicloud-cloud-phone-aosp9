@@ -230,6 +230,8 @@ private:
             HWC2::Error present(int32_t* outRetireFence);
 
             HWC2::Error setActiveConfig(hwc2_config_t configId);
+            HWC2::Error updateActiveConfigSize(uint32_t width, uint32_t height);
+            HWC2::Error eventControl(int32_t event, int32_t enabled);
             HWC2::Error setClientTarget(buffer_handle_t target,
                     int32_t acquireFence, int32_t dataspace,
                     hwc_region_t damage);

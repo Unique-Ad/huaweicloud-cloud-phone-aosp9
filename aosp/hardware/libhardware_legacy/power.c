@@ -84,6 +84,8 @@ initialize_fds(void)
 int
 acquire_wake_lock(int lock, const char* id)
 {
+    return 1;
+
     initialize_fds();
 
 //    ALOGI("acquire_wake_lock lock=%d id='%s'\n", lock, id);
@@ -109,7 +111,9 @@ acquire_wake_lock(int lock, const char* id)
 
 int
 release_wake_lock(const char* id)
-{
+{    
+    return 1;
+
     initialize_fds();
 
 //    ALOGI("release_wake_lock id='%s'\n", id);

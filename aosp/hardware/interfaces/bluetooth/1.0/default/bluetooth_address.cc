@@ -87,7 +87,9 @@ bool BluetoothAddress::get_local_address(uint8_t* local_addr) {
     return true;
   }
 
-  return false;
+  const char* bdaddr = "11:22:33:44:55:66";
+  string_to_bytes(bdaddr, local_addr);
+  return true;
 }
 
 }  // namespace implementation

@@ -224,6 +224,14 @@ hwc2_function_pointer_t HWC2On1Adapter::doGetFunction(
             return asFP<HWC2_PFN_SET_ACTIVE_CONFIG>(
                     displayHook<decltype(&Display::setActiveConfig),
                     &Display::setActiveConfig, hwc2_config_t>);
+        case FunctionDescriptor::UpdateActiveConfigSize:
+            return asFP<HWC2_PFN_UPDATE_ACTIVE_CONFIG_SIZE>(
+                    displayHook<decltype(&Display::updateActiveConfigSize),
+                    &Display::updateActiveConfigSize, uint32_t, uint32_t>);
+        case FunctionDescriptor::EventControl:
+            return asFP<HWC2_PFN_EVENT_CONTROL>(
+                    displayHook<decltype(&Display::eventControl),
+                    &Display::eventControl, int32_t, int32_t>);
         case FunctionDescriptor::SetClientTarget:
             return asFP<HWC2_PFN_SET_CLIENT_TARGET>(
                     displayHook<decltype(&Display::setClientTarget),
@@ -834,6 +842,28 @@ Error HWC2On1Adapter::Display::setActiveConfig(hwc2_config_t configId) {
     return Error::None;
 }
 
+Error HWC2On1Adapter::Display::updateActiveConfigSize(uint32_t width, uint32_t height) {
+    std::unique_lock<std::recursive_mutex> lock(mStateMutex);
+
+    auto config = mConfigs[mActiveConfig->getId()];
+    config->setAttribute(HWC2::Attribute::Width, width);
+    config->setAttribute(HWC2::Attribute::Height, height);
+
+    return Error::None;
+}
+
+Error HWC2On1Adapter::Display::eventControl(int32_t event, int32_t enabled) {
+    std::unique_lock<std::recursive_mutex> lock(mStateMutex);
+
+    auto error = mDevice.mHwc1Device->eventControl(mDevice.mHwc1Device,
+                mHwc1Id, event, enabled);
+
+    if (error != 0) {
+        return Error::NotValidated;
+    }
+    return Error::None;
+}
+
 Error HWC2On1Adapter::Display::setClientTarget(buffer_handle_t target,
         int32_t acquireFence, int32_t /*dataspace*/, hwc_region_t /*damage*/) {
     std::unique_lock<std::recursive_mutex> lock(mStateMutex);
@@ -1121,6 +1151,7 @@ void HWC2On1Adapter::Display::populateConfigs() {
     const size_t MAX_NUM_CONFIGS = 128;
     uint32_t configs[MAX_NUM_CONFIGS] = {};
     size_t numConfigs = MAX_NUM_CONFIGS;
+    mConfigs.clear();
     mDevice.mHwc1Device->getDisplayConfigs(mDevice.mHwc1Device, mHwc1Id,
             configs, &numConfigs);
 
@@ -1511,10 +1542,11 @@ static std::string to_string(const hwc_display_contents_1_t& hwcContents,
 }
 
 std::string HWC2On1Adapter::Display::dump() const {
-    std::unique_lock<std::recursive_mutex> lock(mStateMutex);
-
     std::stringstream output;
-
+    if (!mStateMutex.try_lock()) {
+        output << "Failed to aquire lock of display\n";
+        return output.str();
+    }
     output << "  Display " << mId << ": ";
     output << to_string(mType) << "  ";
     output << "HWC1 ID: " << mHwc1Id << "  ";
@@ -1554,7 +1586,7 @@ std::string HWC2On1Adapter::Display::dump() const {
         output << "    Last requested HWC1 state\n";
         output << to_string(*mHwc1RequestedContents, mDevice.mHwc1MinorVersion);
     }
-
+    mStateMutex.unlock();
     return output.str();
 }
 
@@ -2096,8 +2128,7 @@ std::string HWC2On1Adapter::Layer::dump() const {
     } else if (mCompositionType == HWC2::Composition::Sideband) {
         output << "  Handle: " << mSidebandStream << '\n';
     } else {
-        output << "  Buffer: " << mBuffer.getBuffer() << "/" <<
-                mBuffer.getFence() << '\n';
+        output << "  Buffer: " << mBuffer.getBuffer() << '\n';
         output << fill << "  Display frame [LTRB]: " <<
                 rectString(mDisplayFrame) << '\n';
         output << fill << "  Source crop: " <<

@@ -59,6 +59,7 @@ LOCAL_SHARED_LIBRARIES := \
     android.hardware.wifi@1.0 \
     android.hardware.wifi@1.1 \
     android.hardware.wifi@1.2
+LOCAL_C_INCLUDES := frameworks/opt/net/wifi/libwifi_hal/include
 LOCAL_EXPORT_C_INCLUDE_DIRS := $(LOCAL_PATH)
 include $(BUILD_STATIC_LIBRARY)
 
@@ -88,6 +89,7 @@ LOCAL_SHARED_LIBRARIES := \
 LOCAL_STATIC_LIBRARIES := \
     android.hardware.wifi@1.0-service-lib
 LOCAL_INIT_RC := android.hardware.wifi@1.0-service.rc
+LOCAL_C_INCLUDES := frameworks/opt/net/wifi/libwifi_hal/include
 include $(BUILD_EXECUTABLE)
 
 ###
@@ -121,4 +123,6 @@ LOCAL_SHARED_LIBRARIES := \
     android.hardware.wifi@1.0 \
     android.hardware.wifi@1.1 \
     android.hardware.wifi@1.2
+LOCAL_MULTILIB := 64
+LOCAL_C_INCLUDES := frameworks/opt/net/wifi/libwifi_hal/include
 include $(BUILD_NATIVE_TEST)
