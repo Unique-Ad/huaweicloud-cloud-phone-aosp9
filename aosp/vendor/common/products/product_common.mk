@@ -104,6 +104,7 @@ PRODUCT_COPY_FILES += \
     vendor/common/android/media/media_codecs_google_tv.xml:system/etc/media_codecs_google_tv.xml \
     vendor/common/android/media/media_codecs_google_video.xml:system/etc/media_codecs_google_video.xml \
     vendor/common/android/media/media_codecs_hisi_video.xml:system/etc/media_codecs_hisi_video.xml \
+    vendor/common/android/etc/attributes.xml:system/etc/attributes.xml
 
 DEVICE_PACKAGE_OVERLAYS += \
     vendor/common/android/overlay
