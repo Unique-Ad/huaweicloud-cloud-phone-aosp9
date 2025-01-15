@@ -2063,7 +2063,7 @@ public final class PowerManagerService extends SystemService
                 || (mUserActivitySummary & (USER_ACTIVITY_SCREEN_BRIGHT | USER_ACTIVITY_SCREEN_DIM)) != 0
                 || mScreenBrightnessBoostInProgress);
  
-        mHwPowerManagerService.checkInteractiveStatusAndNotify(nowKeepInteractive, mNotifier);
+        mHwPowerManagerService.checkInteractiveStatusAndNotify(nowKeepInteractive);
     }
 
     private void scheduleUserInactivityTimeout(long timeMs) {
