@@ -165,6 +165,7 @@ public class JobSchedulerService extends com.android.server.SystemService
     static final int MSG_UID_GONE = 5;
     static final int MSG_UID_ACTIVE = 6;
     static final int MSG_UID_IDLE = 7;
+    static final int MSG_INTERACTIVE_CHANGED = 8;
 
     /**
      * Track Services that have currently active or pending jobs. The index is provided by
@@ -196,6 +197,8 @@ public class JobSchedulerService extends com.android.server.SystemService
     ActivityManagerInternal mActivityManagerInternal;
     IBatteryStats mBatteryStats;
     DeviceIdleController.LocalService mLocalDeviceIdleController;
+    HwInteractiveController mHwInteractiveController;
+
     AppStateTracker mAppStateTracker;
     final UsageStatsManagerInternal mUsageStats;
 
@@ -1148,7 +1151,8 @@ public class JobSchedulerService extends com.android.server.SystemService
         mControllers.add(new ContentObserverController(this));
         mDeviceIdleJobsController = new DeviceIdleJobsController(this);
         mControllers.add(mDeviceIdleJobsController);
-        mControllers.add(new HwInteractiveController(this));
+        mHwInteractiveController = new HwInteractiveController(this);
+        mControllers.add(mHwInteractiveController);
 
         // If the job store determined that it can't yet reschedule persisted jobs,
         // we need to start watching the clock.
@@ -1650,7 +1654,11 @@ public class JobSchedulerService extends com.android.server.SystemService
                         }
                         break;
                     }
-
+                    case MSG_INTERACTIVE_CHANGED: {
+                        int interactive = message.arg1;
+                        mHwInteractiveController.onInteraciveChange(interactive == 1);
+                        break;
+                    }
                 }
                 maybeRunPendingJobsLocked();
                 // Don't remove JOB_EXPIRED in case one came along while processing the queue.
@@ -2343,6 +2351,12 @@ public class JobSchedulerService extends com.android.server.SystemService
             synchronized (mLock) {
                 return new JobStorePersistStats(mJobs.getPersistStats());
             }
+        }
+        @Override
+        public void onInteraciveChange(boolean isInteractive) {
+            Message msg = mHandler.obtainMessage(MSG_INTERACTIVE_CHANGED);
+            msg.arg1 = isInteractive ? 1 : 0;
+            mHandler.sendMessage(msg);
         }
     }
 
