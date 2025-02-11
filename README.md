@@ -360,6 +360,7 @@ https://support.huaweicloud.com/api-cph/cph_api_0559.html
 
 配置方式:
 aosp/vendor/common/android/etc/attributes.xml文件enable-vulkan新增包名
+~~~
 <?xml version='1.0' encoding='utf-8' standalone='yes' ?>
 <map>
     <set name="enable-vulkan">
@@ -367,5 +368,6 @@ aosp/vendor/common/android/etc/attributes.xml文件enable-vulkan新增包名
         <string>com.netease.sky</string>
     </set>
 </map>
+~~~
 注意：使用CMD命令添加的vulkan白名单在/data/etc/attributes.xml文件，自定义镜像预置vulkan白名单在/system/etc/attributes.xml文件，vulkan白名单实际为两个白名单文件的并集；
 
