@@ -3,7 +3,7 @@
 # 验证
 KEY="bIX7vyx6tjCK6pYx8LW9kiaGhxf0jSYEz6DNJtIQ3cWF8fK7AVG885v1M11CM8Ry3c5enJycg03CdnNP71AdpQ7ojYpBp97S2hqJTUHJ70xHqYbAwS0DX5nf9ZNAjaWd"
 # 指定克隆分支
-BRANCH_TAG="v1.0.1"
+BRANCH_TAG="v5.0.1"
 # 镜像别名
 IMG_NAME="galaxy-aosp9-001"
 # 编译服务器地址
