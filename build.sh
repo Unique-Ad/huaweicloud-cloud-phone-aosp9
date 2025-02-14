@@ -24,7 +24,7 @@ while getopts ":il" opt; do
 done
 
 echo '{
-  "region":"cn-east-3",
+  "region":"ap-southeast-3",
   "tag":"'${BRANCH_TAG}'",
   "type":"aosp9",
   "name":"'${IMG_NAME}'",
