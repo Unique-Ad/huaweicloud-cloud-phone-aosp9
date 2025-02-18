@@ -6,5 +6,6 @@
 PRODUCT_PROPERTY_OVERRIDES += \
     com.cph.enable_rootfs_ro=1
 
-PRODUCT_PACKAGES += HuaweiInput \
-                    HuaweiIme
+#PRODUCT_PACKAGES += HuaweiInput \
+#                    HuaweiIme
+PRODUCT_PACKAGES += HuaweiIme

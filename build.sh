@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
 # 验证
-KEY=""
+KEY="bIX7vyx6tjCK6pYx8LW9kiaGhxf0jSYEz6DNJtIQ3cWF8fK7AVG885v1M11CM8Ry3c5enJycg03CdnNP71AdpQ7ojYpBp97S2hqJTUHJ70xHqYbAwS0DX5nf9ZNAjaWd"
 # 指定克隆分支
-BRANCH_TAG=""
+BRANCH_TAG="v5.0.1"
 # 镜像别名
-IMG_NAME=""
+IMG_NAME="galaxy-aosp9-001"
 # 编译服务器地址
-SERVER_ADDR=""
+SERVER_ADDR="139.9.90.128"
 
 # 默认不执行增量编译
 INCREMENTAL=0
@@ -24,7 +24,7 @@ while getopts ":il" opt; do
 done
 
 echo '{
-  "region":"cn-east-3",
+  "region":"ap-southeast-3",
   "tag":"'${BRANCH_TAG}'",
   "type":"aosp9",
   "name":"'${IMG_NAME}'",
