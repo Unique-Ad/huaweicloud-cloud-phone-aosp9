@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='utf-8' standalone='yes' ?>
+<map>
+    <set name="disable-fbfetch">
+        <string>com.hermes.p6game</string>
+        <string>com.tencent.letsgo</string>
+    </set>
+    <set name="radv-disable-transcode-etc-soft">
+        <string>com.roblox.client</string>
+        <string>com.miHoYo.Nap</string>
+        <string>com.HoYoverse.Nap</string>
+    </set>
+    <set name="disable-map-discard">
+        <string>com.netease.dhxy</string>
+    </set>
+    <set name="auto-flush">
+        <string>com.youku.phone</string>
+    </set>
+    <set name="enable-vulkan">
+        <string>com.netease.sky</string>
+        <string>com.t2ksports.myteam</string>
+        <string>com.tgc.sky.android</string>
+        <string>com.miHoYo.Nap</string>
+        <string>com.activision.callofduty.warzone</string>
+        <string>com.roblox.client</string>
+        <string>com.HoYoverse.Nap</string>
+        <string>com.seasun.jx3</string>
+        <string>com.studiowildcard.wardrumstudios.ark</string>
+        <string>com.kakaogames.ares</string>
+        <string>jp.pokemon.pokemontcgp</string>
+        <string>com.gameloft.android.ANMP.GloftA9HM</string>
+        <string>com.hybeim.astra</string>        
+    </set>
+    <set name="gallium-thread">
+        <string>com.HoYoverse.hkrpgoversea</string>
+        <string>com.kurogame.wutheringwaves.global</string>
+        <string>com.miHoYo.GenshinImpact</string>
+        <string>com.kurogame.mingchao</string>
+        <string>com.miHoYo.Yuanshen</string>
+        <string>com.netease.dhxy</string>
+        <string>com.miHoYo.hkrpg</string>
+    </set>
+</map>

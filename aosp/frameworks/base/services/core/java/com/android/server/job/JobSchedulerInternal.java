@@ -74,6 +74,8 @@ public interface JobSchedulerInternal {
      */
     void reportAppUsage(String packageName, int userId);
 
+    void onInteraciveChange(boolean isInteractive);
+
     /**
      * Report a snapshot of sync-related jobs back to the sync manager
      */
