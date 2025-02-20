@@ -353,3 +353,21 @@ git push --tags
 https://support.huaweicloud.com/api-cph/cph_api_0559.html
 
 注意:同一个账号在同一个region下最多支持创建200个镜像文件
+
+##### 12. 自定义镜像预置vulkan白名单
+
+构建自定义镜像支持以xml文件的形式,预置vulkan白名单,预置后,白名单中的应用可以使用vulkan
+
+配置方式:
+aosp/vendor/common/android/etc/attributes.xml文件enable-vulkan新增包名
+~~~
+<?xml version='1.0' encoding='utf-8' standalone='yes' ?>
+<map>
+    <set name="enable-vulkan">
+        <string>com.next.netcraft</string> //这里添加包名
+        <string>com.netease.sky</string>
+    </set>
+</map>
+~~~
+注意：使用CMD命令添加的vulkan白名单在/data/etc/attributes.xml文件，自定义镜像预置vulkan白名单在/system/etc/attributes.xml文件，vulkan白名单实际为两个白名单文件的并集；
+
