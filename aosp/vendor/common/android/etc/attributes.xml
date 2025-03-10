@@ -3,6 +3,7 @@
     <set name="disable-fbfetch">
         <string>com.hermes.p6game</string>
         <string>com.tencent.letsgo</string>
+        <string>com.netease.yyslscn</string>
     </set>
     <set name="radv-disable-transcode-etc-soft">
         <string>com.roblox.client</string>
@@ -11,6 +12,7 @@
     </set>
     <set name="disable-map-discard">
         <string>com.netease.dhxy</string>
+        <string>com.netease.XY2Pocket</string>
     </set>
     <set name="auto-flush">
         <string>com.youku.phone</string>
@@ -29,7 +31,8 @@
         <string>jp.pokemon.pokemontcgp</string>
         <string>com.gameloft.android.ANMP.GloftA9HM</string>
         <string>com.hybeim.astra</string>
-        <string>fisheye</string>        
+        <string>fisheye</string>
+        <string>com.wemade.ymir</string>
     </set>
     <set name="gallium-thread">
         <string>com.HoYoverse.hkrpgoversea</string>
@@ -39,5 +42,7 @@
         <string>com.miHoYo.Yuanshen</string>
         <string>com.netease.dhxy</string>
         <string>com.miHoYo.hkrpg</string>
+        <string>com.netease.yyslscn</string>
+        <string>com.netease.XY2Pocket</string>
     </set>
 </map>
