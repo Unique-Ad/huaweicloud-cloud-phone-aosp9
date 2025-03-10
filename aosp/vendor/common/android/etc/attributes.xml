@@ -28,7 +28,8 @@
         <string>com.kakaogames.ares</string>
         <string>jp.pokemon.pokemontcgp</string>
         <string>com.gameloft.android.ANMP.GloftA9HM</string>
-        <string>com.hybeim.astra</string>        
+        <string>com.hybeim.astra</string>
+        <string>fisheye</string>        
     </set>
     <set name="gallium-thread">
         <string>com.HoYoverse.hkrpgoversea</string>
