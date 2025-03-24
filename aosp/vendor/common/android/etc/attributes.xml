@@ -33,6 +33,15 @@
         <string>com.hybeim.astra</string>
         <string>fisheye</string>
         <string>com.wemade.ymir</string>
+        <string>com.papegames.infinitynikki</string>
+        <string>com.infoldgames.infinitynikkien</string>
+        <string>com.epicgames.fortnite</string>
+        <string>com.cmge.xianjianshijie</string>
+        <string>com.DefaultCompany.Unity</string>
+        <string>com.tjhry.zhanjing.hry</string>
+        <string>com.xd.cfbmf</string>
+        <string>com.youkuss.yldr</string>
+        <string>com.hybeim.astra</string>
     </set>
     <set name="gallium-thread">
         <string>com.HoYoverse.hkrpgoversea</string>
