@@ -41,7 +41,7 @@
         <string>com.tjhry.zhanjing.hry</string>
         <string>com.xd.cfbmf</string>
         <string>com.youkuss.yldr</string>
-        <string>com.hybeim.astra</string>
+        <string>com.hybeim.astra</string>     
     </set>
     <set name="gallium-thread">
         <string>com.HoYoverse.hkrpgoversea</string>
