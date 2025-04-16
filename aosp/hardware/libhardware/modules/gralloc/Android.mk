@@ -30,7 +30,7 @@ LOCAL_SRC_FILES := 	\
 
 LOCAL_HEADER_LIBRARIES := libhardware_headers
 
-LOCAL_MODULE := gralloc.default
+LOCAL_MODULE := gralloc_ori.default
 LOCAL_CFLAGS:= -DLOG_TAG=\"gralloc\" -Wno-missing-field-initializers
 ifeq ($(TARGET_USE_PAN_DISPLAY),true)
 LOCAL_CFLAGS += -DUSE_PAN_DISPLAY=1

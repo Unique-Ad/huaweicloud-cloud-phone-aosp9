@@ -13,7 +13,7 @@
 // limitations under the License.
 
 cc_library_shared {
-    name: "camera.default",
+    name: "camera_ori.default",
     relative_install_path: "hw",
 
     include_dirs: [
