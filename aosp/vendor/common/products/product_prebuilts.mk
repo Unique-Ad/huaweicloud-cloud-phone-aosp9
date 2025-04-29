@@ -4,29 +4,22 @@
 #
 
 PRODUCT_PACKAGES += \
-    libVmiStream \
     libCPHMediaEngine \
     libCPHVideoEngine \
     libCPHTurboVideoEngine \
     libCPHMediaServer \
     libCaptureEngine \
     libVmiOperation \
-    libCPHIVmiAudio \
-    libCPHVmiAudioRecord \
-    libvmiservice \
     libVmiCJSON \
     libVmiMediaCommon \
     libEncodeEngine \
     libVmiDevice \
-    sipcserver \
-    libSipc \
     libavcodec \
     libavformat \
     libavutil \
     libswresample \
     libd310encode \
     libRemoteEncoder \
-    libVmiShareMem \
     libevent \
     libLLVM13 \
     libGLES_mesa \
@@ -63,7 +56,6 @@ PRODUCT_COPY_FILES += \
     vendor/common/android/prebuilts/system/vendor/bin/CloudAppEngine:system/vendor/bin/CloudAppEngine \
     vendor/common/android/prebuilts/system/lib64/libcurl.so:system/lib64/libcurl.so \
     vendor/common/android/prebuilts/system/etc/init/media-engine.rc:system/etc/init/media-engine.rc \
-    vendor/common/android/prebuilts/system/vendor/etc/init/sipcserver.rc:system/vendor/etc/init/sipcserver.rc \
     vendor/common/android/prebuilts/system/usr/keylayout/Vendor_0001_Product_0001.kl:system/usr/keylayout/Vendor_0001_Product_0001.kl \
     vendor/common/android/prebuilts/system/usr/keylayout/Vendor_0002_Product_0002.kl:system/usr/keylayout/Vendor_0002_Product_0002.kl \
     vendor/common/android/media/audio_policy.conf:system/etc/audio_policy.conf
