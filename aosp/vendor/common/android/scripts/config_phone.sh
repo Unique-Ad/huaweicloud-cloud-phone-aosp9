@@ -19,6 +19,10 @@ if [[ $ret -eq 0 ]]; then
     settings put secure android_id ${android_id}
 fi
 
+# run ni_rsrc_mon to init Netint encode card when we found encode card
+[[ -b /dev/nvme0n1 ]] && /vendor/bin/ni_rsrc_mon
+
+
 # extend funcion sh
 [[ -f /system/bin/extend_func.sh ]] && timeout -s 9 10 sh /system/bin/extend_func.sh
 [[ -f /data/local/tmp/extend_custom.sh ]] && timeout -s 9 10 sh /data/local/tmp/extend_custom.sh

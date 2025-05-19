@@ -13,7 +13,7 @@
 // limitations under the License.
 
 cc_library_shared {
-    name: "vibrator.default",
+    name: "vibrator_ori.default",
 
     // HAL module implementation stored in
     // hw/<VIBRATOR_HARDWARE_MODULE_ID>.default.so

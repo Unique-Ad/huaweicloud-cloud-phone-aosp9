@@ -5,12 +5,12 @@
 
 PRODUCT_PACKAGES += \
     kauditd \
-    hwcomposer.huawei \
-    gralloc.$(BUILD_HARDWARE) \
-    sensors.$(BUILD_HARDWARE) \
-    camera.$(BUILD_HARDWARE) \
-    gps.$(BUILD_HARDWARE) \
-    vibrator.$(BUILD_HARDWARE) \
+    hwcomposer.default \
+    gralloc.default \
+    sensors.default \
+    camera.default \
+    gps.default \
+    vibrator.default \
     android.hardware.audio@2.0-impl \
     android.hardware.audio.effect@2.0-impl \
     android.hardware.bluetooth@1.0-impl \
@@ -25,7 +25,7 @@ PRODUCT_PACKAGES += \
     android.hardware.vibrator@1.0-impl \
     android.hardware.wifi@1.0-service \
     android.hardware.nidec@1.0-impl \
-    audio.primary.hi3660 \
+    audio.primary.default \
     libGLES_mesa \
     vulkan.radv \
     libGLESv1_CM_slow_binding \
@@ -42,7 +42,8 @@ PRODUCT_PACKAGES += \
     wpa_supplicant \
     CphNetworkLocation \
     ni_rsrc_mon \
-    audio.r_submix.default
+    audio.r_submix.default \
+    appctrl
 
 PRODUCT_PROPERTY_OVERRIDES += \
     persist.sys.language=zh \
