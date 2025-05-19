@@ -18,7 +18,6 @@ PRODUCT_PACKAGES += \
     libVmiMediaCommon \
     libEncodeEngine \
     libVmiDevice \
-    audio.primary.$(BUILD_HARDWARE) \
     sipcserver \
     libSipc \
     libavcodec \
