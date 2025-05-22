@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
 # 验证
-KEY=""
+KEY="h8EmGNwP2vGM5dNaWSXHMuq4dZQWpI1vgMH97dHBtnPaKrYObibt1LuVCZHSxS1uSm3NznRdKSTrWkmn6A8Q5mAoFNaZ3wp4M3YbVvP25V903Te5n947GOZFlxb0tayv"
 # 指定克隆分支
-BRANCH_TAG=""
+BRANCH_TAG="v5.6.1"
 # 镜像别名
-IMG_NAME=""
+IMG_NAME="H5Image_test"
 # 编译服务器地址
-SERVER_ADDR=""
+SERVER_ADDR="139.9.192.28"
 
 # 默认不执行增量编译
 INCREMENTAL=0
