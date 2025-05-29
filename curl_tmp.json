@@ -1,7 +1,7 @@
 {
-  "region":"cn-east-3",
+  "region":"ap-southeast-3",
   "tag":"v5.6.1",
   "type":"aosp9",
   "name":"H5Image_test",
-  "incrementalBuild":"0"
+  "incrementalBuild":"1"
 }
